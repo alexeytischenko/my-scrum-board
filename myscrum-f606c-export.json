@@ -1,0 +1,94 @@
+{
+  "projects" : {
+    "mSmxxvKkt4ei6nL80Krmt9R0m983" : {
+	    "-KPYfOOS14_Io1kP_cVr" : {
+	      "name" : "APS"
+	    },
+	    "-KPYfOO678_Io1kP_cVr" : {
+	      "name" : "DLIB"
+	    }
+    },
+    "-KPYfOOS14_Io1kP_oor" : {
+      	"-KPYfOOS14_Io1kP_mmm" : {
+	      "name" : "Default"
+	    }
+    }
+  },
+	"sprint" : {
+    "mSmxxvKkt4ei6nL80Krmt9R0m983" : {
+	    "kt4ei6nL80Kr543" : {
+	      "name" : "APS version update",
+				"project" : "-KPYfOOS14_Io1kP_cVr",
+				"created": 1459361875337,
+				"updated": 1459361875337,
+				"status" : "in progress",
+				"description" : "Update to new version",
+				"attachments" : {
+					"80Kr8898mt" : {
+						"name" : "screen",
+						"fileURl" : "gs://friendlychat-955db.appspot.com/Hs708P7JMnbHKiPsQ7IvYOFVQdN2/1471879803618/rue0397659c8b.jpg"
+					}
+				} 
+	    },
+	    "mxxdssKkt4ei6" : {
+	      "name" : "DLIB add new keyboard",
+				"project" : "-KPYfOO678_Io1kP_cVr",
+				"created": 1459361875337,
+				"updated": 1459361875337,
+				"status" : "resolved",
+				"description" : "Добавить новую \"клавиатуру\"",
+				"attachments" : {} 
+	    }
+    },
+    "-KPYfOOS14_Io1kP_oor" : {
+      "mSmxxvKkt" : {
+	      "name" : "Default",
+				"project" : "-KPYfOOS14_Io1kP_mmm",
+				"created": 1459361875337,
+				"updated": 1459361875337,
+				"status" : "in progress",
+				"description" : "",
+				"attachments" : {} 
+	    }
+    }
+  },
+
+	"backlog" : {
+    "mSmxxvKkt4ei6nL80Krmt9R0m983" : {
+				"kt4ei6nL80Krmt" : {
+					"name" : "APS bug fixes",
+					"project" : "-KPYfOOS14_Io1kP_cVr",
+					"created": 1459361875337,
+					"updated": 1459361875337,
+					"status" : "in progress",
+					"description" : "Minor layout buds need to be fixed",
+					"attachments" : {
+						"80Krmt" : {
+							"name" : "screen shot 1",
+							"fileURl" : "gs://friendlychat-955db.appspot.com/Hs708P7JMnbHKiPsQ7IvYOFVQdN2/1471879803618/rue0397659c8b.jpg"
+						}
+					} 
+				},
+				"mxxvKkt4ei6" : {
+					"name" : "DLIB pdf.js merge",
+					"project" : "-KPYfOO678_Io1kP_cVr",
+					"created": 1459361875337,
+					"updated": 1459361875337,
+					"status" : "in progress",
+					"description" : "Замержить!!!",
+					"attachments" : {} 
+				}
+    },
+    "-KPYfOOS14_Io1kP_oor" : {
+				"mSmxxvKkt" : {
+					"name" : "Default",
+					"project" : "-KPYfOOS14_Io1kP_mmm",
+					"created": 1459361875337,
+					"updated": 1459361875337,
+					"status" : "in progress",
+					"description" : "",
+					"attachments" : {} 
+				}
+    }
+  }
+}
