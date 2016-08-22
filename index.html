@@ -1,0 +1,174 @@
+<html>
+  <head>
+    <title>myScrum</title>
+    
+<script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-database.js"></script>
+
+<!-- Leave out Storage -->
+<!-- <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-storage.js"></script> -->
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCRZWu8li8yP4Kqbg9YKlN5G8IAIBt-suA",
+    authDomain: "myscrum-f606c.firebaseapp.com",
+    databaseURL: "https://myscrum-f606c.firebaseio.com",
+    storageBucket: "myscrum-f606c.appspot.com",
+  };
+  firebase.initializeApp(config);
+</script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="node_modules/es6-shim/es6-shim.min.js"></script>
+    <script src="node_modules/zone.js/dist/zone.js"></script>
+    <script src="node_modules/reflect-metadata/Reflect.js"></script>
+    <script src="node_modules/systemjs/dist/system.src.js"></script>
+    <script src="systemjs.config.js"></script>
+    <script>
+      System.import('app').catch(function(err) { console.error(err);  });
+    </script>
+    <style>
+      h1, h2, h3 {
+          margin-top: 1px;
+          margin-bottom: 5px;
+      }
+      h1 {font-size: 16px;}
+      h2 {font-size: 14px;}
+    </style>
+
+<style>
+  #jquery-script-menu {
+    position: fixed;
+    height: 40px;
+    width: 100%;
+    top: 0;
+    left: 0;
+    border-top: 5px solid #316594;
+    background: #fff;
+    -moz-box-shadow: 0 2px 3px 0px rgba(0, 0, 0, 0.16);
+    -webkit-box-shadow: 0 2px 3px 0px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 2px 3px 0px rgba(0, 0, 0, 0.16);
+    z-index: 999999;
+    padding: 10px 0;
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+}
+.jquery-script-center {
+    width: 90%;
+    margin: 0 auto;
+}
+    body { background-color:#fafafa;}
+        .table-sortable {
+            position: relative;
+        }
+        .table-sortable .sortable-placeholder {
+            height: 37px;
+        }
+        .table-sortable .sortable-placeholder:after {
+            position: absolute;
+            z-index: 10;
+            content: " ";
+            height: 37px;
+            background: #f9f9f9;
+            left: 0;
+            right: 0;
+        }
+	</style>
+  </head>
+  <body>
+<div id="jquery-script-menu">
+<div class="jquery-script-center">
+   <div class="row">
+     <div class="col-sm-9">
+      <h1>Scrum Board</h1>
+      <h2>Backlog</h2>
+     </div>
+     <div class="col-sm-2">
+        <button class="btn btn-primary">
+          Create
+          <span class="hidden-xs">task</span>
+        </button>
+     </div>
+     <div class="col-sm-1">
+       <button class="btn btn-default" onclick="void($('#MySplitter').trigger('toggleDock'));">
+         <span class="glyphicon glyphicon-resize-horizontal">
+         </span>
+       </button>
+        <button class="btn btn-default">
+          <span class="glyphicon glyphicon-menu-up"></span>
+        </button>
+     </div>
+  </div>
+</div>
+</div>
+    <div class="container" style="margin-top:90px;">
+        
+
+
+		 <section>
+                    <h2>Active sprint (25 issues)</h2>
+
+                        <div class="row">
+                            <ul class="list-group list-group-sortable-connected">
+                                <li class="list-group-item list-group-item-info">Cras justo odio</li>
+                                <li class="list-group-item list-group-item-info">Dapibus ac facilisis in</li>
+                                <li class="list-group-item list-group-item-info">Morbi leo risus</li>
+                                <li class="list-group-item list-group-item-info">Porta ac consectetur ac</li>
+                                <li class="list-group-item list-group-item-info">Vestibulum at eros</li>
+                            </ul>
+                        </div>
+
+
+                </section>
+                <section>
+                    <h2>Backlog (125 issues)</h2>
+
+                        <div class="row">
+                            <ul class="list-group list-group-sortable-connected">
+                                <li class="list-group-item list-group-item-success">Cras justo odio</li>
+                                <li class="list-group-item list-group-item-success">Dapibus ac facilisis in</li>
+                                <li class="list-group-item list-group-item-success">Morbi leo risus</li>
+                                <li class="list-group-item list-group-item-success">Porta ac consectetur ac</li>
+                                <li class="list-group-item list-group-item-success">Vestibulum at eros</li>
+                            </ul>
+                        </div>
+
+                </section>
+	</div>
+	
+
+			    
+    <bookmark-app>Loading...</bookmark-app>
+					
+		
+		<!--<p><a href="javascript:void($('#MySplitter').trigger('toggleDock'))">trigger toggleDock</a></p>
+		<p><a href="javascript:void($('#MySplitter').trigger('dock'))">trigger dock</a></p>
+		<p><a href="javascript:void($('#MySplitter').trigger('undock'))">trigger undock</a></p>
+		<p><a href="javascript:void($('#MySplitter').trigger('destroy'))">trigger destroy</a></p>-->
+
+
+
+</div>
+            
+    </div>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script src="jquery.sortable.js"></script>
+	<script>
+		$(function() {
+            $('.list-group-sortable-connected').sortable({
+                placeholderClass: 'list-group-item',
+                connectWith: '.connected'
+            });
+		});
+	</script>
+
+
+
+  </body>
+</html>
