@@ -19,6 +19,7 @@
 	    "kt4ei6nL80Kr543" : {
 	      "name" : "APS version update",
 				"project" : "-KPYfOOS14_Io1kP_cVr",
+				"sortnum" : 1,
 				"created": 1459361875337,
 				"updated": 1459361875337,
 				"status" : "in progress",
@@ -33,6 +34,7 @@
 	    "mxxdssKkt4ei6" : {
 	      "name" : "DLIB add new keyboard",
 				"project" : "-KPYfOO678_Io1kP_cVr",
+				"sortnum" : 2,
 				"created": 1459361875337,
 				"updated": 1459361875337,
 				"status" : "resolved",
@@ -44,6 +46,7 @@
       "mSmxxvKkt" : {
 	      "name" : "Default",
 				"project" : "-KPYfOOS14_Io1kP_mmm",
+				"sortnum" : 1,
 				"created": 1459361875337,
 				"updated": 1459361875337,
 				"status" : "in progress",
@@ -58,6 +61,7 @@
 				"kt4ei6nL80Krmt" : {
 					"name" : "APS bug fixes",
 					"project" : "-KPYfOOS14_Io1kP_cVr",
+					"sortnum" : 1,
 					"created": 1459361875337,
 					"updated": 1459361875337,
 					"status" : "in progress",
@@ -72,6 +76,7 @@
 				"mxxvKkt4ei6" : {
 					"name" : "DLIB pdf.js merge",
 					"project" : "-KPYfOO678_Io1kP_cVr",
+					"sortnum" : 2,
 					"created": 1459361875337,
 					"updated": 1459361875337,
 					"status" : "in progress",
@@ -83,6 +88,7 @@
 				"mSmxxvKkt" : {
 					"name" : "Default",
 					"project" : "-KPYfOOS14_Io1kP_mmm",
+					"sortnum" : 1,
 					"created": 1459361875337,
 					"updated": 1459361875337,
 					"status" : "in progress",

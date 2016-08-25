@@ -1,4 +1,4 @@
-System.register(['@angular/core', '@angular/platform-browser', '@angular/forms', '@angular/http', './bookmark.service', './app.component', './bookmark-edit.component', './bookmark-list.component'], function(exports_1, context_1) {
+System.register(['@angular/core', '@angular/platform-browser', '@angular/forms', '@angular/router', '@angular/http', './task.service', './app.component', './task.component', './scrum-board.component'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,8 +10,8 @@ System.register(['@angular/core', '@angular/platform-browser', '@angular/forms',
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, platform_browser_1, forms_1, http_1, bookmark_service_1, app_component_1, bookmark_edit_component_1, bookmark_list_component_1;
-    var AppModule;
+    var core_1, platform_browser_1, forms_1, router_1, http_1, task_service_1, app_component_1, task_component_1, scrum_board_component_1;
+    var routerModule, AppModule;
     return {
         setters:[
             function (core_1_1) {
@@ -23,30 +23,51 @@ System.register(['@angular/core', '@angular/platform-browser', '@angular/forms',
             function (forms_1_1) {
                 forms_1 = forms_1_1;
             },
+            function (router_1_1) {
+                router_1 = router_1_1;
+            },
             function (http_1_1) {
                 http_1 = http_1_1;
             },
-            function (bookmark_service_1_1) {
-                bookmark_service_1 = bookmark_service_1_1;
+            function (task_service_1_1) {
+                task_service_1 = task_service_1_1;
             },
             function (app_component_1_1) {
                 app_component_1 = app_component_1_1;
             },
-            function (bookmark_edit_component_1_1) {
-                bookmark_edit_component_1 = bookmark_edit_component_1_1;
+            function (task_component_1_1) {
+                task_component_1 = task_component_1_1;
             },
-            function (bookmark_list_component_1_1) {
-                bookmark_list_component_1 = bookmark_list_component_1_1;
+            function (scrum_board_component_1_1) {
+                scrum_board_component_1 = scrum_board_component_1_1;
             }],
         execute: function() {
+            routerModule = router_1.RouterModule.forRoot([
+                {
+                    path: 'login',
+                    component: scrum_board_component_1.ScrumBoard
+                },
+                {
+                    path: 'tasks',
+                    component: scrum_board_component_1.ScrumBoard
+                },
+                {
+                    path: 'tasks/:tasktId',
+                    component: task_component_1.TaskComponent
+                },
+                {
+                    path: '',
+                    component: scrum_board_component_1.ScrumBoard,
+                }
+            ]);
             AppModule = (function () {
                 function AppModule() {
                 }
                 AppModule = __decorate([
                     core_1.NgModule({
-                        imports: [platform_browser_1.BrowserModule, forms_1.FormsModule, http_1.HttpModule],
-                        declarations: [app_component_1.AppComponent, bookmark_list_component_1.BookmarkListComponent, bookmark_edit_component_1.BookmarkEditComponent],
-                        providers: [bookmark_service_1.BookmarkService],
+                        imports: [platform_browser_1.BrowserModule, forms_1.FormsModule, http_1.HttpModule, routerModule],
+                        declarations: [app_component_1.AppComponent, scrum_board_component_1.ScrumBoard, task_component_1.TaskComponent],
+                        providers: [task_service_1.TaskService],
                         bootstrap: [app_component_1.AppComponent]
                     }), 
                     __metadata('design:paramtypes', [])

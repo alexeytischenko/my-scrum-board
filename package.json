@@ -1,6 +1,6 @@
 {
-  "name": "shared-bookmarks",
-  "version": "1.0.5",
+  "name": "my-scrum-board",
+  "version": "1.0.0",
   "scripts": {
     "build": "tsc",
     "serve": "tsc && concurrently \"tsc -w\" lite-server",
@@ -14,6 +14,7 @@
     "@angular/http": "2.0.0-rc.5",
     "@angular/platform-browser": "2.0.0-rc.5",
     "@angular/platform-browser-dynamic": "2.0.0-rc.5",
+    "@angular/router": "3.0.0-rc.1",
     "bootstrap": "3.3.6",
     "es6-shim": "0.35.1",
     "firebase": "3.3.0",
