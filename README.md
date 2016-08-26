@@ -1,7 +1,7 @@
-# Shared Bookmarks
+# myScrumBoard
 
-An Angular 2 web application that lets users view and manage shared bookmarks.
-Used to demonstrate how to use the HTTP Client to make requests and integrate with a REST backend (Firebase).
+An Angular 2 web application that lets manage your tasks in a scrum manner.
+The application use the HTTP Client to make requests and integrate with a REST backend (Firebase).
 
 To work on this project:
 
@@ -9,4 +9,3 @@ To work on this project:
 * Run `npm run build` to compile the TypeScript code in the `src` folder into ES5 code into the `app` folder.
 * Run `npm run serve` to start a local development web server. You can now access the application at [localhost:8080](http://localhost:8080/).
 
-This example is part of the **Angular 2 From The Ground Up** course by Mirko Nasato.
