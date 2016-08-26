@@ -6,8 +6,18 @@ System.register([], function(exports_1, context_1) {
         setters:[],
         execute: function() {
             Task = (function () {
-                function Task() {
-                    this.attachments = [];
+                function Task(name, project, sortnum, estimate, created, updated, status, description, attachments, comments, worklog) {
+                    this.name = name;
+                    this.project = project;
+                    this.sortnum = sortnum;
+                    this.estimate = estimate;
+                    this.created = created;
+                    this.updated = updated;
+                    this.status = status;
+                    this.description = description;
+                    this.attachments = attachments;
+                    this.comments = comments;
+                    this.worklog = worklog;
                 }
                 return Task;
             }());

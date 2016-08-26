@@ -1,4 +1,4 @@
-System.register(['@angular/core', '@angular/http'], function(exports_1, context_1) {
+System.register(['@angular/core', '@angular/http', './task.class'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,7 +10,7 @@ System.register(['@angular/core', '@angular/http'], function(exports_1, context_
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, http_1;
+    var core_1, http_1, task_class_1;
     var TaskService;
     return {
         setters:[
@@ -19,6 +19,9 @@ System.register(['@angular/core', '@angular/http'], function(exports_1, context_
             },
             function (http_1_1) {
                 http_1 = http_1_1;
+            },
+            function (task_class_1_1) {
+                task_class_1 = task_class_1_1;
             }],
         execute: function() {
             TaskService = (function () {
@@ -48,6 +51,20 @@ System.register(['@angular/core', '@angular/http'], function(exports_1, context_
                         .then(function (response) { return _this.convert(response.json()); })
                         .catch(this.errorHandler);
                 };
+                TaskService.prototype.getSprintTask = function (id) {
+                    var _this = this;
+                    return this.http.get(this.baseUrl + "/sprint/mSmxxvKkt4ei6nL80Krmt9R0m983/" + id + ".json")
+                        .toPromise()
+                        .then(function (response) { return _this.convertToTask(response.json()); })
+                        .catch(this.errorHandler);
+                };
+                TaskService.prototype.getBackLogTask = function (id) {
+                    var _this = this;
+                    return this.http.get(this.baseUrl + "/backlog/mSmxxvKkt4ei6nL80Krmt9R0m983/" + id + ".json")
+                        .toPromise()
+                        .then(function (response) { return _this.convert(response.json()); })
+                        .catch(this.errorHandler);
+                };
                 TaskService.prototype.removeBookmark = function (bookmark) {
                     return this.http.delete(this.baseUrl + "/tasks/" + bookmark.id + ".json")
                         .toPromise()
@@ -62,12 +79,17 @@ System.register(['@angular/core', '@angular/http'], function(exports_1, context_
                         .toPromise()
                         .catch(this.errorHandler);
                 };
+                TaskService.prototype.convertToTask = function (taskJson) {
+                    return new task_class_1.Task(taskJson.name, taskJson.project, taskJson.sortnum, taskJson.estimate, taskJson.created, taskJson.updated, taskJson.status, taskJson.description, [], [], []);
+                };
                 TaskService.prototype.convert = function (parsedResponse) {
                     return Object.keys(parsedResponse)
                         .map(function (id) { return ({
+                        id: id,
                         name: parsedResponse[id].name,
                         project: parsedResponse[id].project,
                         sortnum: parsedResponse[id].sortnum,
+                        estimate: parsedResponse[id].estimate
                     }); });
                     // .sort((a, b) => a.name.localeCompare(b.name));
                 };

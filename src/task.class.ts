@@ -1,13 +1,17 @@
 
 export class Task {
 
-    name : string;
-    project : string;
-    sort : number;
-    created : number;
-    updated : number;
-    status : string;
-    description : string;
-    attachments = []; 
-    
-}
+    constructor (
+        private name: string, 
+        private project : string, 
+        private sortnum : number, 
+        private estimate : number, 
+        private created : number, 
+        private updated : number, 
+        private status : string, 
+        private description : string, 
+        private attachments : any[], 
+        private comments : any[], 
+        private worklog : any[]) {
+    }
+ }

@@ -10,7 +10,11 @@ import { TaskService } from './task.service';
       <div class="row">
           <ul class="list-group list-group-sortable-connected-exclude">
               <li class="list-group-item disabled">Active sprint ({{sprint.length}} issues)</li>
-              <li *ngFor="let taskElement of sprint" class="list-group-item">{{taskElement.name}}</li>
+              <li *ngFor="let taskElement of sprint" class="list-group-item">
+                <a [routerLink]="['/tasks', taskElement.id]">{{taskElement.name}}</a> 
+                <span class="label label-default">{{taskElement.project}}</span> 
+                <span class="badge">{{taskElement.estimate}}h</span>
+              </li>
           </ul>
       </div>
     </section>
@@ -18,7 +22,11 @@ import { TaskService } from './task.service';
       <div class="row">
           <ul class="list-group list-group-sortable-connected-exclude">
               <li class="list-group-item disabled">Backlog ({{backLog.length}} issues)</li>
-              <li class="list-group-item" *ngFor="let taskElement of backLog">{{taskElement.name}}</li>
+              <li class="list-group-item" *ngFor="let taskElement of backLog">
+                {{taskElement.name}} 
+                <span class="label label-default">{{taskElement.project}}</span> 
+                <span class="badge">{{taskElement.estimate}}h</span>
+              </li>
           </ul>
       </div>
     </section>

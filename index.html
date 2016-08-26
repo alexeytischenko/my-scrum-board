@@ -38,6 +38,9 @@
       }
       h1 {font-size: 16px;}
       h2 {font-size: 14px;}
+      .progress {
+        height: 10px;
+      }
     </style>
 
 <style>
@@ -84,18 +87,18 @@
 <div id="jquery-script-menu">
 <div class="jquery-script-center">
    <div class="row">
-     <div class="col-sm-9">
+     <div class="col-sm-6">
       <h1>Scrum Board</h1>
       <h2>Backlog</h2>
      </div>
-     <div class="col-sm-2">
+     <div class="col-sm-3">
         <button class="btn btn-primary">
-          Create
-          <span class="hidden-xs">task</span>
+          <span class="glyphicon glyphicon-plus-sign"></span>
+          <span class="hidden-xs">Create task</span>
         </button>
      </div>
-     <div class="col-sm-1">
-       <button class="btn btn-default" onclick="void($('#MySplitter').trigger('toggleDock'));">
+     <div class="col-sm-3">
+       <button class="btn btn-default">
          <span class="glyphicon glyphicon-resize-horizontal">
          </span>
        </button>
@@ -103,6 +106,10 @@
           <span class="glyphicon glyphicon-menu-up"></span>
         </button>
      </div>
+  </div>
+  <div class="row progress">
+        <div class="progress-bar progress-bar-striped active progress-bar-xs" role="progressbar"
+        aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:50%"></div>
   </div>
 </div>
 </div>  
