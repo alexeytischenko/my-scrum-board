@@ -1,6 +1,6 @@
 {
-  "name": "Friendly Chat",
-  "short_name": "Friendly Chat",
+  "name": "My Scrum Board",
+  "short_name": "myScrumBoard",
   "start_url": "/index.html",
   "display": "standalone",
   "orientation": "portrait"

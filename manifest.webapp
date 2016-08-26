@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "name": "My Scrum Board",
+  "launch_path": "/index.html",
+  "description": "Agile style task manager",
+  "developer": {
+    "name": "Alexey Tishchenko",
+    "url": "http://anakiapps.com"
+  },
+  "installs_allowed_from": [
+    "*"
+  ],
+  "default_locale": "en",
+  "permissions": {
+  },
+  "locales": {
+    "en": {
+      "name": "My Scrum Board",
+      "description": "Agile style task manager"
+    }
+  }
+}
