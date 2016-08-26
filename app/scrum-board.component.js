@@ -54,17 +54,29 @@ System.register(['@angular/core', './task.service'], function(exports_1, context
                     // this.clear();
                 };
                 ScrumBoard.prototype.reload = function () {
+                    var _this = this;
                     var self = this;
-                    this.taskService.getBackLog()
-                        .then(function (tasks) {
-                        self.backLog = tasks;
-                        setTimeout(function () { return self.rebuildSortable(); }, 1000);
+                    progress_start("");
+                    var backLogRef = firebase.database().ref('/backlog/mSmxxvKkt4ei6nL80Krmt9R0m983');
+                    backLogRef.off();
+                    backLogRef.on('value', function (snapshot) { return _this.backLog = _this.convert(snapshot.val()); });
+                    var sprintRef = firebase.database().ref('/sprint/mSmxxvKkt4ei6nL80Krmt9R0m983');
+                    sprintRef.off();
+                    sprintRef.on('value', function (snapshot) {
+                        self.sprint = self.convert(snapshot.val());
+                        progress_end();
                     });
-                    this.taskService.getSprint()
-                        .then(function (tasks) {
-                        self.sprint = tasks;
-                        setTimeout(function () { return self.rebuildSortable(); }, 1000);
-                    });
+                    setTimeout(function () { return _this.rebuildSortable(); }, 1000);
+                    // this.taskService.getBackLog()
+                    //    .then(function(tasks) { 
+                    //       self.backLog = tasks;
+                    //       setTimeout(() => self.rebuildSortable(), 1000);
+                    // });
+                    // this.taskService.getSprint()
+                    //    .then(function(tasks) { 
+                    //       self.sprint = tasks;
+                    //       setTimeout(() => self.rebuildSortable(), 1000);
+                    // });
                 };
                 ScrumBoard.prototype.ngOnInit = function () {
                     //this.reload();
@@ -79,13 +91,26 @@ System.register(['@angular/core', './task.service'], function(exports_1, context
                         .bind('sortupdate', function (e, ui) {
                         //ui.item contains the current dragged element.
                         //Triggered when the user stopped sorting and the DOM position has changed.
+                        progress_start("red");
                         console.log('element1: ' + ui.item.val());
                     });
+                };
+                ScrumBoard.prototype.convert = function (objectedResponse) {
+                    return Object.keys(objectedResponse)
+                        .map(function (id) { return ({
+                        id: id,
+                        name: objectedResponse[id].name,
+                        project: objectedResponse[id].project,
+                        sortnum: objectedResponse[id].sortnum,
+                        estimate: objectedResponse[id].estimate,
+                        status: objectedResponse[id].status
+                    }); });
+                    // .sort((a, b) => a.name.localeCompare(b.name));
                 };
                 ScrumBoard = __decorate([
                     core_1.Component({
                         selector: 'scrum-board',
-                        template: "\n    <section>\n      <div class=\"row\">\n          <ul class=\"list-group list-group-sortable-connected-exclude\">\n              <li class=\"list-group-item disabled\">Active sprint ({{sprint.length}} issues)</li>\n              <li *ngFor=\"let taskElement of sprint\" class=\"list-group-item\">\n                <a [routerLink]=\"['/tasks', taskElement.id]\">{{taskElement.name}}</a> \n                <span class=\"label label-default\">{{taskElement.project}}</span> \n                <span class=\"badge\">{{taskElement.estimate}}h</span>\n              </li>\n          </ul>\n      </div>\n    </section>\n    <section>\n      <div class=\"row\">\n          <ul class=\"list-group list-group-sortable-connected-exclude\">\n              <li class=\"list-group-item disabled\">Backlog ({{backLog.length}} issues)</li>\n              <li class=\"list-group-item\" *ngFor=\"let taskElement of backLog\">\n                {{taskElement.name}} \n                <span class=\"label label-default\">{{taskElement.project}}</span> \n                <span class=\"badge\">{{taskElement.estimate}}h</span>\n              </li>\n          </ul>\n      </div>\n    </section>\n  ",
+                        template: "\n    <section>\n      <div class=\"row\">\n          <ul class=\"list-group list-group-sortable-connected-exclude\">\n              <li class=\"list-group-item disabled\">Active sprint ({{sprint.length}} issues)</li>\n              <li *ngFor=\"let taskElement of sprint\" class=\"list-group-item\">\n                <a [routerLink]=\"['/tasks', taskElement.id]\" [style.text-decoration]=\"taskElement.status==='resolved' ? 'line-through' : 'none'\">{{taskElement.name}}</a> \n                <span class=\"label label-default\">{{taskElement.project}}</span> \n                <span class=\"badge\">{{taskElement.estimate}}h</span>\n              </li>\n          </ul>\n      </div>\n    </section>\n    <section>\n      <div class=\"row\">\n          <ul class=\"list-group list-group-sortable-connected-exclude\">\n              <li class=\"list-group-item disabled\">Backlog ({{backLog.length}} issues)</li>\n              <li class=\"list-group-item\" *ngFor=\"let taskElement of backLog\">\n                {{taskElement.name}} \n                <span class=\"label label-default\">{{taskElement.project}}</span> \n                <span class=\"badge\">{{taskElement.estimate}}h</span>\n              </li>\n          </ul>\n      </div>\n    </section>\n  ",
                     }), 
                     __metadata('design:paramtypes', [task_service_1.TaskService])
                 ], ScrumBoard);

@@ -10,47 +10,51 @@ import { Subscription } from 'rxjs/Subscription';
   template: `
     <div class="panel panel-primary">
       <div class="panel-body">
-
+        <div style="float:right;">
+            <a [routerLink]="['/']" class="btn btn-default">
+              <span class="glyphicon glyphicon-chevron-left"></span>
+              <span class="hidden-xs">Back</span>
+            </a>
+            <button (click)="onEdit(bookmark)" class="btn btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              <span class="hidden-xs">Edit</span>
+            </button>
+        </div>
         <div class="panel-body">
-            <div style="float:right;">
-                <button (click)="onEdit(bookmark)" class="btn btn-default">
-                  <span class="glyphicon glyphicon-pencil"></span>
-                  <span class="hidden-xs">Edit</span>
-                </button>
-            </div>
-            <div>
                 <a href="javascript:void(0);" data-toggle="popover" title="Help!!!" data-trigger="hover" data-content="You can edit the task title. Click the Edit button"><span class="glyphicon glyphicon-question-sign"></span></a>
-                <label>{{task.name}}</label>
-            </div> 
-            <div>
-                <label>Project</label>
-                <button class="btn btn-primary btn-xs" text="Afghan partisan series" disabled="true">APS</button>
-            </div>             
+                <label>{{task.name}}</label>            
         </div>
         <div class="panel-body">
             <div>
               <label>Estimate</label>
-              20h
+              {{task.estimate}}h
             </div>
             <div>
+                <label>Project</label>
+                <button class="btn btn-default btn-xs" disabled="true">{{task.project}}</button>
+            </div> 
+            <div>
               <label>Status</label>
-              <button class="btn btn-primary btn-xs" disabled="true">in progress</button>
-              <button class="btn btn-success btn-xs" disabled="true">resolved</button>
+              <button class="btn btn-xs" 
+                  [class.btn-primary]="task.status==='in progress'" 
+                  [class.btn-success]="task.status==='resolved'" 
+                  disabled="true">
+                    {{task.status}}
+              </button>
             </div>  
         </div>      
         <div class="panel-body">         
           <div>
             <label>Created</label>
-            08-Aug-2015 23:00
+            {{task.created | date:'medium'}}
           </div>
           <div>
             <label>Modified</label>
-            18-Aug-2016 21:10
+            {{task.updated | date:'medium'}}
           </div>
         </div>
-        <div class="panel-body">
-        The history of modern Afghanistan is a history of partisan politics. A myriad of individuals, political parties, and ideological causes have competed not only for temporal power, but also mindshare among ordinary Afghans since the early 20th century. However, while governments and causes have come and gone, one force has remained constant: The Afghan press. Over a century old, the press is one of the few surviving mediums bearing testament to Afghanistan’s tumultuous political history, as well as its rich and varied intellectual and social history.
-        </div>
+        
+        <div class="panel-body"><label>Description</label> {{task.description}}</div>
 
         <div class="panel-body">
           <div style="float:right;">
@@ -109,14 +113,14 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class TaskComponent implements OnInit, OnDestroy {
 
-  task;
+  task = {};
   @Output() clear = new EventEmitter();
   @Output() save = new EventEmitter();
 
   paramsSubscription: Subscription;
 
   constructor(private route: ActivatedRoute,
-              private taskService: TaskService) { }
+              private taskService: TaskService) {  }
 
 
   onClear() {
@@ -128,13 +132,22 @@ export class TaskComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    let self = this;
+
     this.paramsSubscription = this.route.params.subscribe(
       params => {
-        this.task = this.taskService.getSprintTask(params['tasktId']);
-        console.log("task " + this.task.name);
+        progress_start ("");
+        var taskRef = firebase.database().ref('/sprint/mSmxxvKkt4ei6nL80Krmt9R0m983/' + params['tasktId']);
+        taskRef.off();
+        taskRef.on('value', function(snapshot) {
+            self.task = snapshot.val();
+            progress_end ();
+        });
+        //this.task = snapshot.val();
+        //console.log("task ", this.task);
       }
     );
-  
+
     $(document).ready(function(){
         $('[data-toggle="popover"]').popover();
     });
