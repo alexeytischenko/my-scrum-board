@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ProjectsService } from './projects.service';
 
 @Component({
   selector: 'scrum-app',
@@ -8,4 +9,11 @@ import { Component, OnInit } from '@angular/core';
     </div>
   `,
 })
-export class AppComponent {}
+export class AppComponent {
+
+  constructor(private projectsService : ProjectsService) {
+  }
+
+
+
+}

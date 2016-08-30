@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Task } from './task.class';
 import { TaskService } from './task.service';
+import { ProjectsService } from './projects.service';
 
 
 @Component({
@@ -9,24 +10,28 @@ import { TaskService } from './task.service';
     <section>
       <div class="row">
           <ul class="list-group list-group-sortable-connected-exclude">
-              <li class="list-group-item disabled">Active sprint ({{sprint.length}} issues)</li>
-              <li *ngFor="let taskElement of sprint" class="list-group-item">
-                <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
-                <span class="label label-default">{{taskElement.project}}</span> 
-                <span class="badge">{{taskElement.estimate}}h</span>
-              </li>
+              <li class="list-group-item disabled">Active sprint ( {{sprintLength}} issues )</li>
+              <template ngFor let-taskElement [ngForOf]="backLog">
+                <li *ngIf="taskElement.type=='s'" class="list-group-item">
+                  <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
+                  <span class="label label-{{taskElement.project_color}}">{{taskElement.project}}</span> 
+                  <span class="badge">{{taskElement.estimate}}h / 0h</span>
+                </li>
+              </template>
           </ul>
       </div>
     </section>
     <section>
       <div class="row">
           <ul class="list-group list-group-sortable-connected-exclude">
-              <li class="list-group-item disabled">Backlog ({{backLog.length}} issues)</li>
-              <li class="list-group-item" *ngFor="let taskElement of backLog">
-                {{taskElement.name}} 
-                <span class="label label-default">{{taskElement.project}}</span> 
-                <span class="badge">{{taskElement.estimate}}h</span>
-              </li>
+              <li class="list-group-item disabled">Backlog ( {{backLogLength}} issues )</li>
+               <template ngFor let-taskElement [ngForOf]="backLog">
+                <li *ngIf="taskElement.type=='b'" class="list-group-item">
+                  <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
+                  <span class="label label-{{taskElement.project_color}}">{{taskElement.project}}</span> 
+                  <span class="badge">{{taskElement.estimate}}h / 0h</span>
+                </li>
+              </template>     
           </ul>
       </div>
     </section>
@@ -34,13 +39,15 @@ import { TaskService } from './task.service';
 })
 export class ScrumBoard implements OnInit {
 
-  sprint = [];
+  sprintLength : number;
+  backLogLength : number;
   backLog = [];
 
   bookmarks = [];
   editableBookmark = {};
 
-  constructor(private taskService: TaskService) {
+  constructor(private taskService: TaskService,
+              private projectsService : ProjectsService) {
     this.taskService.errorHandler = error =>
       window.alert('Oops! The server request failed.');
 
@@ -56,49 +63,19 @@ export class ScrumBoard implements OnInit {
     this.editableBookmark = Object.assign({}, bookmark);
   }
 
-  remove(bookmark) {
-    // this.bookmarkService.removeBookmark(bookmark)
-    //   .then(() => this.reload());
-  }
-
-  save(bookmark) {
-    // if (bookmark.id) {
-    //   this.bookmarkService.updateBookmark(bookmark)
-    //     .then(() => this.reload());      
-    // } else {
-    //   this.bookmarkService.addBookmark(bookmark)
-    //     .then(() => this.reload());
-    // }
-    // this.clear();
-  }
-
   private reload() {
+
     let self = this;
     progress_start("");
-    var backLogRef = firebase.database().ref('/backlog/mSmxxvKkt4ei6nL80Krmt9R0m983');
+    var backLogRef = firebase.database().ref('mSmxxvKkt4ei6nL80Krmt9R0m983/backlog/');
     backLogRef.off();
-    backLogRef.on('value', snapshot => this.backLog = this.convert(snapshot.val()));
-
-    var sprintRef = firebase.database().ref('/sprint/mSmxxvKkt4ei6nL80Krmt9R0m983');
-    sprintRef.off();
-    sprintRef.on('value', function(snapshot) {
-       self.sprint = self.convert(snapshot.val());
-       progress_end();
+    backLogRef.on('value', function(snapshot) {
+      self.backLog = self.convert(snapshot.val());
+      self.calculateSize();
+      progress_end();
     });
 
     setTimeout(() => this.rebuildSortable(), 1000);
-
-    
-    // this.taskService.getBackLog()
-    //    .then(function(tasks) { 
-    //       self.backLog = tasks;
-    //       setTimeout(() => self.rebuildSortable(), 1000);
-    // });
-    // this.taskService.getSprint()
-    //    .then(function(tasks) { 
-    //       self.sprint = tasks;
-    //       setTimeout(() => self.rebuildSortable(), 1000);
-    // });
   }
 
   ngOnInit() {
@@ -125,11 +102,25 @@ export class ScrumBoard implements OnInit {
       .map(id => ({
         id : id,
         name: objectedResponse[id].name,
-        project: objectedResponse[id].project,
+        project: this.projectsService.getSName(objectedResponse[id].project),
+        project_color : this.projectsService.getColor(objectedResponse[id].project),
         sortnum: objectedResponse[id].sortnum,
         estimate: objectedResponse[id].estimate,
-        status: objectedResponse[id].status
+        status: objectedResponse[id].status,
+        type: objectedResponse[id].type
       }));
      // .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  private calculateSize() {
+    this.sprintLength = 0;
+    this.backLogLength = 0;
+
+    if (this.backLog && this.backLog.length > 0) {
+        this.backLog.forEach(element => {
+          if (element.type=="s") this.sprintLength++;
+          else this.backLogLength++;
+        });
+    }
   }
 }

@@ -1,109 +1,113 @@
 {
-  "projects" : {
-    "mSmxxvKkt4ei6nL80Krmt9R0m983" : {
-				"-KPYfOOS14_Io1kP_cVr" : {
-					"name" : "Afgan Partisan Series",
-					"sname" : "APS"
-				},
-				"-KPYfOO678_Io1kP_cVr" : {
-					"name" : "Universal Databases",
-					"sname" : "DLIB"
-				}
-    },
-    "-KPYfOOS14_Io1kP_oor" : {
-				"-KPYfOOS14_Io1kP_mmm" : {
-					"name" : "Default",	
-					"sname" : "DEF"
-				}
-    }
-  },
-	"sprint" : {
-    "mSmxxvKkt4ei6nL80Krmt9R0m983" : {
-				"kt4ei6nL80Kr543" : {
-					"name" : "APS version update",
-					"project" : "APS",
-					"sortnum" : 1,
-					"estimate" : 5,
-					"created": 1459361875337,
-					"updated": 1459361875337,
-					"status" : "in progress",
-					"description" : "Update to new version",
-					"attachments" : {
-						"80Kr8898mt" : {
-							"name" : "screen",
-							"fileURl" : "gs://friendlychat-955db.appspot.com/Hs708P7JMnbHKiPsQ7IvYOFVQdN2/1471879803618/rue0397659c8b.jpg"
-						}
-					} 
-				},
-				"mxxdssKkt4ei6" : {
-					"name" : "DLIB add new keyboard",
-					"project" : "DLIB",
-					"sortnum" : 2,
-					"estimate" : 15,
-					"created": 1459361875337,
-					"updated": 1459361875337,
-					"status" : "resolved",
-					"description" : "Добавить новую \"клавиатуру\"",
-					"attachments" : {} 
-				}
-    },
-    "-KPYfOOS14_Io1kP_oor" : {
-				"mSmxxvKkt" : {
-					"name" : "Default",
-					"project" : "DEF",
-					"sortnum" : 1,
-					"estimate" : 5,
-					"created": 1459361875337,
-					"updated": 1459361875337,
-					"status" : "in progress",
-					"description" : "",
-					"attachments" : {} 
-				}
-    }
-  },
-
-	"backlog" : {
-    "mSmxxvKkt4ei6nL80Krmt9R0m983" : {
-				"kt4ei6nL80Krmt" : {
-					"name" : "APS bug fixes",
-					"project" : "APS",
-					"sortnum" : 1,
-					"estimate" : 10,
-					"created": 1459361875337,
-					"updated": 1459361875337,
-					"status" : "in progress",
-					"description" : "Minor layout buds need to be fixed",
-					"attachments" : {
-						"80Krmt" : {
-							"name" : "screen shot 1",
-							"fileURl" : "gs://friendlychat-955db.appspot.com/Hs708P7JMnbHKiPsQ7IvYOFVQdN2/1471879803618/rue0397659c8b.jpg"
-						}
-					} 
-				},
-				"mxxvKkt4ei6" : {
-					"name" : "DLIB pdf.js merge",
-					"project" : "DLIB",
-					"sortnum" : 2,
-					"estimate" : 2,
-					"created": 1459361875337,
-					"updated": 1459361875337,
-					"status" : "in progress",
-					"description" : "Замержить!!!",
-					"attachments" : {} 
-				}
-    },
-    "-KPYfOOS14_Io1kP_oor" : {
-				"mSmxxvKkt" : {
-					"name" : "Default",
-					"project" : "DEF",
-					"sortnum" : 1,
-					"estimate" : 3,
-					"created": 1459361875337,
-					"updated": 1459361875337,
-					"status" : "in progress",
-					"description" : "",
-					"attachments" : {} 
-				}
-    }
-  }
+	"mSmxxvKkt4ei6nL80Krmt9R0m983" : {
+		"projects" : {
+			"-KPYfOOS14_Io1kP_cVr" : {
+				"name" : "Afgan Partisan Series",
+				"sname" : "APS",
+				"color" : "default"
+			},
+			"-KPYfOO678_Io1kP_cVr" : {
+				"name" : "Universal Databases",
+				"sname" : "DLIB",
+				"color" : "primary"
+			}
+		},
+		"backlog" : {					
+			"kt4ei6nL80Kr543" : {
+				"name" : "APS version update",
+				"type": "s",
+				"project" : "-KPYfOOS14_Io1kP_cVr",
+				"sortnum" : 1,
+				"estimate" : 5,
+				"created": 1459361875337,
+				"updated": 1459361875337,
+				"status" : "in progress",
+				"description" : "Update to new version",
+				"attachments" : {
+					"80Kr8898mt" : {
+						"name" : "screen",
+						"fileURl" : "gs://friendlychat-955db.appspot.com/Hs708P7JMnbHKiPsQ7IvYOFVQdN2/1471879803618/rue0397659c8b.jpg"
+					}
+				} 
+			},
+			"mxxdssKkt4ei6" : {
+				"name" : "DLIB add new keyboard",
+				"type": "s",
+				"project" : "-KPYfOO678_Io1kP_cVr",
+				"sortnum" : 2,
+				"estimate" : 15,
+				"created": 1459361875337,
+				"updated": 1459361875337,
+				"status" : "resolved",
+				"description" : "Добавить новую \"клавиатуру\"",
+				"attachments" : {} 
+			},
+			"kt4ei6nL80Krmt" : {
+				"name" : "APS bug fixes",
+				"type": "b",
+				"project" : "-KPYfOOS14_Io1kP_cVr",
+				"sortnum" : 1,
+				"estimate" : 10,
+				"created": 1459361875337,
+				"updated": 1459361875337,
+				"status" : "in progress",
+				"description" : "Minor layout buds need to be fixed",
+				"attachments" : {
+					"80Krmt" : {
+						"name" : "screen shot 1",
+						"fileURl" : "gs://friendlychat-955db.appspot.com/Hs708P7JMnbHKiPsQ7IvYOFVQdN2/1471879803618/rue0397659c8b.jpg"
+					}
+				} 
+			},
+			"mxxvKkt4ei6" : {
+				"name" : "DLIB pdf.js merge",
+				"type": "b",
+				"project" : "-KPYfOO678_Io1kP_cVr",
+				"sortnum" : 2,
+				"estimate" : 2,
+				"created": 1459361875337,
+				"updated": 1459361875337,
+				"status" : "in progress",
+				"description" : "Замержить!!!",
+				"attachments" : {} 
+			}
+		}	
+	},
+	"-KPYfOOS14_Io1kP_oor" : {
+		"projects" : {
+		"-KPYfOOS14_Io1kP_mmm" : {
+				"name" : "Default",	
+				"sname" : "DEF",
+				"color" : "warning"
+			}
+		},
+		"backlog" : {
+			"mSmxxvKkt" : {
+				"name" : "Default",
+				"type": "s",
+				"project" : "-KPYfOOS14_Io1kP_mmm",
+				"sortnum" : 1,
+				"estimate" : 5,
+				"created": 1459361875337,
+				"updated": 1459361875337,
+				"status" : "in progress",
+				"description" : "",
+				"attachments" : {} 
+			},
+			"mSmxxvt" : {
+				"name" : "Default",
+				"type": "b",
+				"project" : "-KPYfOOS14_Io1kP_mmm",
+				"sortnum" : 1,
+				"estimate" : 3,
+				"created": 1459361875337,
+				"updated": 1459361875337,
+				"status" : "in progress",
+				"description" : "",
+				"attachments" : {} 
+			}
+		}
+	}
+  
 }
+
