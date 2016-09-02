@@ -12,6 +12,29 @@
 				"color" : "primary"
 			}
 		},
+		"comments" : {
+			"kt4ei6nL80Kr543" : {
+				"L80Kr543" : {
+					"user" : "Шеф",
+					"created" : 1459361875537,
+					"text" : "Необходимо пофиксить все баги, иначе нельзя показывать"
+				},
+				"888vvv" : {
+					"user" : "Alexey",
+					"created" : 1459361875637,
+					"text" : "done!"
+				}
+			},
+			"mxxdssKkt4ei6" : {},
+			"kt4ei6nL80Krmt" : {},
+			"mxxvKkt4ei6" : {}
+		},
+		"logs" : {
+			"kt4ei6nL80Kr543" : {},
+			"mxxdssKkt4ei6" : {},
+			"kt4ei6nL80Krmt" : {},
+			"mxxvKkt4ei6" : {}
+		},
 		"backlog" : {					
 			"kt4ei6nL80Kr543" : {
 				"name" : "APS version update",
@@ -81,6 +104,14 @@
 				"color" : "warning"
 			}
 		},
+		"comments" : {
+			"mSmxxvKkt" : {},
+			"mSmxxvt" : {}
+		},	
+		"logs" : {
+			"mSmxxvKkt" : {},
+			"mSmxxvt" : {}
+		},			
 		"backlog" : {
 			"mSmxxvKkt" : {
 				"name" : "Default",

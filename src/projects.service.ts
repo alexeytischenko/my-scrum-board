@@ -1,16 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 
 @Injectable()
 export class ProjectsService {
    
   projects = [];
-
   errorHandler = error => console.error('ProjectsService error', error);
- // private baseUrl = 'https://a2-test-39d02.firebaseio.com';
-  private baseUrl = 'https://myscrum-f606c.firebaseio.com';
   
-  constructor(private http: Http) {
+  constructor() {
       this.loadProjects("mSmxxvKkt4ei6nL80Krmt9R0m983");
    }
 

@@ -14,4 +14,9 @@ export class Task {
         private comments : any[], 
         private worklog : any[]) {
     }
+
+
+    // private convertToTask(taskJson) : Task {
+    //   return new Task(taskJson.name, taskJson.project, taskJson.sortnum, taskJson.estimate, taskJson.created, taskJson.updated,taskJson.status, taskJson.description, [], [], []);
+    // }
  }
