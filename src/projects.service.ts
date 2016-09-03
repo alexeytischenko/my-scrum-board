@@ -6,15 +6,28 @@ export class ProjectsService {
   projects = [];
   errorHandler = error => console.error('ProjectsService error', error);
   
-  constructor() {
-      this.loadProjects("mSmxxvKkt4ei6nL80Krmt9R0m983");
-   }
+  constructor() {}
 
   loadProjects(url) {
+    let self = this;
     var projectsRef = firebase.database().ref(`${url}/projects/`);
-    projectsRef.off();
-    projectsRef.on('value', snapshot => this.projects = this.convert(snapshot.val())); 
+    projectsRef.off(); 
+
+    return new Promise(function(resolve, reject) {
+          projectsRef.once('value', function(snapshot) {
+            self.projects = self.convert(snapshot.val());
+            console.log("projects", self.projects);
+            resolve(true);
+          }); 
+      }
+    );
   }
+
+  // loadProjects(url) {
+  //   var projectsRef = firebase.database().ref(`${url}/projects/`);
+  //   projectsRef.off();
+  //   projectsRef.on('value', snapshot => this.projects = this.convert(snapshot.val())); 
+  // }
 
   convert(objectedResponse) {
     return Object.keys(objectedResponse)

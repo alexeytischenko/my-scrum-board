@@ -39,6 +39,7 @@ import { ProjectsService } from './projects.service';
 })
 export class ScrumBoard implements OnInit {
 
+  userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
   sprintLength : number;
   backLogLength : number;
   backLog = [];
@@ -46,37 +47,28 @@ export class ScrumBoard implements OnInit {
   bookmarks = [];
   editableBookmark = {};
 
-  constructor(private tasksListService: TasksListService) {
+  constructor(private tasksListService: TasksListService,
+              private projectsService :ProjectsService) {
+
     this.tasksListService.errorHandler = error =>
-      window.alert('Oops! The server request failed.');
+      window.alert('Oops! The server request failed.' + error);
 
-    //this.reload();
+    progress_start("");
+    this.projectsService.loadProjects("mSmxxvKkt4ei6nL80Krmt9R0m983")
+    .then ( () => this.tasksListService.getBackLog("mSmxxvKkt4ei6nL80Krmt9R0m983"))
+    .then ( () => {
+          this.backLog = this.tasksListService.tasks;
+          this.sprintLength = this.tasksListService.sprintLength;
+          this.backLogLength = this.tasksListService.backLogLength;
+          console.info("tasks loaded", this.backLog);
 
-    this.tasksListService.getBackLog("mSmxxvKkt4ei6nL80Krmt9R0m983")
-      .then(//this.backLog = this.tasksListService.tasks
-        () => {console.log("ffff")}, console.log
-      )
-      .catch(()=>console.log("error") );
-    this.sprintLength = this.tasksListService.sprintLength;
-    this.backLogLength = this.tasksListService.backLogLength;
+          setTimeout(() => this.rebuildSortable(), 1000);
+          progress_end();
+        }
+    )
+    .catch((error)=>console.error("error"));
  
   }
-
-
-  // private reload() {
-
-  //   let self = this;
-  //   progress_start("");
-  //   var backLogRef = firebase.database().ref('mSmxxvKkt4ei6nL80Krmt9R0m983/backlog/');
-  //   backLogRef.off();
-  //   backLogRef.on('value', function(snapshot) {
-  //     self.backLog = self.convert(snapshot.val());
-  //     self.calculateSize();
-  //     progress_end();
-  //   });
-
-  //   setTimeout(() => this.rebuildSortable(), 1000);
-  // }
 
   ngOnInit() {
      //this.reload();
@@ -97,30 +89,4 @@ export class ScrumBoard implements OnInit {
       })
   }
 
-  // private convert(objectedResponse) {
-  //   return Object.keys(objectedResponse)
-  //     .map(id => ({
-  //       id : id,
-  //       name: objectedResponse[id].name,
-  //       project: this.projectsService.getSName(objectedResponse[id].project),
-  //       project_color : this.projectsService.getColor(objectedResponse[id].project),
-  //       sortnum: objectedResponse[id].sortnum,
-  //       estimate: objectedResponse[id].estimate,
-  //       status: objectedResponse[id].status,
-  //       type: objectedResponse[id].type
-  //     }));
-  //    // .sort((a, b) => a.name.localeCompare(b.name));
-  // }
-
-  // private calculateSize() {
-  //   this.sprintLength = 0;
-  //   this.backLogLength = 0;
-
-  //   if (this.backLog && this.backLog.length > 0) {
-  //       this.backLog.forEach(element => {
-  //         if (element.type=="s") this.sprintLength++;
-  //         else this.backLogLength++;
-  //       });
-  //   }
-  // }
 }

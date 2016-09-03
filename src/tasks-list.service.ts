@@ -11,26 +11,22 @@ export class TasksListService {
   sprintLength : number = 0;
   backLogLength : number = 0;
   
-  constructor(private projectsService : ProjectsService) {
-      //this.getBackLog("mSmxxvKkt4ei6nL80Krmt9R0m983");
-  }
+  constructor(private projectsService : ProjectsService) {}
 
   getBackLog(url) {
     let self = this;
-    //progress_start("");
-    return new Promise((resolve) => {
-      var tasksRef = firebase.database().ref(`${url}/backlog/`);
-      tasksRef.off(); 
-      tasksRef.on('value', function(snapshot) {
-        self.tasks = self.convert(snapshot.val());
-        self.calculateSize();
-        console.log("tasks", self.tasks);
-        console.log("resolve", resolve);
-        //progress_end();
-      });
-    });
+    var tasksRef = firebase.database().ref(`${url}/backlog/`);
+    tasksRef.off(); 
 
-    //setTimeout(() => this.rebuildSortable(), 1000);
+    return new Promise(function(resolve, reject) {
+          tasksRef.once('value', function(snapshot) {
+            self.tasks = self.convert(snapshot.val());
+            self.calculateSize();
+            console.log("tasks", self.tasks);
+            resolve(true);
+          }); 
+      }
+    );
   }
 
   private convert(objectedResponse) {

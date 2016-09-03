@@ -24,6 +24,7 @@ export class TaskService {
 
 
   getBackLogTask(id: string) {
+      //var articleRef = ref.child('blogposts').child(id);
       return this.http.get(`${this.baseUrl}/backlog/mSmxxvKkt4ei6nL80Krmt9R0m983/${id}.json`)
       .toPromise()
       .then(response => this.convert(response.json()))
