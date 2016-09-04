@@ -1,4 +1,4 @@
-System.register(['@angular/core', '@angular/http'], function(exports_1, context_1) {
+System.register(['@angular/core'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,32 +10,36 @@ System.register(['@angular/core', '@angular/http'], function(exports_1, context_
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, http_1;
+    var core_1;
     var ProjectsService;
     return {
         setters:[
             function (core_1_1) {
                 core_1 = core_1_1;
-            },
-            function (http_1_1) {
-                http_1 = http_1_1;
             }],
         execute: function() {
             ProjectsService = (function () {
-                function ProjectsService(http) {
-                    this.http = http;
+                function ProjectsService() {
                     this.projects = [];
                     this.errorHandler = function (error) { return console.error('ProjectsService error', error); };
-                    // private baseUrl = 'https://a2-test-39d02.firebaseio.com';
-                    this.baseUrl = 'https://myscrum-f606c.firebaseio.com';
-                    this.loadProjects("mSmxxvKkt4ei6nL80Krmt9R0m983");
                 }
                 ProjectsService.prototype.loadProjects = function (url) {
-                    var _this = this;
+                    var self = this;
                     var projectsRef = firebase.database().ref(url + "/projects/");
                     projectsRef.off();
-                    projectsRef.on('value', function (snapshot) { return _this.projects = _this.convert(snapshot.val()); });
+                    return new Promise(function (resolve, reject) {
+                        projectsRef.once('value', function (snapshot) {
+                            self.projects = self.convert(snapshot.val());
+                            console.log("projects", self.projects);
+                            resolve(true);
+                        });
+                    });
                 };
+                // loadProjects(url) {
+                //   var projectsRef = firebase.database().ref(`${url}/projects/`);
+                //   projectsRef.off();
+                //   projectsRef.on('value', snapshot => this.projects = this.convert(snapshot.val())); 
+                // }
                 ProjectsService.prototype.convert = function (objectedResponse) {
                     return Object.keys(objectedResponse)
                         .map(function (id) { return ({
@@ -66,7 +70,7 @@ System.register(['@angular/core', '@angular/http'], function(exports_1, context_
                 };
                 ProjectsService = __decorate([
                     core_1.Injectable(), 
-                    __metadata('design:paramtypes', [http_1.Http])
+                    __metadata('design:paramtypes', [])
                 ], ProjectsService);
                 return ProjectsService;
             }());

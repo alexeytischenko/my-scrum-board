@@ -1,4 +1,4 @@
-System.register(['@angular/core', '@angular/http', './task.class'], function(exports_1, context_1) {
+System.register(['@angular/core', '@angular/http'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,7 +10,7 @@ System.register(['@angular/core', '@angular/http', './task.class'], function(exp
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, http_1, task_class_1;
+    var core_1, http_1;
     var TaskService;
     return {
         setters:[
@@ -19,16 +19,12 @@ System.register(['@angular/core', '@angular/http', './task.class'], function(exp
             },
             function (http_1_1) {
                 http_1 = http_1_1;
-            },
-            function (task_class_1_1) {
-                task_class_1 = task_class_1_1;
             }],
         execute: function() {
             TaskService = (function () {
                 function TaskService(http) {
                     this.http = http;
                     this.errorHandler = function (error) { return console.error('TaskService error', error); };
-                    // private baseUrl = 'https://a2-test-39d02.firebaseio.com';
                     this.baseUrl = 'https://myscrum-f606c.firebaseio.com';
                 }
                 TaskService.prototype.addBookmark = function (bookmark) {
@@ -37,26 +33,18 @@ System.register(['@angular/core', '@angular/http', './task.class'], function(exp
                         .toPromise()
                         .catch(this.errorHandler);
                 };
-                TaskService.prototype.getBackLog = function () {
-                    var _this = this;
-                    return this.http.get(this.baseUrl + "/backlog/mSmxxvKkt4ei6nL80Krmt9R0m983.json")
-                        .toPromise()
-                        .then(function (response) { return _this.convert(response.json()); })
-                        .catch(this.errorHandler);
-                };
-                TaskService.prototype.getSprint = function () {
-                    var _this = this;
-                    return this.http.get(this.baseUrl + "/sprint/mSmxxvKkt4ei6nL80Krmt9R0m983.json")
-                        .toPromise()
-                        .then(function (response) { return _this.convert(response.json()); })
-                        .catch(this.errorHandler);
-                };
-                TaskService.prototype.getSprintTask = function (id) {
-                    var _this = this;
-                    return this.http.get(this.baseUrl + "/sprint/mSmxxvKkt4ei6nL80Krmt9R0m983/" + id + ".json")
-                        .toPromise()
-                        .then(function (response) { return _this.convertToTask(response.json()); })
-                        .catch(this.errorHandler);
+                TaskService.prototype.getTask = function (url, id) {
+                    var self = this;
+                    var taskRef = firebase.database().ref(url + "/backlog/").child(id);
+                    taskRef.off();
+                    return new Promise(function (resolve, reject) {
+                        taskRef.once('value', function (snapshot) {
+                            //console.log(snapshot.val());
+                            self.task = snapshot.val();
+                            console.log("task", self.task);
+                            resolve(true);
+                        });
+                    });
                 };
                 TaskService.prototype.getBackLogTask = function (id) {
                     var _this = this;
@@ -79,9 +67,9 @@ System.register(['@angular/core', '@angular/http', './task.class'], function(exp
                         .toPromise()
                         .catch(this.errorHandler);
                 };
-                TaskService.prototype.convertToTask = function (taskJson) {
-                    return new task_class_1.Task(taskJson.name, taskJson.project, taskJson.sortnum, taskJson.estimate, taskJson.created, taskJson.updated, taskJson.status, taskJson.description, [], [], []);
-                };
+                // private convertToTask(taskJson) : Task {
+                //   return new Task(taskJson.name, taskJson.project, taskJson.sortnum, taskJson.estimate, taskJson.created, taskJson.updated,taskJson.status, taskJson.description, [], [], []);
+                // }
                 TaskService.prototype.convert = function (parsedResponse) {
                     return Object.keys(parsedResponse)
                         .map(function (id) { return ({

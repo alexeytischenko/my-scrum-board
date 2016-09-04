@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TaskService } from './task.service';
-import { Task } from './task.class';
+import { ProjectsService } from './projects.service';
+// import { Task } from './task.class';
 import { Subscription } from 'rxjs/Subscription';
 
 
@@ -27,11 +28,11 @@ import { Subscription } from 'rxjs/Subscription';
         <div class="panel-body">
             <div>
               <label>Estimate</label>
-              {{task.estimate}}h
+              {{task.estimate}}h / 0h
             </div>
             <div>
                 <label>Project</label>
-                <button class="btn btn-default btn-xs" disabled="true">{{task.project}}</button>
+                <button class="btn btn-{{task.project_color}} btn-xs" disabled="true">{{task.project_sname}}</button>
             </div> 
             <div>
               <label>Status</label>
@@ -114,13 +115,23 @@ import { Subscription } from 'rxjs/Subscription';
 export class TaskComponent implements OnInit, OnDestroy {
 
   task = {};
+  userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
   @Output() clear = new EventEmitter();
   @Output() save = new EventEmitter();
 
   paramsSubscription: Subscription;
 
-  constructor(private route: ActivatedRoute,
-              private taskService: TaskService) {  }
+  constructor(private route : ActivatedRoute,
+              private taskService : TaskService,
+              private projectsService : ProjectsService) {
+
+      //load projects if ness
+      if (this.projectsService.projects && this.projectsService.projects.length > 0) {
+        console.info('projects already loaded');
+      }
+      else
+        this.projectsService.loadProjects(this.userId);
+  }
 
 
   onClear() {
@@ -137,14 +148,27 @@ export class TaskComponent implements OnInit, OnDestroy {
     this.paramsSubscription = this.route.params.subscribe(
       params => {
         progress_start ("");
-        var taskRef = firebase.database().ref('/sprint/mSmxxvKkt4ei6nL80Krmt9R0m983/' + params['tasktId']);
-        taskRef.off();
-        taskRef.on('value', function(snapshot) {
-            self.task = snapshot.val();
-            progress_end ();
-        });
-        //this.task = snapshot.val();
-        //console.log("task ", this.task);
+        this.taskService.getTask("mSmxxvKkt4ei6nL80Krmt9R0m983", params['tasktId'])
+        .then ( () => {
+              this.task = this.taskService.task;
+
+              this.task.project_color = this.projectsService.getColor(this.task.project);
+              this.task.project_sname = this.projectsService.getSName(this.task.project);
+              console.info("task loaded", this.task);
+
+              progress_end();
+            }
+        )
+        .catch((error)=>console.error("error"));
+
+        // var taskRef = firebase.database().ref('/sprint/mSmxxvKkt4ei6nL80Krmt9R0m983/' + params['tasktId']);
+        // taskRef.off();
+        // taskRef.on('value', function(snapshot) {
+        //     self.task = snapshot.val();
+        //     progress_end ();
+        // });
+        // //this.task = snapshot.val();
+        // //console.log("task ", this.task);
       }
     );
 

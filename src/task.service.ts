@@ -6,14 +6,11 @@ import { Task } from './task.class';
 export class TaskService {
 
   errorHandler = error => console.error('TaskService error', error);
-  private baseUrl = 'https://myscrum-f606c.firebaseio.com';
-
-  tasks = [];
-  sprintLength : number = 0;
-  backLogLength : number = 0;
   
-  constructor(private http: Http) {
-  }
+  private baseUrl = 'https://myscrum-f606c.firebaseio.com';
+  task;
+  
+  constructor(private http: Http) { }
 
   addBookmark(bookmark) {
     const json = JSON.stringify(bookmark);
@@ -22,9 +19,24 @@ export class TaskService {
       .catch(this.errorHandler);
   }
 
+  getTask(url: string, id:string) {
+    let self = this;
+    var taskRef = firebase.database().ref(`${url}/backlog/`).child(id);
+    taskRef.off(); 
+
+    return new Promise(function(resolve, reject) {
+          taskRef.once('value', function(snapshot) {
+            //console.log(snapshot.val());
+            self.task = snapshot.val();
+            console.log("task", self.task);
+            resolve(true);
+          }); 
+      }
+    );
+  }
 
   getBackLogTask(id: string) {
-      //var articleRef = ref.child('blogposts').child(id);
+
       return this.http.get(`${this.baseUrl}/backlog/mSmxxvKkt4ei6nL80Krmt9R0m983/${id}.json`)
       .toPromise()
       .then(response => this.convert(response.json()))

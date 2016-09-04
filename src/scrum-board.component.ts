@@ -54,8 +54,8 @@ export class ScrumBoard implements OnInit {
       window.alert('Oops! The server request failed.' + error);
 
     progress_start("");
-    this.projectsService.loadProjects("mSmxxvKkt4ei6nL80Krmt9R0m983")
-    .then ( () => this.tasksListService.getBackLog("mSmxxvKkt4ei6nL80Krmt9R0m983"))
+    this.projectsService.loadProjects(this.userId)
+    .then ( () => this.tasksListService.getBackLog(this.userId))
     .then ( () => {
           this.backLog = this.tasksListService.tasks;
           this.sprintLength = this.tasksListService.sprintLength;
