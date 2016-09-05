@@ -114,7 +114,7 @@ import { Subscription } from 'rxjs/Subscription';
 })
 export class TaskComponent implements OnInit, OnDestroy {
 
-  task = {};
+  task;
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
   @Output() clear = new EventEmitter();
   @Output() save = new EventEmitter();
@@ -125,6 +125,12 @@ export class TaskComponent implements OnInit, OnDestroy {
               private taskService : TaskService,
               private projectsService : ProjectsService) {
 
+      this.taskService.errorHandler = error => {
+        console.error('Task component error! ' + error);
+        window.alert('An error occurred while processing this page! Try again later.');
+      }
+
+      this.task = {};
       //load projects if ness
       if (this.projectsService.projects && this.projectsService.projects.length > 0) {
         console.info('projects already loaded');
@@ -151,15 +157,16 @@ export class TaskComponent implements OnInit, OnDestroy {
         this.taskService.getTask("mSmxxvKkt4ei6nL80Krmt9R0m983", params['tasktId'])
         .then ( () => {
               this.task = this.taskService.task;
-
               this.task.project_color = this.projectsService.getColor(this.task.project);
               this.task.project_sname = this.projectsService.getSName(this.task.project);
               console.info("task loaded", this.task);
-
-              progress_end();
             }
         )
-        .catch((error)=>console.error("error"));
+        .catch((error)=>console.error("Task component error:", error))
+        .then (() => {
+          //finally
+          progress_end();
+        });
 
         // var taskRef = firebase.database().ref('/sprint/mSmxxvKkt4ei6nL80Krmt9R0m983/' + params['tasktId']);
         // taskRef.off();

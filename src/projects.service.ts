@@ -16,8 +16,12 @@ export class ProjectsService {
     return new Promise(function(resolve, reject) {
           projectsRef.once('value', function(snapshot) {
             self.projects = self.convert(snapshot.val());
-            console.log("projects", self.projects);
-            resolve(true);
+
+            if (self.projects.length > 0) {
+              console.log("projects", self.projects);
+              resolve(true);
+            }
+            else reject("Couldn't retrive projects list");
           }); 
       }
     );

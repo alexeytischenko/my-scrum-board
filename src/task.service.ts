@@ -28,8 +28,12 @@ export class TaskService {
           taskRef.once('value', function(snapshot) {
             //console.log(snapshot.val());
             self.task = snapshot.val();
-            console.log("task", self.task);
-            resolve(true);
+
+            if (self.task.name.length > 0) {
+              console.log("task", self.task);
+              resolve(true);
+            }
+            else reject("Couldn't get task data");
           }); 
       }
     );
@@ -39,7 +43,7 @@ export class TaskService {
 
       return this.http.get(`${this.baseUrl}/backlog/mSmxxvKkt4ei6nL80Krmt9R0m983/${id}.json`)
       .toPromise()
-      .then(response => this.convert(response.json()))
+      .then(response => response.json())
       .catch(this.errorHandler);
   }
 
@@ -64,16 +68,16 @@ export class TaskService {
 
   // }
 
-  private convert(parsedResponse) {
-    return Object.keys(parsedResponse)
-      .map(id => ({
-        id : id,
-        name: parsedResponse[id].name,
-        project: parsedResponse[id].project,
-        sortnum: parsedResponse[id].sortnum,
-        estimate: parsedResponse[id].estimate
-      }));
-     // .sort((a, b) => a.name.localeCompare(b.name));
-  }
+  // private convert(parsedResponse) {
+  //   return Object.keys(parsedResponse)
+  //     .map(id => ({
+  //       id : id,
+  //       name: parsedResponse[id].name,
+  //       project: parsedResponse[id].project,
+  //       sortnum: parsedResponse[id].sortnum,
+  //       estimate: parsedResponse[id].estimate
+  //     }));
+  //    // .sort((a, b) => a.name.localeCompare(b.name));
+  // }
 
 }
