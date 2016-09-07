@@ -5,10 +5,12 @@ import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
 import { TasksListService } from './tasks-list.service';
 import { TaskService } from './task.service';
+import { Project } from './project.class';
 import { ProjectsService } from './projects.service';
 import { AppComponent } from './app.component';
 import { TaskComponent } from './task.component';
 import { ScrumBoard } from './scrum-board.component';
+
 
 const routerModule = RouterModule.forRoot([
   {
@@ -34,7 +36,7 @@ const routerModule = RouterModule.forRoot([
 @NgModule({
   imports: [BrowserModule, FormsModule, HttpModule, routerModule],
   declarations: [AppComponent, ScrumBoard, TaskComponent],
-  providers: [TasksListService, TaskService, ProjectsService],
+  providers: [TasksListService, TaskService, ProjectsService, Project],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

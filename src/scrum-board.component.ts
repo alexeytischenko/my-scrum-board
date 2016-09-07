@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 // import { Task } from './task.class';
 import { TasksListService } from './tasks-list.service';
 import { ProjectsService } from './projects.service';
+import { Project } from './project.class';
 
 
 @Component({
@@ -38,7 +39,7 @@ import { ProjectsService } from './projects.service';
     </section>
   `,
 })
-export class ScrumBoard implements OnInit {
+export class ScrumBoard {
 
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
   sprintLength : number;
@@ -52,30 +53,21 @@ export class ScrumBoard implements OnInit {
               private projectsService :ProjectsService) {
 
     this.tasksListService.errorHandler = error => {
-      console.error('Backlog component error! ' + error);
+      console.error('Backlog component (tasksListService) error! ' + error);
       window.alert('An error occurred while processing this page! Try again later.');
     }
 
+    //load projects into property of the ProjectsService then loads list of tasks into tasksListService tasks property 
     progress_start("");
     this.projectsService.loadProjects(this.userId)
-    .then ( () => this.tasksListService.getBackLog(this.userId)) //, error => console.error("Getting projects list error:", error)
-    .then ( () => {
-          this.backLog = this.tasksListService.tasks;
-          this.sprintLength = this.tasksListService.sprintLength;
-          this.backLogLength = this.tasksListService.backLogLength;
-          console.info("tasks loaded", this.backLog);
-        }
-    )
-    .catch((error)=>this.tasksListService.errorHandler(error))
-    .then(()=> {    
-      //finally      
-      setTimeout(() => this.rebuildSortable(), 1000);
-      progress_end();
-    });
-  }
-
-  ngOnInit() {
-     //this.reload();
+      .then ( () => this.tasksListService.getBackLog(this.userId)) //, error => console.error("Getting projects list error:", error)
+      .then ( () => this.backLog = this.tasksListService.tasks)
+      .catch((error)=>this.tasksListService.errorHandler(error))
+      .then(()=> {    
+        //finally / default     
+        setTimeout(() => this.rebuildSortable(), 1000);
+        progress_end();
+      });
   }
 
   rebuildSortable() {
@@ -90,24 +82,84 @@ export class ScrumBoard implements OnInit {
       })
       .disableSelection();
 
+      //sprint block events listner
       $('#sprnt')
       .on('sortupdate', (e, ui) => {
-        //ui.item contains the current dragged element.
-        //Triggered when the user stopped sorting and the DOM position has changed.
+        //triggered if sprint section is updated
         progress_start("red");
-        console.log('element1: ', ui.item);
+        //call resortBackLog method to update tasks list
+        this.tasksListService.resortBackLog(this.userId, this.prepareJSON("s", 'sprnt'))
+          .catch((error)=>this.tasksListService.errorHandler(error))
+          .then(() => {
+            progress_end();
+            this.countDomSizes("s");
+            console.log("s");
+          });        
       });
 
+      //backlog block events listner
       $('#bklg')
       .on('sortupdate', (e, ui) => {
-        //ui.item contains the current dragged element.
-        //Triggered when the user stopped sorting and the DOM position has changed.
+        //triggered if backlog section is updated
         progress_start("red");
-        console.log('element2: ', ui.item);
-        $('#bklg li').each(function( index ) {
-          console.log( index + ": " + this.id);
-        });
-      });      
+        //call resortBackLog method to update tasks list
+        this.tasksListService.resortBackLog(this.userId, this.prepareJSON("b", 'bklg'))
+          .catch((error)=>this.tasksListService.errorHandler(error))
+          .then(() => {
+            progress_end();
+            console.log("b");
+            this.countDomSizes("b");  //!!!! no need to run it here, it already fired 10 lines above
+          });  
+      });   
+
+      this.countDomSizes("s");  
+      this.countDomSizes("b");
   }
+
+  private prepareJSON(recordType : string, domNode : string) {
+    //prepare JSON for UPDATE sortnum and type (active sprint / backlog) after resort of the elements
+    let updatedData = [];
+    $('#' + domNode + ' li').each(function( index ) {
+          updatedData[index] = {
+            "id" : this.id,
+            "sortnum": index,
+            "type": recordType
+          };    
+    });
+
+    return updatedData;
+  }
+
+  private countDomSizes(tp: string) {
+    //updates current values   
+
+    if (tp === "s") {
+      let sl = 0;
+      $('#sprnt li').each(function( index ) {
+        if (index > 0) sl++;  
+      });
+      this.sprintLength = sl;
+    }
+    else {
+      let bll = 0;
+      $('#bklg li').each(function( index ) {
+        if (index > 0) bll++;  
+      });
+      console.info("backLogLength", bll);
+      this.backLogLength = bll;
+    }
+  }
+    
+
+  //  private setBackLogSizes() {
+  //   //updates current values
+  //   this.sprintLength = 0;
+  //   this.backLogLength = 0;
+
+  //   for (let task of this.backLog) {
+  //       if (task.type == "s") this.sprintLength++;
+  //       else this.backLogLength++;
+  //   }  
+  // }
 
 }

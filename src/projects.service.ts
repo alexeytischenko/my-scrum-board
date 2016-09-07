@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Project } from './project.class';
 
 @Injectable()
 export class ProjectsService {
@@ -43,20 +44,30 @@ export class ProjectsService {
       }));
   }
 
-  getColor(project : string) {
-      let color;
-      this.projects.forEach(element => {
-            if (element.id == project)  color = element.color; 
-      });
-      return color;
+  getProject(project : string) : Project {
+
+    let projectData = new Project();
+    this.projects.forEach(element => {
+        if (element.id == project)  projectData.fill(element.name, element.sname, element.color, element.id);
+    });
+
+    return projectData;
   }
-  getSName(project : string) {
-      let sname = "";
-      console.log("pr", project);
-      this.projects.forEach(element => {
-          if (element.id == project)  sname = element.sname; 
-          else console.log("n", element);
-      });
-      return sname;
-  }
+
+  // getColor(project : string) {
+  //     let color;
+  //     this.projects.forEach(element => {
+  //           if (element.id == project)  color = element.color; 
+  //     });
+  //     return color;
+  // }
+  // getSName(project : string) {
+  //     let sname = "";
+  //     console.log("pr", project);
+  //     this.projects.forEach(element => {
+  //         if (element.id == project)  sname = element.sname; 
+  //         else console.log("n", element);
+  //     });
+  //     return sname;
+  // }
 }

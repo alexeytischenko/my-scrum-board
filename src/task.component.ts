@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angu
 import { ActivatedRoute } from '@angular/router';
 import { TaskService } from './task.service';
 import { ProjectsService } from './projects.service';
+import { Project } from './project.class';
 // import { Task } from './task.class';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -20,10 +21,11 @@ import { Subscription } from 'rxjs/Subscription';
               <span class="glyphicon glyphicon-pencil"></span>
               <span class="hidden-xs">Edit</span>
             </button>
+            <a href="javascript:void(0);" data-toggle="popover" title="Help" data-trigger="hover" data-content="You can edit the task properties. Click the Edit button"><span class="glyphicon glyphicon-question-sign"></span></a>
         </div>
-        <div class="panel-body">
-                <a href="javascript:void(0);" data-toggle="popover" title="Help!!!" data-trigger="hover" data-content="You can edit the task title. Click the Edit button"><span class="glyphicon glyphicon-question-sign"></span></a>
-                <label>{{task.name}}</label>            
+        <div class="panel-body">               
+                <label>{{task.name}}</label> 
+                <button class="btn btn-{{project.color}} btn-xs" disabled="true">{{project.sname}}</button>           
         </div>
         <div class="panel-body">
             <div>
@@ -32,7 +34,7 @@ import { Subscription } from 'rxjs/Subscription';
             </div>
             <div>
                 <label>Project</label>
-                <button class="btn btn-{{task.project_color}} btn-xs" disabled="true">{{task.project_sname}}</button>
+                {{project.name}}
             </div> 
             <div>
               <label>Status</label>
@@ -115,6 +117,7 @@ import { Subscription } from 'rxjs/Subscription';
 export class TaskComponent implements OnInit, OnDestroy {
 
   task;
+  project : Project;
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
   @Output() clear = new EventEmitter();
   @Output() save = new EventEmitter();
@@ -131,6 +134,7 @@ export class TaskComponent implements OnInit, OnDestroy {
       }
 
       this.task = {};
+      this.project = new Project();
       //load projects if ness
       if (this.projectsService.projects && this.projectsService.projects.length > 0) {
         console.info('projects already loaded');
@@ -157,8 +161,9 @@ export class TaskComponent implements OnInit, OnDestroy {
         this.taskService.getTask("mSmxxvKkt4ei6nL80Krmt9R0m983", params['tasktId'])
         .then ( () => {
               this.task = this.taskService.task;
-              this.task.project_color = this.projectsService.getColor(this.task.project);
-              this.task.project_sname = this.projectsService.getSName(this.task.project);
+              this.project = this.projectsService.getProject(this.task.project);
+              //this.task.project_color = this.projectsService.getColor(this.task.project);
+              //this.task.project_sname = this.projectsService.getSName(this.task.project);
               console.info("task loaded", this.task);
             }
         )
