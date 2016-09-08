@@ -2,20 +2,21 @@
 export class Task {
 
     constructor (
-        private name: string, 
-        private project : string, 
-        private sortnum : number, 
-        private estimate : number, 
-        private created : number, 
-        private updated : number, 
-        private status : string, 
-        private description : string, 
-        private attachments : any[], 
-        private comments : any[], 
-        private worklog : any[]) {
+        public id: number,
+        public name: string, 
+        public project : string,  
+        public estimate : number,   
+        public description : string,
+        public status? : string,
+        public sortnum? : number,
+        public created? : number, 
+        public updated? : number,         
+        public attachments? : any[], 
+        public comments? : any[], 
+        public worklog? : any[]) {
     }
 
-
+    
     // private convertToTask(taskJson) : Task {
     //   return new Task(taskJson.name, taskJson.project, taskJson.sortnum, taskJson.estimate, taskJson.created, taskJson.updated,taskJson.status, taskJson.description, [], [], []);
     // }

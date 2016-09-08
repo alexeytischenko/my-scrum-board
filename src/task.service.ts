@@ -9,6 +9,7 @@ export class TaskService {
   
   private baseUrl = 'https://myscrum-f606c.firebaseio.com';
   task;
+  taskSatuses = ['idle', 'in progress', 'review', 'resolved'];
   
   constructor(private http: Http) { }
 
@@ -28,6 +29,7 @@ export class TaskService {
           taskRef.once('value', function(snapshot) {
             //console.log(snapshot.val());
             self.task = snapshot.val();
+            self.task.id = id;
 
             if (self.task.name.length > 0) {
               console.log("task", self.task);

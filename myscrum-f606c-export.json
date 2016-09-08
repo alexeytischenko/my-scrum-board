@@ -13,7 +13,7 @@
 			}
 		},
 		"comments" : {
-			"kt4ei6nL80Kr543" : {
+			"1" : {
 				"L80Kr543" : {
 					"user" : "Шеф",
 					"created" : 1459361875537,
@@ -25,18 +25,18 @@
 					"text" : "done!"
 				}
 			},
-			"mxxdssKkt4ei6" : {},
-			"kt4ei6nL80Krmt" : {},
-			"mxxvKkt4ei6" : {}
+			"2" : {},
+			"3" : {},
+			"4" : {}
 		},
 		"logs" : {
-			"kt4ei6nL80Kr543" : {},
-			"mxxdssKkt4ei6" : {},
-			"kt4ei6nL80Krmt" : {},
-			"mxxvKkt4ei6" : {}
+			"1" : {},
+			"2" : {},
+			"3" : {},
+			"4" : {}
 		},
 		"backlog" : {					
-			"kt4ei6nL80Kr543" : {
+			"1" : {
 				"name" : "APS version update",
 				"type": "s",
 				"project" : "-KPYfOOS14_Io1kP_cVr",
@@ -53,7 +53,7 @@
 					}
 				} 
 			},
-			"mxxdssKkt4ei6" : {
+			"2" : {
 				"name" : "DLIB add new keyboard",
 				"type": "s",
 				"project" : "-KPYfOO678_Io1kP_cVr",
@@ -65,7 +65,7 @@
 				"description" : "Добавить новую \"клавиатуру\"",
 				"attachments" : {} 
 			},
-			"kt4ei6nL80Krmt" : {
+			"3" : {
 				"name" : "APS bug fixes",
 				"type": "b",
 				"project" : "-KPYfOOS14_Io1kP_cVr",
@@ -82,7 +82,7 @@
 					}
 				} 
 			},
-			"mxxvKkt4ei6" : {
+			"4" : {
 				"name" : "DLIB pdf.js merge",
 				"type": "b",
 				"project" : "-KPYfOO678_Io1kP_cVr",
@@ -105,15 +105,15 @@
 			}
 		},
 		"comments" : {
-			"mSmxxvKkt" : {},
-			"mSmxxvt" : {}
+			"1" : {},
+			"2" : {}
 		},	
 		"logs" : {
-			"mSmxxvKkt" : {},
-			"mSmxxvt" : {}
+			"1" : {},
+			"2" : {}
 		},			
 		"backlog" : {
-			"mSmxxvKkt" : {
+			"1" : {
 				"name" : "Default",
 				"type": "s",
 				"project" : "-KPYfOOS14_Io1kP_mmm",
@@ -125,7 +125,7 @@
 				"description" : "",
 				"attachments" : {} 
 			},
-			"mSmxxvt" : {
+			"2" : {
 				"name" : "Default",
 				"type": "b",
 				"project" : "-KPYfOOS14_Io1kP_mmm",

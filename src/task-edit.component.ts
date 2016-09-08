@@ -13,24 +13,24 @@ import { Subscription } from 'rxjs/Subscription';
     <div class="panel panel-primary">
       <div class="panel-body">
         <div style="float:right;">
-            <a [routerLink]="['/']" class="btn btn-default">
-              <span class="glyphicon glyphicon-chevron-left"></span>
-              <span class="hidden-xs">Back</span>
-            </a>
-            <a [routerLink]="['/tasks/edit/'+ taskId]" class="btn btn-default">
-              <span class="glyphicon glyphicon-pencil"></span>
-              <span class="hidden-xs">Edit</span>
-            </a>          
-            <a href="javascript:void(0);" data-toggle="popover" title="Help" data-trigger="hover" data-content="You can edit the task properties. Click the Edit button"><span class="glyphicon glyphicon-question-sign"></span></a>
+            <a [routerLink]="['/tasks/'+ taskId]" class="btn btn-warning">
+              <span class="glyphicon glyphicon-remove"></span>
+              <span class="hidden-xs">Cancel</span>
+            </a> 
+            <button  (click)="onSave()" class="btn btn-primary">
+              <span class="glyphicon glyphicon-ok"></span>
+              <span class="hidden-xs">Save</span>
+            </button>            
+            
         </div>
         <div class="panel-body form-inline">               
-                <label>{{task.name}}</label> 
+                <input type="text" ng-required="true" [value]="task.name" class="form-control input-sm" style="width:50%" /> 
                 <button class="btn btn-{{project.color}} btn-xs hidden-xs" disabled="true">{{project.sname}} - {{task.id}}</button>           
         </div>
         <div class="panel-body">
-            <div>
+            <div class="form-inline">
               <label>Estimate</label>
-              <span>{{task.estimate}}</span> h / 0h
+              <input type="number" style="width:60px;" class="form-control input-sm" [value]="task.estimate" /> h / 0h
             </div>
             <div>
                 <label>Project</label>
@@ -47,67 +47,38 @@ import { Subscription } from 'rxjs/Subscription';
               </button>
             </div>  
         </div>      
-        <div class="panel-body">         
-          <div>
-            <label>Created</label>
-            {{task.created | date:'medium'}}
-          </div>
-          <div>
-            <label>Modified</label>
-            {{task.updated | date:'medium'}}
-          </div>
-        </div>
         
         <div class="panel-body">
           <label>Description</label> 
-          <span>{{task.description}}</span>
+          <textarea class="form-control input-sm" [value]="task.description" rows="4"></textarea>
         </div>
 
-        <div class="panel-body">
-          <div style="float:right;">
-            <button class="btn btn-default">
-              <span class="glyphicon glyphicon-file"></span>
-              <span class="hidden-xs">Add files</span>
-            </button>
-          </div>
-          <div>
-            <label>Attachments</label>
-            There are no attachments
-          </div>
-        </div>
-        <div class="panel-body">
-          <div style="float:right;">
-            <button class="btn btn-default">
-              <span class="glyphicon glyphicon-comment"></span>
-              <span class="hidden-xs">Add comment</span>
-            </button>
-          </div>
-          <div>
-            <label>Comments</label>
-            There are no comments
-          </div>       
-      </div>
-      <div class="panel-body">
-          <div style="float:right;">
-            <button class="btn btn-default">
-              <span class="glyphicon glyphicon-time"></span>
-              <span class="hidden-xs">Log work</span>
-            </button>
-          </div>
-          <div>
-            <label>Worklogs</label>
-            There are no worklogs
-          </div>       
-      </div>
 
+
+
+      <!--div class="panel-body">
+        <input type="text" [(ngModel)]="bookmark.title"
+          placeholder="Title" style="width: 25%;">
+        <input type="text" [(ngModel)]="bookmark.url" 
+          placeholder="URL" style="width: 50%;">
+        <button (click)="onSave()" class="btn btn-primary">
+          <span class="glyphicon glyphicon-ok"></span>
+          <span class="hidden-xs">Save</span>
+        </button>
+        <button (click)="onClear()" class="btn btn-warning">
+          <span class="glyphicon glyphicon-remove"></span>
+          <span class="hidden-xs">Clear</span>
+        </button>
+      </div-->
     </div>
   `,
 })
-export class TaskComponent implements OnInit, OnDestroy {
+export class TaskEditComponent implements OnInit, OnDestroy {
 
   task;
   taskId;
   project : Project;
+  editorMode : boolean;
   taskStatuses : string[];
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
   @Output() clear = new EventEmitter();
@@ -126,6 +97,7 @@ export class TaskComponent implements OnInit, OnDestroy {
 
       this.task = {};
       this.project = new Project();
+      this.editorMode = false;
       this.taskStatuses = this.taskService.taskSatuses;
 
       //load projects if ness
@@ -136,9 +108,6 @@ export class TaskComponent implements OnInit, OnDestroy {
         this.projectsService.loadProjects(this.userId);
   }
 
-  get diagnostic() {
-    return JSON.stringify(this.task);
-  }
 
   onClear() {
     this.clear.emit(null);
@@ -146,6 +115,10 @@ export class TaskComponent implements OnInit, OnDestroy {
 
   onSave() {
     this.save.emit(this.task);
+  }
+
+  onEdit() {
+    this.editorMode = true;
   }
 
   ngOnInit() {
