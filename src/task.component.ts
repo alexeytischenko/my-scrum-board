@@ -140,14 +140,6 @@ export class TaskComponent implements OnInit, OnDestroy {
     return JSON.stringify(this.task);
   }
 
-  onClear() {
-    this.clear.emit(null);
-  }
-
-  onSave() {
-    this.save.emit(this.task);
-  }
-
   ngOnInit() {
     let self = this;
 

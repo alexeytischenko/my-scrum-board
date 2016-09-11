@@ -9,76 +9,71 @@ import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'task-panel',
-  template: `
+  template: `{{diagnostic}}
     <div class="panel panel-primary">
+    <form (ngSubmit)="onSave()" #editForm="ngForm">
       <div class="panel-body">
         <div style="float:right;">
-            <a [routerLink]="['/tasks/'+ taskId]" class="btn btn-warning">
+            <a [routerLink]="['/tasks/'+ taskUrl]" class="btn btn-warning">
               <span class="glyphicon glyphicon-remove"></span>
               <span class="hidden-xs">Cancel</span>
             </a> 
-            <button  (click)="onSave()" class="btn btn-primary">
+            <button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid">
               <span class="glyphicon glyphicon-ok"></span>
               <span class="hidden-xs">Save</span>
+              <!-- (click)="onSave()"-->
             </button>            
-            
+      
         </div>
         <div class="panel-body form-inline">               
-                <input type="text" ng-required="true" [value]="task.name" class="form-control input-sm" style="width:50%" /> 
-                <button class="btn btn-{{project.color}} btn-xs hidden-xs" disabled="true">{{project.sname}} - {{task.id}}</button>           
+                <input type="text" name="name" required [(ngModel)]="task.name" class="form-control input-sm" style="width:50%" #nameValidation="ngModel" /> 
+                <button *ngIf="!newTask" class="btn btn-{{project.color}} btn-xs hidden-xs" disabled="true">{{project.sname}} - {{task.id}}</button>    
+                <div class="alert alert-danger" style="width:50%" [hidden]="nameValidation.valid || nameValidation.pristine">Name is required</div>       
         </div>
         <div class="panel-body">
             <div class="form-inline">
-              <label>Estimate</label>
-              <input type="number" style="width:60px;" class="form-control input-sm" [value]="task.estimate" /> h / 0h
+              <label for="estimate">Estimate</label>
+              <input type="number" id="estimate" name="estimate" style="width:60px;" class="form-control input-sm" [(ngModel)]="task.estimate" /> h / 0h
             </div>
             <div>
-                <label>Project</label>
+                <label for="project">Project</label>
+
                 {{project.name}}
             </div> 
-            <div>
-              <label>Status</label>
-
-              <button class="btn btn-xs" 
-                  [class.btn-primary]="task.status==='in progress'" 
-                  [class.btn-success]="task.status==='resolved'" 
-                  disabled="true">
-                    {{task.status}}
-              </button>
+            <div class="form-group">
+              <label for="status">Status</label>
+              <div class="form-inline">
+                <select name="status" id="status" [(ngModel)]="task.status" class="form-control input-sm" style="width:50%">
+                  <option *ngFor="let status of taskStatuses" [value]="status">{{status}}</option>
+                </select>
+                <button class="btn btn-xs" 
+                    [class.btn-primary]="task.status==='in progress'" 
+                    [class.btn-success]="task.status==='resolved'" 
+                    [class.btn-info]="task.status==='review'"
+                    disabled="true">
+                      {{task.status}}
+                </button>
+              </div>
             </div>  
         </div>      
         
         <div class="panel-body">
-          <label>Description</label> 
-          <textarea class="form-control input-sm" [value]="task.description" rows="4"></textarea>
+          <label for="description">Description</label> 
+          <textarea name="description" id="description" class="form-control input-sm" [(ngModel)]="task.description" rows="4"></textarea>
         </div>
 
-
-
-
-      <!--div class="panel-body">
-        <input type="text" [(ngModel)]="bookmark.title"
-          placeholder="Title" style="width: 25%;">
-        <input type="text" [(ngModel)]="bookmark.url" 
-          placeholder="URL" style="width: 50%;">
-        <button (click)="onSave()" class="btn btn-primary">
-          <span class="glyphicon glyphicon-ok"></span>
-          <span class="hidden-xs">Save</span>
-        </button>
-        <button (click)="onClear()" class="btn btn-warning">
-          <span class="glyphicon glyphicon-remove"></span>
-          <span class="hidden-xs">Clear</span>
-        </button>
-      </div-->
     </div>
+  </form>  
+  </div>
   `,
 })
 export class TaskEditComponent implements OnInit, OnDestroy {
 
   task;
+  taskUrl;
   taskId;
   project : Project;
-  editorMode : boolean;
+  newTask : boolean;
   taskStatuses : string[];
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
   @Output() clear = new EventEmitter();
@@ -96,8 +91,8 @@ export class TaskEditComponent implements OnInit, OnDestroy {
       }
 
       this.task = {};
+      this.newTask = false;
       this.project = new Project();
-      this.editorMode = false;
       this.taskStatuses = this.taskService.taskSatuses;
 
       //load projects if ness
@@ -108,17 +103,9 @@ export class TaskEditComponent implements OnInit, OnDestroy {
         this.projectsService.loadProjects(this.userId);
   }
 
-
-  onClear() {
-    this.clear.emit(null);
-  }
-
   onSave() {
+    console.log("Submit fired");
     this.save.emit(this.task);
-  }
-
-  onEdit() {
-    this.editorMode = true;
   }
 
   ngOnInit() {
@@ -126,27 +113,39 @@ export class TaskEditComponent implements OnInit, OnDestroy {
 
     this.paramsSubscription = this.route.params.subscribe(
       params => {
-        progress_start ("");
-        this.taskId = params['tasktId'];
-        this.taskService.getTask("mSmxxvKkt4ei6nL80Krmt9R0m983", this.taskId)
-        .then ( () => {
-              this.task = this.taskService.task;
-              this.project = this.projectsService.getProject(this.task.project);
-              console.info("task loaded", this.task);
-            }
-        )
-        .catch((error)=>console.error("Task component error:", error))
-        .then (() => {
-          //finally
-          progress_end();
-        });
-
+        if (params['tasktId'] > 0) {
+          progress_start ("");
+          this.taskId = params['tasktId'];
+          this.taskUrl = this.taskId;
+          this.taskService.getTask("mSmxxvKkt4ei6nL80Krmt9R0m983", this.taskId)
+          .then ( () => {
+                this.task = this.taskService.task;
+                this.project = this.projectsService.getProject(this.task.project);
+                console.info("task loaded", this.task);
+              }
+          )
+          .catch((error)=>console.error("Task component error:", error))
+          .then (() => {
+            //finally
+            progress_end();
+          });
+        }
+          else {
+            this.newTask = true;
+            this.taskUrl = "";
+            this.task.estimate = 0;
+            this.task.status = "idle";
+          }
       }
     );
 
     $(document).ready(function(){
         $('[data-toggle="popover"]').popover();
     });
+  }
+
+  get diagnostic() {
+    return JSON.stringify(this.task);
   }
 
   ngOnDestroy() {

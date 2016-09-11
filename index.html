@@ -30,6 +30,14 @@
       System.import('app').catch(function(err) { console.error(err);  });
     </script>
     <style>
+      .ng-valid[required], .ng-valid.required  {
+        border-left: 5px solid #42A948; /* green */
+      }
+
+      .ng-invalid:not(form)  {
+        border-left: 5px solid #a94442; /* red */
+      }
+
       h1, h2, h3 {
           margin-top: 1px;
           margin-bottom: 5px;
@@ -114,10 +122,10 @@
       </div>
     </div>
      <div class="col-xs-4">
-        <button class="btn btn-primary">
+        <a href="/tasks/edit/-1" class="btn btn-primary">
           <span class="glyphicon glyphicon-plus-sign"></span>
           <span class="hidden-xs">Create task</span>
-        </button>
+        </a>
      </div>
      <!--<div class="col-sm-2">
        <button class="btn btn-default">
