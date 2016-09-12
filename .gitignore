@@ -3,3 +3,4 @@ firebase-debug.log
 .DS_Store
 app/*
 node_modules/*
+npm-debug.log
