@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { HttpModule } from '@angular/http';
+// import { HttpModule } from '@angular/http';
 import { TasksListService } from './tasks-list.service';
 import { TaskService } from './task.service';
 import { Project } from './project.class';
@@ -39,7 +39,7 @@ const routerModule = RouterModule.forRoot([
 ]);
 
 @NgModule({
-  imports: [BrowserModule, FormsModule, HttpModule, routerModule],
+  imports: [BrowserModule, FormsModule, routerModule],
   declarations: [AppComponent, ScrumBoard, TaskComponent, TaskEditComponent],
   providers: [TasksListService, TaskService, ProjectsService, Project],
   bootstrap: [AppComponent]

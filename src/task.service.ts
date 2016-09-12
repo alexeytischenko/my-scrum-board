@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+// import { Http } from '@angular/http';
 import { Task } from './task.class';
 
 @Injectable()
@@ -11,14 +11,7 @@ export class TaskService {
   task;
   taskSatuses = ['idle', 'in progress', 'review', 'resolved'];
   
-  constructor(private http: Http) { }
-
-  addBookmark(bookmark) {
-    const json = JSON.stringify(bookmark);
-    return this.http.post(`${this.baseUrl}/tasks.json`, json)
-      .toPromise()
-      .catch(this.errorHandler);
-  }
+  constructor() { }
 
   getTask(url: string, id:string) {
     let self = this;
@@ -39,30 +32,6 @@ export class TaskService {
           }); 
       }
     );
-  }
-
-  getBackLogTask(id: string) {
-
-      return this.http.get(`${this.baseUrl}/backlog/mSmxxvKkt4ei6nL80Krmt9R0m983/${id}.json`)
-      .toPromise()
-      .then(response => response.json())
-      .catch(this.errorHandler);
-  }
-
-  removeBookmark(bookmark) {
-    return this.http.delete(`${this.baseUrl}/tasks/${bookmark.id}.json`)
-      .toPromise()
-      .catch(this.errorHandler);
-  }
-
-  updateBookmark(bookmark) {
-    const json = JSON.stringify({
-      title: bookmark.title,
-      url: bookmark.url
-    });
-    return this.http.patch(`${this.baseUrl}/tasks/${bookmark.id}.json`, json)
-      .toPromise()
-      .catch(this.errorHandler);
   }
 
   // private convertToTask(taskJson) : Task {

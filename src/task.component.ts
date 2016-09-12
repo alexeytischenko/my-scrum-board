@@ -38,10 +38,10 @@ import { Subscription } from 'rxjs/Subscription';
             </div> 
             <div>
               <label>Status</label>
-
               <button class="btn btn-xs" 
                   [class.btn-primary]="task.status==='in progress'" 
                   [class.btn-success]="task.status==='resolved'" 
+                  [class.btn-info]="task.status==='review'" 
                   disabled="true">
                     {{task.status}}
               </button>

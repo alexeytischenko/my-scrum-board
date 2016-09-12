@@ -30,43 +30,35 @@
       System.import('app').catch(function(err) { console.error(err);  });
     </script>
     <style>
-      .ng-valid[required], .ng-valid.required  {
-        border-left: 5px solid #42A948; /* green */
-      }
+  body { background-color:#fafafa;}
 
-      .ng-invalid:not(form)  {
-        border-left: 5px solid #a94442; /* red */
-      }
+  h1, h2, h3 {
+      margin-top: 1px;
+      margin-bottom: 5px;
+  }
+  h1 {font-size: 16px;}
+  h2 {font-size: 14px;}
+  .progress {
+    height: 10px;
+    margin-top: 5px;
+    width: 100px;
+  }
+  .w50 {
+    width:50%;
+  }
+  .w100 {
+    width:100%;
+  }
+  .w0 {
+    width:0%;
+  }            
+  .panel-body {
+      padding: 15px 15px 5px 15px;
+  }
+  .progress-bar-red {
+      background-color: red !important;
+  }
 
-      h1, h2, h3 {
-          margin-top: 1px;
-          margin-bottom: 5px;
-      }
-      h1 {font-size: 16px;}
-      h2 {font-size: 14px;}
-      .progress {
-        height: 10px;
-        margin-top: 5px;
-        width: 100px;
-      }
-      .w50 {
-        width:50%;
-      }
-      .w100 {
-        width:100%;
-      }
-      .w0 {
-        width:0%;
-      }            
-      .panel-body {
-          padding: 15px 15px 5px 15px;
-      }
-      .progress-bar-red {
-          background-color: red !important;
-      }
-    </style>
-
-<style>
   #jquery-script-menu {
     position: fixed;
     height: 40px;
@@ -88,22 +80,6 @@
     width: 90%;
     margin: 0 auto;
 }
-    body { background-color:#fafafa;}
-        .table-sortable {
-            position: relative;
-        }
-        .table-sortable .sortable-placeholder {
-            height: 37px;
-        }
-        .table-sortable .sortable-placeholder:after {
-            position: absolute;
-            z-index: 10;
-            content: " ";
-            height: 37px;
-            background: #f9f9f9;
-            left: 0;
-            right: 0;
-        }
 	</style>
   </head>
   <body>
