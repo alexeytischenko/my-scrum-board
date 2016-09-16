@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TaskService } from './task.service';
 import { ProjectsService } from './projects.service';
 import { Project } from './project.class';
@@ -40,15 +40,19 @@ import { Subscription } from 'rxjs/Subscription';
 
         <div class="form-group">
             <label for="project">Project</label>
-            {{project.name}}
+            <div class="form-inline">
+              <select name="project" id="project" [(ngModel)]="task.project" class="form-control input-sm w50">
+                <option *ngFor="let pr of projects" [value]="pr.id">{{pr.name}}</option>
+              </select>
+              <newproject></newproject>              
+            </div> 
         </div> 
 
         <div class="form-group w50">
             <label for="status">Status</label>
             <select name="status" id="status" [(ngModel)]="task.status" class="form-control input-sm">
               <option *ngFor="let status of taskStatuses" [value]="status">{{status}}</option>
-            </select>
-
+            </select> 
         </div>    
         
         <div class="form-group">
@@ -71,6 +75,7 @@ export class TaskEditComponent implements OnInit, OnDestroy {
   taskUrl;
   taskId;
   project : Project;
+  projects;
   taskStatuses : string[];
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
   @Output() clear = new EventEmitter();
@@ -80,7 +85,8 @@ export class TaskEditComponent implements OnInit, OnDestroy {
 
   constructor(private route : ActivatedRoute,
               private taskService : TaskService,
-              private projectsService : ProjectsService) {
+              private projectsService : ProjectsService,
+              private router: Router) {
 
       this.taskService.errorHandler = error => {
         console.error('Task component error! ' + error);
@@ -88,43 +94,31 @@ export class TaskEditComponent implements OnInit, OnDestroy {
       }
 
       this.task = {};
+      this.projects = [];
       this.project = new Project();
       this.taskStatuses = this.taskService.taskSatuses;
 
       //load projects if ness
       if (this.projectsService.projects && this.projectsService.projects.length > 0) {
         console.info('projects already loaded');
+        this.projects = this.projectsService.projects;
       }
       else
-        this.projectsService.loadProjects(this.userId);
+        this.projectsService.loadProjects(this.userId)
+          .then ( () => this.projects = this.projectsService.projects);
   }
 
   onSave() {
     console.log("Submit fired");
-    this.save.emit(this.task);
+    progress_start("red");
+    this.taskService.saveTask(this.userId, this.task)
+      .catch((error)=>this.taskService.errorHandler(error))
+      .then(()=> {    
+        //finally / default     
+        progress_end();
+        setTimeout(() => this.router.navigateByUrl('/tasks/'+ this.taskUrl), 1000);
+      });
   }
-
-  saveTask(uid, username, picture, title, body) {
-    //////////////////////////////////////////////////      FOR UPDATE     ///////////////////////////
-    var postData = {
-      author: username,
-      uid: uid,
-      body: body,
-      title: title,
-      starCount: 0,
-      authorPic: picture
-    };
-
-    // Get a key for a new Post.
-    var newPostKey = firebase.database().ref().child('posts').push().key;
-
-    // Write the new post's data simultaneously in the posts list and the user's post list.
-    var updates = {};
-    updates['/posts/' + newPostKey] = postData;
-    updates['/user-posts/' + uid + '/' + newPostKey] = postData;
-
-    return firebase.database().ref().update(updates);
-}
 
 
   ngOnInit() {
@@ -132,7 +126,12 @@ export class TaskEditComponent implements OnInit, OnDestroy {
 
     this.paramsSubscription = this.route.params.subscribe(
       params => {
-        if (params['tasktId'] > 0) {
+        if (params['tasktId'] == -1) {
+          this.taskUrl = "";
+          this.task.estimate = 0;
+          this.task.status = "idle";
+        }
+        else {
           progress_start ("");
           this.taskId = params['tasktId'];
           this.taskUrl = this.taskId;
@@ -149,11 +148,6 @@ export class TaskEditComponent implements OnInit, OnDestroy {
             progress_end();
           });
         }
-          else {
-            this.taskUrl = "";
-            this.task.estimate = 0;
-            this.task.status = "idle";
-          }
       }
     );
 
@@ -163,7 +157,7 @@ export class TaskEditComponent implements OnInit, OnDestroy {
   }
 
   get diagnostic() {
-    return JSON.stringify(this.task);
+    return JSON.stringify(this.projects);
   }
 
   ngOnDestroy() {

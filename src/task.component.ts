@@ -17,15 +17,26 @@ import { Subscription } from 'rxjs/Subscription';
               <span class="glyphicon glyphicon-chevron-left"></span>
               <span class="hidden-xs">Back</span>
             </a>
+            <span class="dropdown">
+              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">...</button>
+              <ul class="dropdown-menu">
+                <li><a href="#">Resolve / Reopen task</a></li>
+                <li><a href="#">Move task to archive</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Add comment</a></li>
+                <li><a href="#">Add attachment</a></li>
+                <li><a href="#">Log work</a></li>
+              </ul>
+            </span>
             <a [routerLink]="['/tasks/edit/'+ taskId]" class="btn btn-default">
               <span class="glyphicon glyphicon-pencil"></span>
               <span class="hidden-xs">Edit</span>
-            </a>          
-            <a href="javascript:void(0);" data-toggle="popover" title="Help" data-trigger="hover" data-content="You can edit the task properties. Click the Edit button"><span class="glyphicon glyphicon-question-sign"></span></a>
+            </a>      
+            <a href="javascript:void(0);" data-toggle="popover" title="Help" data-trigger="hover" data-content="To edit the task click the Edit button"><span class="glyphicon glyphicon-question-sign"></span></a>
         </div>
         <div class="panel-body form-inline">               
                 <label>{{task.name}}</label> 
-                <button class="btn btn-{{project.color}} btn-xs hidden-xs" disabled="true">{{project.sname}} - {{task.id}}</button>           
+                <button class="btn btn-{{project.color}} btn-xs hidden-xs" disabled="true">{{project.sname}} - {{task.id_in_project}}</button>           
         </div>
         <div class="panel-body">
             <div>
@@ -72,7 +83,7 @@ import { Subscription } from 'rxjs/Subscription';
           </div>
           <div>
             <label>Attachments</label>
-            There are no attachments
+            <p class="norecords">There are no attachments</p>
           </div>
         </div>
         <div class="panel-body">
@@ -84,7 +95,7 @@ import { Subscription } from 'rxjs/Subscription';
           </div>
           <div>
             <label>Comments</label>
-            There are no comments
+            <p class="norecords">There are no comments</p>
           </div>       
       </div>
       <div class="panel-body">
@@ -96,12 +107,16 @@ import { Subscription } from 'rxjs/Subscription';
           </div>
           <div>
             <label>Worklogs</label>
-            There are no worklogs
+            <p class="norecords">There are no worklogs</p>
           </div>       
       </div>
 
     </div>
   `,
+  styles : [`
+    .norecords {color: #999; font-style: italic}
+    .dropdown {padding-bottom: 10px;}
+  `]
 })
 export class TaskComponent implements OnInit, OnDestroy {
 

@@ -85,6 +85,7 @@ export class TasksListService {
     return {
         id : id,
         name: objectedResponse.name,
+        id_in_project : objectedResponse.id_in_project,
         project: project.sname,
         project_color : project.color,
         sortnum: objectedResponse.sortnum,

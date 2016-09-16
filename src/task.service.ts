@@ -15,7 +15,7 @@ export class TaskService {
 
   getTask(url: string, id:string) {
     let self = this;
-    var taskRef = firebase.database().ref(`${url}/backlog/`).child(id);
+    let taskRef = firebase.database().ref(`${url}/backlog/`).child(id);
     taskRef.off(); 
 
     return new Promise(function(resolve, reject) {
@@ -32,6 +32,41 @@ export class TaskService {
           }); 
       }
     );
+  }
+
+  saveTask(url: string, task) {
+    
+    let postData = {
+      name: task.name,
+      estimate: task.estimate,
+      status: task.status,
+      description: task.description,
+      project: task.project,
+      updated: Date.now()
+    };
+
+    console.log("update data", postData);
+    console.log("update data id", task.id);
+
+    let self = this;
+    let taskRef = firebase.database().ref(`${url}/backlog/`).child(task.id);
+
+    return new Promise(function(resolve, reject) {
+        taskRef.update(postData, function(snapshot) {
+            console.log(snapshot);
+            resolve(true);
+          }); 
+      }
+    );
+    // // Get a key for a new Post.
+    // var newPostKey = firebase.database().ref().child('posts').push().key;
+
+    // // Write the new post's data simultaneously in the posts list and the user's post list.
+    // var updates = {};
+    // updates['/posts/' + newPostKey] = postData;
+    // updates['/user-posts/' + uid + '/' + newPostKey] = postData;
+
+    // return firebase.database().ref().update(updates);
   }
 
   // private convertToTask(taskJson) : Task {

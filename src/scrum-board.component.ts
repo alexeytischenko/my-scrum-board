@@ -15,7 +15,7 @@ import { Project } from './project.class';
               <template ngFor let-taskElement [ngForOf]="backLog">
                 <li *ngIf="taskElement.type=='s'" class="list-group-item" id="{{taskElement.id}}">
                   <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
-                  <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.id}}</span> 
+                  <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.id_in_project}}</span> 
                   <span class="badge">{{taskElement.estimate}}h / 0h</span>
                 </li>
               </template>
@@ -30,7 +30,7 @@ import { Project } from './project.class';
                <template ngFor let-taskElement [ngForOf]="backLog">
                 <li *ngIf="taskElement.type=='b'" class="list-group-item" id="{{taskElement.id}}">
                   <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
-                  <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.id}}</span> 
+                  <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.id_in_project}}</span> 
                   <span class="badge">{{taskElement.estimate}}h / 0h</span>
                 </li>
               </template>  

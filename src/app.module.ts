@@ -11,6 +11,7 @@ import { AppComponent } from './app.component';
 import { TaskComponent } from './task.component';
 import { TaskEditComponent } from './task-edit.component';
 import { ScrumBoard } from './scrum-board.component';
+import { NewProject } from './new-project.component';
 
 
 const routerModule = RouterModule.forRoot([
@@ -40,7 +41,7 @@ const routerModule = RouterModule.forRoot([
 
 @NgModule({
   imports: [BrowserModule, FormsModule, routerModule],
-  declarations: [AppComponent, ScrumBoard, TaskComponent, TaskEditComponent],
+  declarations: [AppComponent, ScrumBoard, TaskComponent, TaskEditComponent, NewProject],
   providers: [TasksListService, TaskService, ProjectsService, Project],
   bootstrap: [AppComponent]
 })

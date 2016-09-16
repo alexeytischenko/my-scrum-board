@@ -13,7 +13,7 @@
 			}
 		},
 		"comments" : {
-			"1" : {
+			"1x" : {
 				"L80Kr543" : {
 					"user" : "Шеф",
 					"created" : 1459361875537,
@@ -25,21 +25,22 @@
 					"text" : "done!"
 				}
 			},
-			"2" : {},
-			"3" : {},
-			"4" : {}
+			"2x" : {},
+			"3x" : {},
+			"4x" : {}
 		},
 		"logs" : {
-			"1" : {},
-			"2" : {},
-			"3" : {},
-			"4" : {}
+			"1x" : {},
+			"2x" : {},
+			"3x" : {},
+			"4x" : {}
 		},
 		"backlog" : {					
-			"1" : {
+			"1x" : {
 				"name" : "APS version update",
 				"type": "s",
 				"project" : "-KPYfOOS14_Io1kP_cVr",
+				"id_in_project" : 1,
 				"sortnum" : 1,
 				"estimate" : 5,
 				"created": 1459361875337,
@@ -53,10 +54,11 @@
 					}
 				} 
 			},
-			"2" : {
+			"2x" : {
 				"name" : "DLIB add new keyboard",
 				"type": "s",
 				"project" : "-KPYfOO678_Io1kP_cVr",
+				"id_in_project" : 1,
 				"sortnum" : 2,
 				"estimate" : 15,
 				"created": 1459361875337,
@@ -65,10 +67,11 @@
 				"description" : "Добавить новую \"клавиатуру\"",
 				"attachments" : {} 
 			},
-			"3" : {
+			"3x" : {
 				"name" : "APS bug fixes",
 				"type": "b",
 				"project" : "-KPYfOOS14_Io1kP_cVr",
+				"id_in_project" : 2,
 				"sortnum" : 1,
 				"estimate" : 10,
 				"created": 1459361875337,
@@ -82,10 +85,11 @@
 					}
 				} 
 			},
-			"4" : {
+			"4x" : {
 				"name" : "DLIB pdf.js merge",
 				"type": "b",
 				"project" : "-KPYfOO678_Io1kP_cVr",
+				"id_in_project" : 2,
 				"sortnum" : 2,
 				"estimate" : 2,
 				"created": 1459361875337,
@@ -105,18 +109,19 @@
 			}
 		},
 		"comments" : {
-			"1" : {},
-			"2" : {}
+			"1x" : {},
+			"2x" : {}
 		},	
 		"logs" : {
-			"1" : {},
-			"2" : {}
+			"1x" : {},
+			"2x" : {}
 		},			
 		"backlog" : {
-			"1" : {
+			"1x" : {
 				"name" : "Default",
 				"type": "s",
 				"project" : "-KPYfOOS14_Io1kP_mmm",
+				"id_in_project" : 1,
 				"sortnum" : 1,
 				"estimate" : 5,
 				"created": 1459361875337,
@@ -125,10 +130,11 @@
 				"description" : "",
 				"attachments" : {} 
 			},
-			"2" : {
+			"2x" : {
 				"name" : "Default",
 				"type": "b",
 				"project" : "-KPYfOOS14_Io1kP_mmm",
+				"id_in_project" : 2,
 				"sortnum" : 1,
 				"estimate" : 3,
 				"created": 1459361875337,

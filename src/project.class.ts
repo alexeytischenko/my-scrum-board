@@ -13,5 +13,9 @@ export class Project {
         this.sname = sname;
     }
 
+    newProject(name: string, color: string) {
+        this.name = name;
+        this.color = color;
+    }
 
  }
