@@ -38,6 +38,10 @@ import { Project } from './project.class';
       </div>
     </section>
   `,
+  styles : [`
+    .list-group-item {cursor: move;}
+    .list-group-item:hover {background: #e9e9e9;}
+  `]
 })
 export class ScrumBoard {
 

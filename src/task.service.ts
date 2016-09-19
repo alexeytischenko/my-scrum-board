@@ -69,21 +69,5 @@ export class TaskService {
     // return firebase.database().ref().update(updates);
   }
 
-  // private convertToTask(taskJson) : Task {
-  //   return new Task(taskJson.name, taskJson.project, taskJson.sortnum, taskJson.estimate, taskJson.created, taskJson.updated,taskJson.status, taskJson.description, [], [], []);
-
-  // }
-
-  // private convert(parsedResponse) {
-  //   return Object.keys(parsedResponse)
-  //     .map(id => ({
-  //       id : id,
-  //       name: parsedResponse[id].name,
-  //       project: parsedResponse[id].project,
-  //       sortnum: parsedResponse[id].sortnum,
-  //       estimate: parsedResponse[id].estimate
-  //     }));
-  //    // .sort((a, b) => a.name.localeCompare(b.name));
-  // }
 
 }

@@ -28,6 +28,7 @@ import { Project } from './project.class';
   `,
   styles : [`
     .new_project_form {float:right;}
+
   `]
 })
 export class NewProject implements OnInit {  
@@ -45,11 +46,12 @@ export class NewProject implements OnInit {
 
     addProject() {
         
+        return false;
     }
 
     showNewProjectForm() {
         this.setNewProject = true;
-        setTimeout(() => $('[data-toggle="popover"]').popover(), 2000);
+        setTimeout(() => $('[data-toggle="popover"]').popover(), 1000);
     }
 
     clear() {

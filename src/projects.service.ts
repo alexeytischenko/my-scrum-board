@@ -28,22 +28,6 @@ export class ProjectsService {
     );
   }
 
-  // loadProjects(url) {
-  //   var projectsRef = firebase.database().ref(`${url}/projects/`);
-  //   projectsRef.off();
-  //   projectsRef.on('value', snapshot => this.projects = this.convert(snapshot.val())); 
-  // }
-
-  convert(objectedResponse) {
-    return Object.keys(objectedResponse)
-      .map(id => ({
-        id : id,
-        name: objectedResponse[id].name,
-        sname: objectedResponse[id].sname,
-        color: objectedResponse[id].color
-      }));
-  }
-
   getProject(project : string) : Project {
 
     let projectData = new Project();
@@ -54,20 +38,39 @@ export class ProjectsService {
     return projectData;
   }
 
-  // getColor(project : string) {
-  //     let color;
-  //     this.projects.forEach(element => {
-  //           if (element.id == project)  color = element.color; 
-  //     });
-  //     return color;
-  // }
-  // getSName(project : string) {
-  //     let sname = "";
-  //     console.log("pr", project);
-  //     this.projects.forEach(element => {
-  //         if (element.id == project)  sname = element.sname; 
-  //         else console.log("n", element);
-  //     });
-  //     return sname;
-  // }
+  addProject(url: string, newProject : Project) {
+    let self = this;
+    var projectsRef = firebase.database().ref(`${url}/projects/`);
+    projectsRef.off();  
+
+    let postData = {
+      name: newProject.name,
+      sname: newProject.sname,
+      color: newProject.color
+    };
+
+    console.log("project add data", postData);
+
+/////////////////// ассинхорнно получить new key до или после основного insert
+    return new Promise(function(resolve, reject) {
+            // // Get a key for a new Post.
+      var newPostKey = firebase.database().ref().child('posts').push().key;
+        taskRef.update(postData, function(snapshot) {
+            console.log(snapshot);
+            resolve(true);
+          }); 
+      }
+    );
+
+  }
+
+  convert(objectedResponse) {
+    return Object.keys(objectedResponse)
+      .map(id => ({
+        id : id,
+        name: objectedResponse[id].name,
+        sname: objectedResponse[id].sname,
+        color: objectedResponse[id].color
+      }));
+  }
 }
