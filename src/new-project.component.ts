@@ -36,16 +36,32 @@ export class NewProject implements OnInit {
     newproject : string;
     newcolor : string;
     setNewProject : boolean;
+    userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
     colors = ['white', 'orange', 'dark blue', 'blue', 'red', 'green'];
     colorsMap: any = {'white': 'default', 'orange': 'warning', 'dark blue': 'primary', 'blue': 'info', 'red': 'danger','green': 'success'};
 
 
-    constructor() {
+    constructor(private projectsService: ProjectsService) {
         this.clear();
+        this.projectsService.errorHandler = error => {
+            window.alert('Could not create a new project.');
+        }
     }
 
     addProject() {
+        //creating new Project object
+        let projectToAdd = new Project();
+        projectToAdd.newProject(this.newproject, this.newcolor);
         
+        //add new Project 
+        progress_start("red");
+        this.projectsService.addProject(this.userId, projectToAdd)
+            .catch((error)=>this.projectsService.errorHandler(error))
+            .then(()=> {    
+                //finally / default    
+                this.clear();
+                progress_end();
+            });
         return false;
     }
 
@@ -55,6 +71,7 @@ export class NewProject implements OnInit {
     }
 
     clear() {
+        //clearing new project form
         this.setNewProject = false;
         this.newproject = "";
         this.newcolor = "";

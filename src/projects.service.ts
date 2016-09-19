@@ -40,8 +40,7 @@ export class ProjectsService {
 
   addProject(url: string, newProject : Project) {
     let self = this;
-    var projectsRef = firebase.database().ref(`${url}/projects/`);
-    projectsRef.off();  
+    let projectsRef = firebase.database().ref(`${url}/projects/`);
 
     let postData = {
       name: newProject.name,
@@ -51,14 +50,18 @@ export class ProjectsService {
 
     console.log("project add data", postData);
 
-/////////////////// ассинхорнно получить new key до или после основного insert
     return new Promise(function(resolve, reject) {
-            // // Get a key for a new Post.
-      var newPostKey = firebase.database().ref().child('posts').push().key;
-        taskRef.update(postData, function(snapshot) {
-            console.log(snapshot);
-            resolve(true);
-          }); 
+      projectsRef.push(postData, function(snapshot) {
+          self.projects.push({
+            name: newProject.name,
+            sname: newProject.sname,
+            color: newProject.color,
+            id: projectsRef.toString()
+          });
+
+          console.log("new projects", self.projects);
+          resolve(true);
+        }); 
       }
     );
 
