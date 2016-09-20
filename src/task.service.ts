@@ -35,39 +35,80 @@ export class TaskService {
   }
 
   saveTask(url: string, task) {
-    
-    let postData = {
-      name: task.name,
-      estimate: task.estimate,
-      status: task.status,
-      description: task.description,
-      project: task.project,
-      updated: Date.now()
-    };
-
-    console.log("update data", postData);
-    console.log("update data id", task.id);
-
+    let postData; 
     let self = this;
-    let taskRef = firebase.database().ref(`${url}/backlog/`).child(task.id);
+    let taskRef = firebase.database().ref(`${url}/backlog/`);
 
-    return new Promise(function(resolve, reject) {
-        taskRef.update(postData, function(snapshot) {
-            console.log(snapshot);
-            resolve(true);
-          }); 
-      }
-    );
-    // // Get a key for a new Post.
-    // var newPostKey = firebase.database().ref().child('posts').push().key;
+    if (task.id == -1) {
+      //new task properties
+      return new Promise(function(resolve, reject) {
+        self.getMaxCodeNum(url)
+          .catch((error)=>reject(error))
+          .then((maxnum : any)=> { 
+            console.error("maxnum", maxnum);
+            const newmaxnum = maxnum.code + 1;
+            postData = {
+              name: task.name,
+              estimate: task.estimate,
+              sortnum : Date.now(),
+              status: task.status,
+              type: "b",
+              code: newmaxnum,
+              description: task.description,
+              project: task.project,
+              updated: Date.now(),
+              created: Date.now()
+            }
+            let newtaskRef = taskRef.push();
+            newtaskRef.set(postData, function(error) {
+              if (error) {
+                reject(error);
+              } else {
+                  console.log("new task", postData);
+                  console.log("newtaskRef", newtaskRef.key.toString());
+                  resolve(newtaskRef.key.toString());
+              }
+            }); 
+          });
+      });
 
-    // // Write the new post's data simultaneously in the posts list and the user's post list.
-    // var updates = {};
-    // updates['/posts/' + newPostKey] = postData;
-    // updates['/user-posts/' + uid + '/' + newPostKey] = postData;
+    } else {
+        //existing task properties
+        postData = {
+          name: task.name,
+          estimate: task.estimate,
+          status: task.status,
+          description: task.description,
+          project: task.project,
+          updated: Date.now()
+        }
 
-    // return firebase.database().ref().update(updates);
+        return new Promise(function(resolve, reject) {
+            taskRef.child(task.id).update(postData, function(error) {
+                if (error) {
+                  console.error('Update failed');
+                  reject(error);
+                } else {
+                  resolve(true);
+                }
+            }); 
+        });
+    }
+
   }
 
+  private getMaxCodeNum (url) {
+    let tasksRef = firebase.database().ref(`${url}/backlog/`);
+    
+    return new Promise(function(resolve, reject) {
+          tasksRef.orderByChild("code").limitToLast(1).once('value', function(snapshot) {           
+            let maxnum = 0;
+            snapshot.forEach(function(child) {
+             maxnum = child.val();
+            });
+            resolve(maxnum);
+          });        
+    });
+  }
 
 }

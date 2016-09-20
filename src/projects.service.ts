@@ -51,19 +51,24 @@ export class ProjectsService {
     console.log("project add data", postData);
 
     return new Promise(function(resolve, reject) {
-      projectsRef.push(postData, function(snapshot) {
+      let newprojectsRef = projectsRef.push();
+      newprojectsRef.set(postData, function(error) {
+      if (error) {
+        console.log('Synchronization failed');
+        reject(error);
+      } else {
           self.projects.push({
             name: newProject.name,
             sname: newProject.sname,
             color: newProject.color,
-            id: projectsRef.toString()
+            id: newprojectsRef.key.toString()
           });
 
           console.log("new projects", self.projects);
-          resolve(true);
-        }); 
+          resolve(newprojectsRef.key.toString());
       }
-    );
+      }); 
+    });
 
   }
 

@@ -9,9 +9,9 @@ import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'task-panel',
-  template: `{{diagnostic}}
+  template: `
     <div class="panel panel-primary">
-    <form (ngSubmit)="onSave()" #editForm="ngForm" novalidate>
+    <form (ngSubmit)="saveTask()" #editForm="ngForm" novalidate>
       <div class="panel-body">
         <div style="float:right;">
             <a [routerLink]="['/tasks/'+ taskUrl]" class="btn btn-warning">
@@ -41,11 +41,12 @@ import { Subscription } from 'rxjs/Subscription';
         <div class="form-group">
             <label for="project">Project</label>
             <div class="form-inline">
-              <select name="project" id="project" [(ngModel)]="task.project" class="form-control input-sm w50">
+              <select name="project" id="project" required [(ngModel)]="task.project" class="form-control input-sm w50" #projectValidation="ngModel">
                 <option *ngFor="let pr of projects" [value]="pr.id">{{pr.name}}</option>
               </select>
-              <newproject></newproject>              
-            </div> 
+              <newproject (save)="updateProjectsSelect($event)"></newproject>              
+            </div>
+            <div class="alert alert-danger w50" [hidden]="projectValidation.valid || projectValidation.untouched">Project is required</div> 
         </div> 
 
         <div class="form-group w50">
@@ -74,12 +75,11 @@ export class TaskEditComponent implements OnInit, OnDestroy {
   task;
   taskUrl;
   taskId;
-  project : Project;
+  //project : Project;
   projects;
   taskStatuses : string[];
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
-  @Output() clear = new EventEmitter();
-  @Output() save = new EventEmitter();
+
 
   paramsSubscription: Subscription;
 
@@ -95,7 +95,7 @@ export class TaskEditComponent implements OnInit, OnDestroy {
 
       this.task = {};
       this.projects = [];
-      this.project = new Project();
+      //this.project = new Project();
       this.taskStatuses = this.taskService.taskSatuses;
 
       //load projects if ness
@@ -108,13 +108,21 @@ export class TaskEditComponent implements OnInit, OnDestroy {
           .then ( () => this.projects = this.projectsService.projects);
   }
 
-  onSave() {
-    console.log("Submit fired");
+  updateProjectsSelect(newId) {
+      this.task.project = newId;
+  }
+
+  saveTask() {
     progress_start("red");
     this.taskService.saveTask(this.userId, this.task)
       .catch((error)=>this.taskService.errorHandler(error))
-      .then(()=> {    
-        //finally / default     
+      .then((newurl)=> {    
+        //finally / default  
+        if (this.taskUrl == ""){
+          this.taskUrl = newurl;
+          this.taskId = newurl;
+        }
+
         progress_end();
         setTimeout(() => this.router.navigateByUrl('/tasks/'+ this.taskUrl), 1000);
       });
@@ -128,8 +136,10 @@ export class TaskEditComponent implements OnInit, OnDestroy {
       params => {
         if (params['tasktId'] == -1) {
           this.taskUrl = "";
+          //Task defasult values
           this.task.estimate = 0;
           this.task.status = "idle";
+          this.task.id = -1;
         }
         else {
           progress_start ("");
@@ -138,7 +148,7 @@ export class TaskEditComponent implements OnInit, OnDestroy {
           this.taskService.getTask("mSmxxvKkt4ei6nL80Krmt9R0m983", this.taskId)
           .then ( () => {
                 this.task = this.taskService.task;
-                this.project = this.projectsService.getProject(this.task.project);
+                //this.project = this.projectsService.getProject(this.task.project);
                 console.info("task loaded", this.task);
               }
           )

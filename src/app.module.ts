@@ -10,18 +10,18 @@ import { ProjectsService } from './projects.service';
 import { AppComponent } from './app.component';
 import { TaskComponent } from './task.component';
 import { TaskEditComponent } from './task-edit.component';
-import { ScrumBoard } from './scrum-board.component';
+import { BackLogComponent } from './backlog.component';
 import { NewProject } from './new-project.component';
 
 
 const routerModule = RouterModule.forRoot([
   {
     path: 'login',
-    component: ScrumBoard
+    component: BackLogComponent
   },
   {
     path: 'tasks',
-    component: ScrumBoard
+    component: BackLogComponent
   },
   {
     path: 'tasks/:tasktId',
@@ -33,7 +33,7 @@ const routerModule = RouterModule.forRoot([
   },
   {
     path: '',
-    component: ScrumBoard,
+    component: BackLogComponent,
     // redirectTo: '/tasks',
     // pathMatch: 'full'
   }
@@ -41,7 +41,7 @@ const routerModule = RouterModule.forRoot([
 
 @NgModule({
   imports: [BrowserModule, FormsModule, routerModule],
-  declarations: [AppComponent, ScrumBoard, TaskComponent, TaskEditComponent, NewProject],
+  declarations: [AppComponent, BackLogComponent, TaskComponent, TaskEditComponent, NewProject],
   providers: [TasksListService, TaskService, ProjectsService, Project],
   bootstrap: [AppComponent]
 })

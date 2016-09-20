@@ -48,9 +48,6 @@ export class TasksListService {
             "type": child.type
           })
           .then(function() {
-            //update tasks
-            //self.updateTaskSorting(child.id, child.type, child.sortnum);
-
             //checking if it's time to call resolve : resolve only after last success callback
             resolveCounter--;
             if (resolveCounter <= 0)  resolve(true); 
@@ -66,17 +63,6 @@ export class TasksListService {
 
   }
 
-  private updateTaskSorting(id : string, type : string, sortnum : number) {
-    //updating stored tasklist object
-    for (let task of this.tasks) {
-        if (task.id == id)
-        {
-          task.type = type;
-          task.sortnum = sortnum;
-        }
-    }
-  }
-
   private convertObject(objectedResponse, id) {
     //creating/inflating Project object
     let project = new Project();
@@ -85,7 +71,7 @@ export class TasksListService {
     return {
         id : id,
         name: objectedResponse.name,
-        id_in_project : objectedResponse.id_in_project,
+        code : objectedResponse.code,
         project: project.sname,
         project_color : project.color,
         sortnum: objectedResponse.sortnum,

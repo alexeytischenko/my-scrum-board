@@ -22,6 +22,7 @@ import { Subscription } from 'rxjs/Subscription';
               <ul class="dropdown-menu">
                 <li><a href="#">Resolve / Reopen task</a></li>
                 <li><a href="#">Move task to archive</a></li>
+                <li><a href="#">Delete task</a></li>
                 <li class="divider"></li>
                 <li><a href="#">Add comment</a></li>
                 <li><a href="#">Add attachment</a></li>
@@ -36,7 +37,7 @@ import { Subscription } from 'rxjs/Subscription';
         </div>
         <div class="panel-body form-inline">               
                 <label>{{task.name}}</label> 
-                <button class="btn btn-{{project.color}} btn-xs hidden-xs" disabled="true">{{project.sname}} - {{task.id_in_project}}</button>           
+                <button class="btn btn-{{project.color}} btn-xs hidden-xs" disabled="true">{{project.sname}} - {{task.code}}</button>           
         </div>
         <div class="panel-body">
             <div>

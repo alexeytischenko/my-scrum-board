@@ -5,7 +5,7 @@ import { Project } from './project.class';
 
 @Component({
   selector: 'newproject',
-  template: `{{diagnostic}}
+  template: `
     <button *ngIf="!setNewProject" class="btn btn-default btn-sm" (click)="showNewProjectForm()">
         <span class="glyphicon glyphicon-plus"></span>
         New project
@@ -36,6 +36,7 @@ export class NewProject implements OnInit {
     newproject : string;
     newcolor : string;
     setNewProject : boolean;
+    @Output() save = new EventEmitter();
     userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
     colors = ['white', 'orange', 'dark blue', 'blue', 'red', 'green'];
     colorsMap: any = {'white': 'default', 'orange': 'warning', 'dark blue': 'primary', 'blue': 'info', 'red': 'danger','green': 'success'};
@@ -51,15 +52,18 @@ export class NewProject implements OnInit {
     addProject() {
         //creating new Project object
         let projectToAdd = new Project();
-        projectToAdd.newProject(this.newproject, this.newcolor);
+        projectToAdd.newProject(this.newproject, this.newcolor == '' ? 'default' : this.newcolor);
         
         //add new Project 
         progress_start("red");
         this.projectsService.addProject(this.userId, projectToAdd)
             .catch((error)=>this.projectsService.errorHandler(error))
-            .then(()=> {    
+            .then((newId)=> {    
                 //finally / default    
+                //clean newProject form, emit output event with new node ID, close progressbar
                 this.clear();
+                this.save.emit(newId);
+                console.log("newID", newId);
                 progress_end();
             });
         return false;
