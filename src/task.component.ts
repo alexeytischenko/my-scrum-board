@@ -170,7 +170,7 @@ export class TaskComponent implements OnInit, OnDestroy {
               console.info("task loaded", this.task);
             }
         )
-        .catch((error)=>console.error("Task component error:", error))
+        .catch((error)=>this.taskService.errorHandler(error))
         .then (() => {
           //finally
           progress_end();

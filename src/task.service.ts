@@ -20,12 +20,10 @@ export class TaskService {
 
     return new Promise(function(resolve, reject) {
           taskRef.once('value', function(snapshot) {
-            //console.log(snapshot.val());
-            self.task = snapshot.val();
-            self.task.id = id;
 
-            if (self.task.name.length > 0) {
-              console.log("task", self.task);
+            if (snapshot.exists()) {
+              self.task = snapshot.val();
+              self.task.id = id;
               resolve(true);
             }
             else reject("Couldn't get task data");
