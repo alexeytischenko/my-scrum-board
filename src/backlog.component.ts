@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 // import { Task } from './task.class';
-import { TasksListService } from './tasks-list.service';
+import { BackLogService } from './backlog.service';
 import { ProjectsService } from './projects.service';
 import { Project } from './project.class';
 
@@ -53,7 +53,7 @@ export class BackLogComponent {
   bookmarks = [];
   editableBookmark = {};
 
-  constructor(private tasksListService: TasksListService,
+  constructor(private tasksListService: BackLogService,
               private projectsService :ProjectsService) {
 
     this.tasksListService.errorHandler = error => {

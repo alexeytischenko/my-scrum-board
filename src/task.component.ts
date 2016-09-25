@@ -175,7 +175,6 @@ export class TaskComponent implements OnInit, OnDestroy {
           //finally
           progress_end();
         });
-
       }
     );
 

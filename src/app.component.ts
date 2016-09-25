@@ -27,7 +27,7 @@ import { Component } from '@angular/core';
             </a>
             <a [routerLink]="['/projects/']" class="btn btn-primary" style="float: right;margin:5px;">
               <span class="glyphicon glyphicon-tags"></span>
-              <span class="hidden-xs">Manage Projects</span>
+              <span class="hidden-xs">&nbsp;Manage Projects</span>
             </a>
         </div>
       </div>
