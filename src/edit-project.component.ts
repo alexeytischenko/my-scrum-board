@@ -13,9 +13,9 @@ import { Project } from './project.class';
     </button>
     <div *ngIf="editProject" class="form-inline">
        <a href="javascript:void(0);" style="float:right;" data-toggle="popover" title="Add new project" data-trigger="hover" data-content="To add new project type name, choose color and click Add button"><span class="glyphicon glyphicon-question-sign"></span></a>
-       <input type="text" id="newproject" name="newproject" [(ngModel)]="projectToEdit.name" class="form-control" placeholder="type name here" />
-       <input type="text" id="newsname" name="newsname" [(ngModel)]="projectToEdit.sname" class="form-control" placeholder="type short name here" />
-       <select name="color" id="color" [(ngModel)]="projectToEdit.color" class="form-control">
+       <input type="text" id="newproject" name="newproject" [(ngModel)]="project.name" class="form-control" placeholder="type name here" />
+       <input type="text" id="newsname" name="newsname" [(ngModel)]="project.sname" class="form-control" placeholder="type short name here" />
+       <select name="color" id="color" [(ngModel)]="project.color" class="form-control">
            <option *ngFor="let color of colors" [value]="color | i18nSelect: colorsMap">{{color}}</option>
        </select> 
        <button class="btn btn-default" (click)="clear()">
@@ -26,7 +26,7 @@ import { Project } from './project.class';
            <span class="glyphicon glyphicon-ok"></span>
            <span class="hidden-xs">Add</span>
        </button>
-    </div>
+    </div>editProject :{{showForm}}
   </div>  
   `,
   styles : [`   
@@ -35,7 +35,7 @@ import { Project } from './project.class';
 })
 export class EditProject implements OnInit {  
 
-    editProject : boolean;
+    @Input() editProject : boolean;
     @Input() project : Project;
     @Output() save = new EventEmitter();
 
@@ -73,7 +73,7 @@ export class EditProject implements OnInit {
     }
 
     showNewProjectForm() {
-        this.clear();
+        //this.clear();
         this.editProject = true;
         setTimeout(() => $('[data-toggle="popover"]').popover(), 1000);
     }
@@ -87,8 +87,8 @@ export class EditProject implements OnInit {
     ngOnInit() {
     }
 
-    get projectToEdit() {
-        console.log("project request");
-        return this.project;
+    get showForm() {
+        //console.log("project request", this.project);
+        return this.editProject;
     }
 }            

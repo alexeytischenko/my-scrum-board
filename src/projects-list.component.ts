@@ -8,7 +8,7 @@ import { Project } from './project.class';
   template: `
     <section>
       <div class="row">
-          <editproject [project]="projectToEdit" (save)="updateProjectsSelect($event)"></editproject>
+          <editproject [editProject]="openForm" [project]="projectToEdit" (save)="updateProjectsSelect($event)"></editproject>
           <ul class="list-group list-group-sortable" id="projects">
               <li class="list-group-item disabled">Projects</li>
               <template ngFor let-prElement [ngForOf]="projects">
@@ -17,7 +17,7 @@ import { Project } from './project.class';
                   <span class="label label-{{prElement.color}}">{{prElement.sname}}</span> 
                 </li>
               </template>
-          </ul>
+          </ul>showForm {{openForm}}
       </div>
     </section>
   `,
@@ -28,9 +28,9 @@ import { Project } from './project.class';
 export class ProjectsListComponent {
 
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
-  listLength : number;
   projects = [];
   projectToEdit : Project = new Project();
+  openForm : boolean = false;
 
   constructor(private projectsService :ProjectsService) {
 
@@ -53,6 +53,10 @@ export class ProjectsListComponent {
   edit(project) {
       console.log ("edit fired", project);
       this.projectToEdit.fill (project.name, project.sname, project.color, project.id);
-      console.log ("projectToEdit", this.projectToEdit);
+      this.openForm = true;
+  }
+
+  get showForm() {
+    return this.openForm;
   }
 }
