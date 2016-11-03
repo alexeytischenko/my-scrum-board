@@ -1,4 +1,4 @@
-System.register(['@angular/core', '@angular/router', './task.service', './projects.service'], function(exports_1, context_1) {
+System.register(['@angular/core', '@angular/router', './task.service', './projects.service', './project.class'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,7 +10,7 @@ System.register(['@angular/core', '@angular/router', './task.service', './projec
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, router_1, task_service_1, projects_service_1;
+    var core_1, router_1, task_service_1, projects_service_1, project_class_1;
     var TaskComponent;
     return {
         setters:[
@@ -25,6 +25,9 @@ System.register(['@angular/core', '@angular/router', './task.service', './projec
             },
             function (projects_service_1_1) {
                 projects_service_1 = projects_service_1_1;
+            },
+            function (project_class_1_1) {
+                project_class_1 = project_class_1_1;
             }],
         execute: function() {
             TaskComponent = (function () {
@@ -32,10 +35,16 @@ System.register(['@angular/core', '@angular/router', './task.service', './projec
                     this.route = route;
                     this.taskService = taskService;
                     this.projectsService = projectsService;
-                    this.task = {};
                     this.userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
                     this.clear = new core_1.EventEmitter();
                     this.save = new core_1.EventEmitter();
+                    this.taskService.errorHandler = function (error) {
+                        console.error('Task component error! ' + error);
+                        window.alert('An error occurred while processing this page! Try again later.');
+                    };
+                    this.task = {};
+                    this.project = new project_class_1.Project();
+                    this.taskStatuses = this.taskService.taskSatuses;
                     //load projects if ness
                     if (this.projectsService.projects && this.projectsService.projects.length > 0) {
                         console.info('projects already loaded');
@@ -43,34 +52,30 @@ System.register(['@angular/core', '@angular/router', './task.service', './projec
                     else
                         this.projectsService.loadProjects(this.userId);
                 }
-                TaskComponent.prototype.onClear = function () {
-                    this.clear.emit(null);
-                };
-                TaskComponent.prototype.onSave = function () {
-                    this.save.emit(this.task);
-                };
+                Object.defineProperty(TaskComponent.prototype, "diagnostic", {
+                    get: function () {
+                        return JSON.stringify(this.task);
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
                 TaskComponent.prototype.ngOnInit = function () {
                     var _this = this;
                     var self = this;
                     this.paramsSubscription = this.route.params.subscribe(function (params) {
                         progress_start("");
-                        _this.taskService.getTask("mSmxxvKkt4ei6nL80Krmt9R0m983", params['tasktId'])
+                        _this.taskId = params['tasktId'];
+                        _this.taskService.getTask("mSmxxvKkt4ei6nL80Krmt9R0m983", _this.taskId)
                             .then(function () {
                             _this.task = _this.taskService.task;
-                            _this.task.project_color = _this.projectsService.getColor(_this.task.project);
-                            _this.task.project_sname = _this.projectsService.getSName(_this.task.project);
+                            _this.project = _this.projectsService.getProject(_this.task.project);
                             console.info("task loaded", _this.task);
-                            progress_end();
                         })
-                            .catch(function (error) { return console.error("error"); });
-                        // var taskRef = firebase.database().ref('/sprint/mSmxxvKkt4ei6nL80Krmt9R0m983/' + params['tasktId']);
-                        // taskRef.off();
-                        // taskRef.on('value', function(snapshot) {
-                        //     self.task = snapshot.val();
-                        //     progress_end ();
-                        // });
-                        // //this.task = snapshot.val();
-                        // //console.log("task ", this.task);
+                            .catch(function (error) { return _this.taskService.errorHandler(error); })
+                            .then(function () {
+                            //finally
+                            progress_end();
+                        });
                     });
                     $(document).ready(function () {
                         $('[data-toggle="popover"]').popover();
@@ -90,7 +95,8 @@ System.register(['@angular/core', '@angular/router', './task.service', './projec
                 TaskComponent = __decorate([
                     core_1.Component({
                         selector: 'task-panel',
-                        template: "\n    <div class=\"panel panel-primary\">\n      <div class=\"panel-body\">\n        <div style=\"float:right;\">\n            <a [routerLink]=\"['/']\" class=\"btn btn-default\">\n              <span class=\"glyphicon glyphicon-chevron-left\"></span>\n              <span class=\"hidden-xs\">Back</span>\n            </a>\n            <button (click)=\"onEdit(bookmark)\" class=\"btn btn-default\">\n              <span class=\"glyphicon glyphicon-pencil\"></span>\n              <span class=\"hidden-xs\">Edit</span>\n            </button>\n        </div>\n        <div class=\"panel-body\">\n                <a href=\"javascript:void(0);\" data-toggle=\"popover\" title=\"Help!!!\" data-trigger=\"hover\" data-content=\"You can edit the task title. Click the Edit button\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>\n                <label>{{task.name}}</label>            \n        </div>\n        <div class=\"panel-body\">\n            <div>\n              <label>Estimate</label>\n              {{task.estimate}}h / 0h\n            </div>\n            <div>\n                <label>Project</label>\n                <button class=\"btn btn-{{task.project_color}} btn-xs\" disabled=\"true\">{{task.project_sname}}</button>\n            </div> \n            <div>\n              <label>Status</label>\n              <button class=\"btn btn-xs\" \n                  [class.btn-primary]=\"task.status==='in progress'\" \n                  [class.btn-success]=\"task.status==='resolved'\" \n                  disabled=\"true\">\n                    {{task.status}}\n              </button>\n            </div>  \n        </div>      \n        <div class=\"panel-body\">         \n          <div>\n            <label>Created</label>\n            {{task.created | date:'medium'}}\n          </div>\n          <div>\n            <label>Modified</label>\n            {{task.updated | date:'medium'}}\n          </div>\n        </div>\n        \n        <div class=\"panel-body\"><label>Description</label> {{task.description}}</div>\n\n        <div class=\"panel-body\">\n          <div style=\"float:right;\">\n            <button class=\"btn btn-default\">\n              <span class=\"glyphicon glyphicon-file\"></span>\n              <span class=\"hidden-xs\">Add files</span>\n            </button>\n          </div>\n          <div>\n            <label>Attachments</label>\n            There are no attachments\n          </div>\n        </div>\n        <div class=\"panel-body\">\n          <div style=\"float:right;\">\n            <button class=\"btn btn-default\">\n              <span class=\"glyphicon glyphicon-comment\"></span>\n              <span class=\"hidden-xs\">Add comment</span>\n            </button>\n          </div>\n          <div>\n            <label>Comments</label>\n            There are no comments\n          </div>       \n      </div>\n      <div class=\"panel-body\">\n          <div style=\"float:right;\">\n            <button class=\"btn btn-default\">\n              <span class=\"glyphicon glyphicon-time\"></span>\n              <span class=\"hidden-xs\">Log work</span>\n            </button>\n          </div>\n          <div>\n            <label>Worklogs</label>\n            There are no worklogs\n          </div>       \n      </div>\n\n\n      <!--div class=\"panel-body\">\n        <input type=\"text\" [(ngModel)]=\"bookmark.title\"\n          placeholder=\"Title\" style=\"width: 25%;\">\n        <input type=\"text\" [(ngModel)]=\"bookmark.url\" \n          placeholder=\"URL\" style=\"width: 50%;\">\n        <button (click)=\"onSave()\" class=\"btn btn-primary\">\n          <span class=\"glyphicon glyphicon-ok\"></span>\n          <span class=\"hidden-xs\">Save</span>\n        </button>\n        <button (click)=\"onClear()\" class=\"btn btn-warning\">\n          <span class=\"glyphicon glyphicon-remove\"></span>\n          <span class=\"hidden-xs\">Clear</span>\n        </button>\n      </div-->\n    </div>\n  ",
+                        template: "\n    <div class=\"panel panel-primary\">\n      <div class=\"panel-body\">\n        <div style=\"float:right;\">\n            <a [routerLink]=\"['/']\" class=\"btn btn-default\">\n              <span class=\"glyphicon glyphicon-chevron-left\"></span>\n              <span class=\"hidden-xs\">Back</span>\n            </a>\n            <span class=\"dropdown\">\n              <button class=\"btn btn-default dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\">...</button>\n              <ul class=\"dropdown-menu\">\n                <li><a href=\"#\">Resolve / Reopen task</a></li>\n                <li><a href=\"#\">Move task to archive</a></li>\n                <li><a href=\"#\">Delete task</a></li>\n                <li class=\"divider\"></li>\n                <li><a href=\"#\">Add comment</a></li>\n                <li><a href=\"#\">Add attachment</a></li>\n                <li><a href=\"#\">Log work</a></li>\n              </ul>\n            </span>\n            <a [routerLink]=\"['/tasks/edit/'+ taskId]\" class=\"btn btn-default\">\n              <span class=\"glyphicon glyphicon-pencil\"></span>\n              <span class=\"hidden-xs\">Edit</span>\n            </a>      \n            <a href=\"javascript:void(0);\" data-toggle=\"popover\" title=\"Help\" data-trigger=\"hover\" data-content=\"To edit the task click the Edit button\"><span class=\"glyphicon glyphicon-question-sign\"></span></a>\n        </div>\n        <div class=\"panel-body form-inline\">               \n                <label>{{task.name}}</label> \n                <button class=\"btn btn-{{project.color}} btn-xs hidden-xs\" disabled=\"true\">{{project.sname}} - {{task.code}}</button>           \n        </div>\n        <div class=\"panel-body\">\n            <div>\n              <label>Estimate</label>\n              <span>{{task.estimate}}</span> h / 0h\n            </div>\n            <div>\n                <label>Project</label>\n                {{project.name}}\n            </div> \n            <div>\n              <label>Status</label>\n              <button class=\"btn btn-xs\" \n                  [class.btn-primary]=\"task.status==='in progress'\" \n                  [class.btn-success]=\"task.status==='resolved'\" \n                  [class.btn-info]=\"task.status==='review'\" \n                  disabled=\"true\">\n                    {{task.status}}\n              </button>\n            </div>  \n        </div>      \n        <div class=\"panel-body\">         \n          <div>\n            <label>Created</label>\n            {{task.created | date:'medium'}}\n          </div>\n          <div>\n            <label>Modified</label>\n            {{task.updated | date:'medium'}}\n          </div>\n        </div>\n        \n        <div class=\"panel-body\">\n          <label>Description</label> \n          <span>{{task.description}}</span>\n        </div>\n\n        <div class=\"panel-body\">\n          <div style=\"float:right;\">\n            <button class=\"btn btn-default\">\n              <span class=\"glyphicon glyphicon-file\"></span>\n              <span class=\"hidden-xs\">Add files</span>\n            </button>\n          </div>\n          <div>\n            <label>Attachments</label>\n            <p class=\"norecords\">There are no attachments</p>\n          </div>\n        </div>\n        <div class=\"panel-body\">\n          <div style=\"float:right;\">\n            <button class=\"btn btn-default\">\n              <span class=\"glyphicon glyphicon-comment\"></span>\n              <span class=\"hidden-xs\">Add comment</span>\n            </button>\n          </div>\n          <div>\n            <label>Comments</label>\n            <p class=\"norecords\">There are no comments</p>\n          </div>       \n      </div>\n      <div class=\"panel-body\">\n          <div style=\"float:right;\">\n            <button class=\"btn btn-default\">\n              <span class=\"glyphicon glyphicon-time\"></span>\n              <span class=\"hidden-xs\">Log work</span>\n            </button>\n          </div>\n          <div>\n            <label>Worklogs</label>\n            <p class=\"norecords\">There are no worklogs</p>\n          </div>       \n      </div>\n\n    </div>\n  ",
+                        styles: ["\n    .norecords {color: #999; font-style: italic}\n    .dropdown {padding-bottom: 10px;}\n  "]
                     }), 
                     __metadata('design:paramtypes', [router_1.ActivatedRoute, task_service_1.TaskService, projects_service_1.ProjectsService])
                 ], TaskComponent);

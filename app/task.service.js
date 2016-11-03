@@ -1,4 +1,4 @@
-System.register(['@angular/core', '@angular/http'], function(exports_1, context_1) {
+System.register(['@angular/core'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,80 +10,112 @@ System.register(['@angular/core', '@angular/http'], function(exports_1, context_
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, http_1;
+    var core_1;
     var TaskService;
     return {
         setters:[
             function (core_1_1) {
                 core_1 = core_1_1;
-            },
-            function (http_1_1) {
-                http_1 = http_1_1;
             }],
         execute: function() {
             TaskService = (function () {
-                function TaskService(http) {
-                    this.http = http;
+                function TaskService() {
                     this.errorHandler = function (error) { return console.error('TaskService error', error); };
                     this.baseUrl = 'https://myscrum-f606c.firebaseio.com';
+                    this.taskSatuses = ['idle', 'in progress', 'review', 'resolved'];
                 }
-                TaskService.prototype.addBookmark = function (bookmark) {
-                    var json = JSON.stringify(bookmark);
-                    return this.http.post(this.baseUrl + "/tasks.json", json)
-                        .toPromise()
-                        .catch(this.errorHandler);
-                };
                 TaskService.prototype.getTask = function (url, id) {
                     var self = this;
                     var taskRef = firebase.database().ref(url + "/backlog/").child(id);
                     taskRef.off();
                     return new Promise(function (resolve, reject) {
                         taskRef.once('value', function (snapshot) {
-                            //console.log(snapshot.val());
-                            self.task = snapshot.val();
-                            console.log("task", self.task);
-                            resolve(true);
+                            if (snapshot.exists()) {
+                                self.task = snapshot.val();
+                                self.task.id = id;
+                                resolve(true);
+                            }
+                            else
+                                reject("Couldn't get task data");
                         });
                     });
                 };
-                TaskService.prototype.getBackLogTask = function (id) {
-                    var _this = this;
-                    return this.http.get(this.baseUrl + "/backlog/mSmxxvKkt4ei6nL80Krmt9R0m983/" + id + ".json")
-                        .toPromise()
-                        .then(function (response) { return _this.convert(response.json()); })
-                        .catch(this.errorHandler);
+                TaskService.prototype.saveTask = function (url, task) {
+                    var postData;
+                    var self = this;
+                    var taskRef = firebase.database().ref(url + "/backlog/");
+                    if (task.id == -1) {
+                        //new task properties
+                        return new Promise(function (resolve, reject) {
+                            self.getMaxCodeNum(url)
+                                .catch(function (error) { return reject(error); })
+                                .then(function (maxnum) {
+                                console.error("maxnum", maxnum);
+                                var newmaxnum = maxnum.code + 1;
+                                postData = {
+                                    name: task.name,
+                                    estimate: task.estimate,
+                                    sortnum: Date.now(),
+                                    status: task.status,
+                                    type: "b",
+                                    code: newmaxnum,
+                                    description: task.description,
+                                    project: task.project,
+                                    updated: Date.now(),
+                                    created: Date.now()
+                                };
+                                var newtaskRef = taskRef.push();
+                                newtaskRef.set(postData, function (error) {
+                                    if (error) {
+                                        reject(error);
+                                    }
+                                    else {
+                                        console.log("new task", postData);
+                                        console.log("newtaskRef", newtaskRef.key.toString());
+                                        resolve(newtaskRef.key.toString());
+                                    }
+                                });
+                            });
+                        });
+                    }
+                    else {
+                        //existing task properties
+                        postData = {
+                            name: task.name,
+                            estimate: task.estimate,
+                            status: task.status,
+                            description: task.description,
+                            project: task.project,
+                            updated: Date.now()
+                        };
+                        return new Promise(function (resolve, reject) {
+                            taskRef.child(task.id).update(postData, function (error) {
+                                if (error) {
+                                    console.error('Update failed');
+                                    reject(error);
+                                }
+                                else {
+                                    resolve(true);
+                                }
+                            });
+                        });
+                    }
                 };
-                TaskService.prototype.removeBookmark = function (bookmark) {
-                    return this.http.delete(this.baseUrl + "/tasks/" + bookmark.id + ".json")
-                        .toPromise()
-                        .catch(this.errorHandler);
-                };
-                TaskService.prototype.updateBookmark = function (bookmark) {
-                    var json = JSON.stringify({
-                        title: bookmark.title,
-                        url: bookmark.url
+                TaskService.prototype.getMaxCodeNum = function (url) {
+                    var tasksRef = firebase.database().ref(url + "/backlog/");
+                    return new Promise(function (resolve, reject) {
+                        tasksRef.orderByChild("code").limitToLast(1).once('value', function (snapshot) {
+                            var maxnum = 0;
+                            snapshot.forEach(function (child) {
+                                maxnum = child.val();
+                            });
+                            resolve(maxnum);
+                        });
                     });
-                    return this.http.patch(this.baseUrl + "/tasks/" + bookmark.id + ".json", json)
-                        .toPromise()
-                        .catch(this.errorHandler);
-                };
-                // private convertToTask(taskJson) : Task {
-                //   return new Task(taskJson.name, taskJson.project, taskJson.sortnum, taskJson.estimate, taskJson.created, taskJson.updated,taskJson.status, taskJson.description, [], [], []);
-                // }
-                TaskService.prototype.convert = function (parsedResponse) {
-                    return Object.keys(parsedResponse)
-                        .map(function (id) { return ({
-                        id: id,
-                        name: parsedResponse[id].name,
-                        project: parsedResponse[id].project,
-                        sortnum: parsedResponse[id].sortnum,
-                        estimate: parsedResponse[id].estimate
-                    }); });
-                    // .sort((a, b) => a.name.localeCompare(b.name));
                 };
                 TaskService = __decorate([
                     core_1.Injectable(), 
-                    __metadata('design:paramtypes', [http_1.Http])
+                    __metadata('design:paramtypes', [])
                 ], TaskService);
                 return TaskService;
             }());

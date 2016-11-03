@@ -1,4 +1,4 @@
-System.register(['@angular/core', './projects.service'], function(exports_1, context_1) {
+System.register(['@angular/core', './projects.service', './project.class'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,7 +10,7 @@ System.register(['@angular/core', './projects.service'], function(exports_1, con
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, projects_service_1;
+    var core_1, projects_service_1, project_class_1;
     var TasksListService;
     return {
         setters:[
@@ -19,55 +19,82 @@ System.register(['@angular/core', './projects.service'], function(exports_1, con
             },
             function (projects_service_1_1) {
                 projects_service_1 = projects_service_1_1;
+            },
+            function (project_class_1_1) {
+                project_class_1 = project_class_1_1;
             }],
         execute: function() {
-            // import { Task } from './task.class';
             TasksListService = (function () {
                 function TasksListService(projectsService) {
                     this.projectsService = projectsService;
                     this.errorHandler = function (error) { return console.error('TaskService error', error); };
                     this.tasks = [];
-                    this.sprintLength = 0;
-                    this.backLogLength = 0;
                 }
                 TasksListService.prototype.getBackLog = function (url) {
                     var self = this;
+                    var taskscount = 0;
                     var tasksRef = firebase.database().ref(url + "/backlog/");
                     tasksRef.off();
+                    //retrun Promise to get the backLog
                     return new Promise(function (resolve, reject) {
-                        tasksRef.once('value', function (snapshot) {
-                            self.tasks = self.convert(snapshot.val());
-                            self.calculateSize();
-                            console.log("tasks", self.tasks);
-                            resolve(true);
+                        tasksRef.orderByChild("sortnum").once('value', function (snapshot) {
+                            snapshot.forEach(function (child) {
+                                self.tasks[taskscount] = self.convertObject(child.val(), child.getKey());
+                                taskscount++;
+                            });
+                            if (taskscount > 0)
+                                resolve(true);
+                            else
+                                reject("No tasks yet");
                         });
                     });
                 };
-                TasksListService.prototype.convert = function (objectedResponse) {
-                    var _this = this;
-                    return Object.keys(objectedResponse)
-                        .map(function (id) { return ({
-                        id: id,
-                        name: objectedResponse[id].name,
-                        project: _this.projectsService.getSName(objectedResponse[id].project),
-                        project_color: _this.projectsService.getColor(objectedResponse[id].project),
-                        sortnum: objectedResponse[id].sortnum,
-                        estimate: objectedResponse[id].estimate,
-                        status: objectedResponse[id].status,
-                        type: objectedResponse[id].type
-                    }); });
-                    // .sort((a, b) => a.name.localeCompare(b.name));
+                TasksListService.prototype.resortBackLog = function (url, jsonData) {
+                    var self = this;
+                    var resolveCounter = jsonData.length;
+                    //return Promise to record new tasks order
+                    return new Promise(function (resolve, reject) {
+                        for (var _i = 0, jsonData_1 = jsonData; _i < jsonData_1.length; _i++) {
+                            var child = jsonData_1[_i];
+                            //proceed if element is not empty
+                            if (child.id && 0 !== child.id.length) {
+                                //update FIREBASE
+                                var ref = firebase.database().ref(url + "/backlog/" + child.id + "/");
+                                ref.update({
+                                    "sortnum": child.sortnum,
+                                    "type": child.type
+                                })
+                                    .then(function () {
+                                    //checking if it's time to call resolve : resolve only after last success callback
+                                    resolveCounter--;
+                                    if (resolveCounter <= 0)
+                                        resolve(true);
+                                })
+                                    .catch(function (error) { return reject("Backlog sorting failed: {" + error + "}"); });
+                            }
+                            else {
+                                resolveCounter--;
+                                if (jsonData.length == 1)
+                                    resolve(true); //if the only element is disable-section_header or just empty, then resolving immidiately
+                            }
+                        }
+                    });
                 };
-                TasksListService.prototype.calculateSize = function () {
-                    var _this = this;
-                    if (this.tasks && this.tasks.length > 0) {
-                        this.tasks.forEach(function (element) {
-                            if (element.type == "s")
-                                _this.sprintLength++;
-                            else
-                                _this.backLogLength++;
-                        });
-                    }
+                TasksListService.prototype.convertObject = function (objectedResponse, id) {
+                    //creating/inflating Project object
+                    var project = new project_class_1.Project();
+                    project = this.projectsService.getProject(objectedResponse.project);
+                    return {
+                        id: id,
+                        name: objectedResponse.name,
+                        code: objectedResponse.code,
+                        project: project.sname,
+                        project_color: project.color,
+                        sortnum: objectedResponse.sortnum,
+                        estimate: objectedResponse.estimate,
+                        status: objectedResponse.status,
+                        type: objectedResponse.type
+                    };
                 };
                 TasksListService = __decorate([
                     core_1.Injectable(), 

@@ -6,15 +6,16 @@ System.register([], function(exports_1, context_1) {
         setters:[],
         execute: function() {
             Task = (function () {
-                function Task(name, project, sortnum, estimate, created, updated, status, description, attachments, comments, worklog) {
+                function Task(id, name, project, estimate, description, status, sortnum, created, updated, attachments, comments, worklog) {
+                    this.id = id;
                     this.name = name;
                     this.project = project;
-                    this.sortnum = sortnum;
                     this.estimate = estimate;
+                    this.description = description;
+                    this.status = status;
+                    this.sortnum = sortnum;
                     this.created = created;
                     this.updated = updated;
-                    this.status = status;
-                    this.description = description;
                     this.attachments = attachments;
                     this.comments = comments;
                     this.worklog = worklog;

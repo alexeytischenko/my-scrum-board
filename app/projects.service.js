@@ -1,4 +1,4 @@
-System.register(['@angular/core'], function(exports_1, context_1) {
+System.register(['@angular/core', './project.class'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,12 +10,15 @@ System.register(['@angular/core'], function(exports_1, context_1) {
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1;
+    var core_1, project_class_1;
     var ProjectsService;
     return {
         setters:[
             function (core_1_1) {
                 core_1 = core_1_1;
+            },
+            function (project_class_1_1) {
+                project_class_1 = project_class_1_1;
             }],
         execute: function() {
             ProjectsService = (function () {
@@ -30,16 +33,52 @@ System.register(['@angular/core'], function(exports_1, context_1) {
                     return new Promise(function (resolve, reject) {
                         projectsRef.once('value', function (snapshot) {
                             self.projects = self.convert(snapshot.val());
-                            console.log("projects", self.projects);
-                            resolve(true);
+                            if (self.projects.length > 0) {
+                                console.log("projects", self.projects);
+                                resolve(true);
+                            }
+                            else
+                                reject("Couldn't retrive projects list");
                         });
                     });
                 };
-                // loadProjects(url) {
-                //   var projectsRef = firebase.database().ref(`${url}/projects/`);
-                //   projectsRef.off();
-                //   projectsRef.on('value', snapshot => this.projects = this.convert(snapshot.val())); 
-                // }
+                ProjectsService.prototype.getProject = function (project) {
+                    var projectData = new project_class_1.Project();
+                    this.projects.forEach(function (element) {
+                        if (element.id == project)
+                            projectData.fill(element.name, element.sname, element.color, element.id);
+                    });
+                    return projectData;
+                };
+                ProjectsService.prototype.addProject = function (url, newProject) {
+                    var self = this;
+                    var projectsRef = firebase.database().ref(url + "/projects/");
+                    var postData = {
+                        name: newProject.name,
+                        sname: newProject.sname,
+                        color: newProject.color
+                    };
+                    console.log("project add data", postData);
+                    return new Promise(function (resolve, reject) {
+                        var newprojectsRef = projectsRef.push();
+                        newprojectsRef.set(postData, function (error) {
+                            if (error) {
+                                console.log('Synchronization failed');
+                                reject(error);
+                            }
+                            else {
+                                self.projects.push({
+                                    name: newProject.name,
+                                    sname: newProject.sname,
+                                    color: newProject.color,
+                                    id: newprojectsRef.key.toString()
+                                });
+                                console.log("new projects", self.projects);
+                                resolve(newprojectsRef.key.toString());
+                            }
+                        });
+                    });
+                };
                 ProjectsService.prototype.convert = function (objectedResponse) {
                     return Object.keys(objectedResponse)
                         .map(function (id) { return ({
@@ -48,25 +87,6 @@ System.register(['@angular/core'], function(exports_1, context_1) {
                         sname: objectedResponse[id].sname,
                         color: objectedResponse[id].color
                     }); });
-                };
-                ProjectsService.prototype.getColor = function (project) {
-                    var color;
-                    this.projects.forEach(function (element) {
-                        if (element.id == project)
-                            color = element.color;
-                    });
-                    return color;
-                };
-                ProjectsService.prototype.getSName = function (project) {
-                    var sname = "";
-                    console.log("pr", project);
-                    this.projects.forEach(function (element) {
-                        if (element.id == project)
-                            sname = element.sname;
-                        else
-                            console.log("n", element);
-                    });
-                    return sname;
                 };
                 ProjectsService = __decorate([
                     core_1.Injectable(), 
