@@ -5,6 +5,9 @@ import { Project } from './project.class';
 export class ProjectsService {
    
   projects = [];
+  colors = ['white', 'orange', 'dark blue', 'blue', 'red', 'green'];
+  colorsMap: any = {'white': 'default', 'orange': 'warning', 'dark blue': 'primary', 'blue': 'info', 'red': 'danger','green': 'success'};
+  
   errorHandler = error => console.error('ProjectsService error', error);
   
   constructor() {}

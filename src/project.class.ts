@@ -6,6 +6,13 @@ export class Project {
     sname: string;
     color: string;
 
+    constructor() {
+        this.id = "";
+        this.name = "";
+        this.color = "";
+        this.sname = ""; 
+    }
+
     fill (name: string, sname: string, color: string, id: string) {
         this.id = id;
         this.name = name;
