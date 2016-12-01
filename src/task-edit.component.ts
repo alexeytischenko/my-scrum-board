@@ -10,19 +10,22 @@ import { Subscription } from 'rxjs/Subscription';
 @Component({
   selector: 'task-panel',
   template: `
-    <div class="panel panel-primary">
-    <form (ngSubmit)="saveTask()" #editForm="ngForm" novalidate>
+  <form (ngSubmit)="saveTask()" #editForm="ngForm" novalidate>
+  <div class="panel panel-default">
+      <div class="panel-heading">
+          <label>{{taskLabel}}</label> 
+          <div style="float:right;">
+              <a [routerLink]="['/tasks/'+ taskUrl]" class="btn btn-warning btn-sm">
+                <span class="glyphicon glyphicon-remove"></span>
+                <span class="hidden-xs">Cancel</span>
+              </a> 
+              <button class="btn btn-primary btn-sm" type="submit" [disabled]="!editForm.form.valid">
+                <span class="glyphicon glyphicon-ok"></span>
+                <span class="hidden-xs">Save</span>
+              </button>            
+          </div>
+      </div>
       <div class="panel-body">
-        <div style="float:right;">
-            <a [routerLink]="['/tasks/'+ taskUrl]" class="btn btn-warning">
-              <span class="glyphicon glyphicon-remove"></span>
-              <span class="hidden-xs">Cancel</span>
-            </a> 
-            <button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid">
-              <span class="glyphicon glyphicon-ok"></span>
-              <span class="hidden-xs">Save</span>
-            </button>            
-        </div>
 
         <div class="form-group w50">   
            <label for="name">Title</label>            
@@ -62,8 +65,8 @@ import { Subscription } from 'rxjs/Subscription';
         </div>
 
     </div>
-  </form>  
-  </div>
+</div>
+</form>  
   `,
   styles : [`
     .ng-valid[required], .ng-valid.required  { border-left: 5px solid #42A948; /* green */}
@@ -106,6 +109,10 @@ export class TaskEditComponent implements OnInit, OnDestroy {
       else
         this.projectsService.loadProjects(this.userId)
           .then ( () => this.projects = this.projectsService.projects);
+  }
+
+  get taskLabel() : string {
+    return this.task.name ? this.task.name : 'Creating new task...'; 
   }
 
   updateProjectsSelect(newId) {
@@ -161,14 +168,15 @@ export class TaskEditComponent implements OnInit, OnDestroy {
       }
     );
 
-    $(document).ready(function(){
-        $('[data-toggle="popover"]').popover();
-    });
+    // $(document).ready(function(){
+    //     $('[data-toggle="popover"]').popover();
+    // });
   }
 
   get diagnostic() {
     return JSON.stringify(this.projects);
   }
+
 
   ngOnDestroy() {
     this.paramsSubscription.unsubscribe();

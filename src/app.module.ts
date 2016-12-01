@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 // import { HttpModule } from '@angular/http';
-import { BackLogService } from './backlog.service';
+import { TasksListService } from './tasks-list.service';
 import { TaskService } from './task.service';
 import { Project } from './project.class';
 import { ProjectsService } from './projects.service';
@@ -48,7 +48,7 @@ const routerModule = RouterModule.forRoot([
 @NgModule({
   imports: [BrowserModule, FormsModule, routerModule],
   declarations: [AppComponent, BackLogComponent, TaskComponent, TaskEditComponent, NewProject, EditProject, ProjectsListComponent],
-  providers: [BackLogService, TaskService, ProjectsService, Project],
+  providers: [TasksListService, TaskService, ProjectsService, Project],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
