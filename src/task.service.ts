@@ -95,6 +95,21 @@ export class TaskService {
 
   }
 
+  removeTask(url: string, taskId: string) {
+    let self = this;
+    let taskRef = firebase.database().ref(`${url}/backlog/${taskId}`);
+    console.log("taskRef", `${url}/backlog/${taskId}`);
+
+    //removing task
+    return new Promise(function(resolve, reject) {
+        taskRef.remove(function(error) {
+            if (error) reject(error);
+            resolve(true);
+          })
+        .catch((error)=>reject(error));
+    });
+  }
+
   private getMaxCodeNum (url) {
     let tasksRef = firebase.database().ref(`${url}/backlog/`);
     

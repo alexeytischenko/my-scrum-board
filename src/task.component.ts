@@ -124,9 +124,8 @@ import { Subscription } from 'rxjs/Subscription';
     
       <!-- Modal content-->
       <div class="modal-content">
-        <div class="modal-header" style="padding:35px 50px;">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4><span class="glyphicon glyphicon-fire"></span> Delete the task?</h4>
+        <div class="modal-header" style="padding:25px 50px;">
+          <h4 style="text-align: center;"><span class="glyphicon glyphicon-fire"></span> Delete the task?</h4>
         </div>
         <div class="modal-body" style="padding:40px 50px;">
               <button class="btn btn-danger btn-block" (click)="deleteTask()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
@@ -178,6 +177,7 @@ export class TaskComponent implements OnInit, OnDestroy {
       }
       else
         this.projectsService.loadProjects(this.userId);
+
   }
 
   get diagnostic() {
@@ -194,7 +194,7 @@ export class TaskComponent implements OnInit, OnDestroy {
       params => {
         progress_start ("");
         this.taskId = params['tasktId'];
-        this.taskService.getTask("mSmxxvKkt4ei6nL80Krmt9R0m983", this.taskId)
+        this.taskService.getTask(this.userId, this.taskId)
         .then ( () => {
               this.task = this.taskService.task;
               this.project = this.projectsService.getProject(this.task.project);
@@ -228,6 +228,7 @@ export class TaskComponent implements OnInit, OnDestroy {
       });
     
   }
+  
   reopenTask() : void {
     //task reopen from drop-down menu
     progress_start("red");
@@ -242,16 +243,20 @@ export class TaskComponent implements OnInit, OnDestroy {
   }
 
   deleteTask() {
+    //dismiss alert window
+    $('#delModal').modal("hide");
+    //start red progress
+    progress_start("red");
 
-    // progress_start("red");
-    // this.taskService.saveTask(this.userId, this.task)
-    //   .catch((error)=>this.taskService.errorHandler(error))
-    //   .then((newurl)=> {    
-    //     //finally / default  
-    //     progress_end();
-    //     //$('#delModal').modal("hide");
-    //     setTimeout(() => this.router.navigateByUrl('/tasks/'), 1000);
-    //   });
+    //service requesdt
+    this.taskService.removeTask(this.userId, this.task.id)
+      .catch((error)=>this.taskService.errorHandler(error))
+      .then(()=> {    
+        //finally / default  
+        progress_end();
+        setTimeout(() => document.location.href= "/tasks", 1000);
+        //setTimeout(() => this.router.navigateByUrl('/tasks'), 1000);
+      });
   }
 
 
