@@ -57,32 +57,32 @@ export class BackLogComponent {
   backLogLength : number;
   backLog = [];
 
-  bookmarks = [];
-  editableBookmark = {};
-
   constructor(private tasksListService: TasksListService,
               private projectsService :ProjectsService) {
 
-    this.tasksListService.errorHandler = error => {
-      console.error('Backlog component (tasksListService) error! ' + error);
-      window.alert('An error occurred while processing this page! Try again later.');
-    }
+      console.info ("BackLogComponent:constructor");
+    
+      this.tasksListService.errorHandler = error => {
+        console.error('Backlog component (tasksListService) error! ' + error);
+        window.alert('An error occurred while processing this page! Try again later.');
+      }
 
-    //load projects into property of the ProjectsService then loads list of tasks into tasksListService tasks property 
-    progress_start("");
-    this.projectsService.loadProjects(this.userId)
-      .then ( () => this.tasksListService.getBackLog(this.userId)) //, error => console.error("Getting projects list error:", error)
-      .then ( () => this.backLog = this.tasksListService.tasks)
-      .catch((error)=>this.tasksListService.errorHandler(error))
-      .then(()=> {    
-        //finally / default     
-        setTimeout(() => this.rebuildSortable(), 1000);
-        progress_end();
-      });
+      //load projects into property of the ProjectsService then loads list of tasks into tasksListService tasks property 
+      progress_start("");
+      this.projectsService.loadProjects(this.userId)
+        .then ( () => this.tasksListService.getBackLog(this.userId)) //, error => console.error("Getting projects list error:", error)
+        .then ( () => this.backLog = this.tasksListService.tasks)
+        .catch((error)=>this.tasksListService.errorHandler(error))
+        .then(()=> {    
+          //finally / default     
+          setTimeout(() => this.rebuildSortable(), 1000);
+          progress_end();
+        });
   }
 
   rebuildSortable() {
-      console.log('rebuildSortable called!');
+      console.info ("BackLogComponent:rebuildSortable()");
+
       $('.list-group-sortable').sortable({
           placeholderClass: 'list-group-item',
           cursor: "move",
@@ -104,7 +104,6 @@ export class BackLogComponent {
           .then(() => {
             progress_end();
             this.countDomSizes("s");
-            console.log("s");
           });        
       });
 
@@ -118,7 +117,6 @@ export class BackLogComponent {
           .catch((error)=>this.tasksListService.errorHandler(error))
           .then(() => {
             progress_end();
-            console.log("b");
             this.countDomSizes("b");
           });  
       });   
@@ -129,6 +127,8 @@ export class BackLogComponent {
 
   private prepareJSON(recordType : string, domNode : string) {
     //prepare JSON for UPDATE sortnum and type (active sprint / backlog) after resort of the elements
+    console.info ("BackLogComponent:prepareJSON(recordType : string, domNode : string)",recordType ,domNode);
+
     let updatedData = [];
     $('#' + domNode + ' li').each(function( index ) {
           updatedData[index] = {
@@ -143,6 +143,7 @@ export class BackLogComponent {
 
   private countDomSizes(tp: string) {
     //updates current values   
+    console.info ("BackLogComponent:countDomSizes(tp: string)",tp);
 
     if (tp === "s") {
       let sl = 0;
@@ -156,21 +157,8 @@ export class BackLogComponent {
       $('#bklg li').each(function( index ) {
         if (index > 0) bll++;  
       });
-      console.info("backLogLength", bll);
       this.backLogLength = bll;
     }
   }
-    
-
-  //  private setBackLogSizes() {
-  //   //updates current values
-  //   this.sprintLength = 0;
-  //   this.backLogLength = 0;
-
-  //   for (let task of this.backLog) {
-  //       if (task.type == "s") this.sprintLength++;
-  //       else this.backLogLength++;
-  //   }  
-  // }
 
 }

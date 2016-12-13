@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
+import { AfterViewInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaskService } from './task.service';
+import { CommentsListComponent } from './comments-list.component';
 import { ProjectsService } from './projects.service';
 import { Project } from './project.class';
 // import { Task } from './task.class';
@@ -33,7 +35,6 @@ import { Subscription } from 'rxjs/Subscription';
               <span class="glyphicon glyphicon-pencil"></span>
               <span class="hidden-xs">Edit</span>
             </a>      
-            <!--a href="javascript:void(0);" data-toggle="popover" title="Help" data-trigger="hover" data-content="To edit the task click the Edit button"><span class="glyphicon glyphicon-question-sign"></span></a-->
         </div>
         <div class="form-inline">               
                 <label>{{task.name}}</label> 
@@ -92,14 +93,20 @@ import { Subscription } from 'rxjs/Subscription';
         </div>
         <div class="panel-body">
           <div style="float:right;">
-            <button class="btn btn-default">
+            <button class="btn btn-default" (click)="clc.setEditorField(-1)">
               <span class="glyphicon glyphicon-comment"></span>
               <span class="hidden-xs">Add comment</span>
             </button>
           </div>
           <div>
-            <label>Comments</label>
-            <p class="norecords">There are no comments</p>
+            <label>Comments</label> 
+            <span *ngIf="task.commentsNum > 0" class="commentsToggle">
+                ({{task.commentsNum}}) 
+                <div (click)="toggleComments()" [class]="openComments ? 'glyphicon glyphicon-menu-up' : 'glyphicon glyphicon-menu-down'"></div>
+                <div *ngIf="openComments" (click)="clc.loadComments()" class="glyphicon glyphicon-repeat" alt="reload" title="reload"></div>
+            </span> 
+            <p *ngIf="!task.commentsNum || task.commentsNum == 0" class="norecords">There are no comments</p>
+            <add-edit-comment (setCount) = "updateTaskCommentsCounts($event)" [editComment]="editComment" [openComments]="openComments" [taskId]="taskId"></add-edit-comment>
           </div>       
       </div>
       <div class="panel-body">
@@ -143,6 +150,8 @@ import { Subscription } from 'rxjs/Subscription';
     .norecords {color: #999; font-style: italic}
     .dropdown {padding-bottom: 10px;}
     .modal-dialog {margin: 100px auto!important;}
+    .commentsToggle div {cursor: pointer; color: #999;}
+    .commentsToggle div:first-child {margin-left: 10px;}
   `]
 })
 export class TaskComponent implements OnInit, OnDestroy {
@@ -151,9 +160,12 @@ export class TaskComponent implements OnInit, OnDestroy {
   taskId;
   project : Project;
   taskStatuses : string[];
+  openComments: boolean;
+  editComment: number;
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
-  @Output() clear = new EventEmitter();
-  @Output() save = new EventEmitter();
+
+
+  @ViewChild(CommentsListComponent) private clc : CommentsListComponent;
 
   paramsSubscription: Subscription;
 
@@ -161,6 +173,8 @@ export class TaskComponent implements OnInit, OnDestroy {
               private taskService : TaskService,
               private projectsService : ProjectsService,
               private router: Router) {
+      
+      console.info ("TaskComponent:constructor");
 
       this.taskService.errorHandler = error => {
         console.error('Task component error! ' + error);
@@ -170,13 +184,34 @@ export class TaskComponent implements OnInit, OnDestroy {
       this.task = {};
       this.project = new Project();
       this.taskStatuses = this.taskService.taskSatuses;
+      this.openComments = false;
+      this.editComment = 0;
 
       //load projects if ness
       if (this.projectsService.projects && this.projectsService.projects.length > 0) {
-        console.info('projects already loaded');
+        console.info('TaskComponent->projectsService -- projects already loaded');
       }
       else
         this.projectsService.loadProjects(this.userId);
+
+      this.paramsSubscription = this.route.params.subscribe(
+        params => {
+          progress_start ("");
+          this.taskId = params['tasktId'];
+          this.taskService.getTask(this.userId, this.taskId)
+          .then ( () => {
+                this.task = this.taskService.task;
+                this.project = this.projectsService.getProject(this.task.project);
+                console.info("task loaded", this.task);
+              }
+          )
+          .catch((error)=>this.taskService.errorHandler(error))
+          .then (() => {
+            //finally
+            progress_end();
+          });
+        }
+      );
 
   }
 
@@ -189,26 +224,7 @@ export class TaskComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-
-    this.paramsSubscription = this.route.params.subscribe(
-      params => {
-        progress_start ("");
-        this.taskId = params['tasktId'];
-        this.taskService.getTask(this.userId, this.taskId)
-        .then ( () => {
-              this.task = this.taskService.task;
-              this.project = this.projectsService.getProject(this.task.project);
-              console.info("task loaded", this.task);
-            }
-        )
-        .catch((error)=>this.taskService.errorHandler(error))
-        .then (() => {
-          //finally
-          progress_end();
-        });
-      }
-    );
-
+    console.info ("TaskComponent:ngOnInit");
 
     // $(document).ready(function(){
     //     $('[data-toggle="popover"]').popover();
@@ -217,6 +233,8 @@ export class TaskComponent implements OnInit, OnDestroy {
 
   resolveTask() : void {
     //task resolve from drop-down menu
+    console.info ("TaskComponent:resolveTask()");
+
     progress_start("red");
     this.task.status = 'resolved';
     this.task.updated = Date.now();
@@ -231,6 +249,8 @@ export class TaskComponent implements OnInit, OnDestroy {
   
   reopenTask() : void {
     //task reopen from drop-down menu
+    console.info ("TaskComponent:reopenTask()");
+
     progress_start("red");
     this.task.status = 'in progress';
     this.task.updated = Date.now();
@@ -242,7 +262,20 @@ export class TaskComponent implements OnInit, OnDestroy {
       });
   }
 
+  updateTaskCommentsCounts (val : number) {
+    console.info ("TaskComponent:updateTaskCommentsCounts($event)", val);
+
+    this.task.commentsNum = val;
+    this.taskService.saveTask(this.userId, this.task)
+      .catch((error)=>this.taskService.errorHandler(error));
+      // .then(()=> {    
+      //   //finally / default  
+      // });
+  }
+
   deleteTask() {
+    console.info ("TaskComponent:deleteTask()");
+
     //dismiss alert window
     $('#delModal').modal("hide");
     //start red progress
@@ -259,8 +292,18 @@ export class TaskComponent implements OnInit, OnDestroy {
       });
   }
 
+  toggleComments() {
+    console.info ("TaskComponent:toggleComments()");
+
+    this.openComments = (this.openComments) ? false : true;
+    if (this.openComments) {
+      this.clc.loadComments();
+    }
+  }
 
   ngOnDestroy() {
+    console.info ("TaskComponent:ngOnDestroy()");
+
     this.paramsSubscription.unsubscribe();
   }
 

@@ -24,9 +24,13 @@ System.register(['@angular/core', './project.class'], function(exports_1, contex
             ProjectsService = (function () {
                 function ProjectsService() {
                     this.projects = [];
+                    this.colors = ['white', 'orange', 'dark blue', 'blue', 'red', 'green'];
+                    this.colorsMap = { 'white': 'default', 'orange': 'warning', 'dark blue': 'primary', 'blue': 'info', 'red': 'danger', 'green': 'success' };
                     this.errorHandler = function (error) { return console.error('ProjectsService error', error); };
+                    console.info("ProjectsService:constructor");
                 }
                 ProjectsService.prototype.loadProjects = function (url) {
+                    console.info("ProjectsService:loadProjects(url)", url);
                     var self = this;
                     var projectsRef = firebase.database().ref(url + "/projects/");
                     projectsRef.off();
@@ -34,7 +38,6 @@ System.register(['@angular/core', './project.class'], function(exports_1, contex
                         projectsRef.once('value', function (snapshot) {
                             self.projects = self.convert(snapshot.val());
                             if (self.projects.length > 0) {
-                                console.log("projects", self.projects);
                                 resolve(true);
                             }
                             else
@@ -43,6 +46,7 @@ System.register(['@angular/core', './project.class'], function(exports_1, contex
                     });
                 };
                 ProjectsService.prototype.getProject = function (project) {
+                    console.info("ProjectsService:getProject(project)", project);
                     var projectData = new project_class_1.Project();
                     this.projects.forEach(function (element) {
                         if (element.id == project)
@@ -51,6 +55,7 @@ System.register(['@angular/core', './project.class'], function(exports_1, contex
                     return projectData;
                 };
                 ProjectsService.prototype.addProject = function (url, newProject) {
+                    console.info("ProjectsService:addProject(url: string, newProject : Project)", url, newProject);
                     var self = this;
                     var projectsRef = firebase.database().ref(url + "/projects/");
                     var postData = {
@@ -58,7 +63,6 @@ System.register(['@angular/core', './project.class'], function(exports_1, contex
                         sname: newProject.sname,
                         color: newProject.color
                     };
-                    console.log("project add data", postData);
                     return new Promise(function (resolve, reject) {
                         var newprojectsRef = projectsRef.push();
                         newprojectsRef.set(postData, function (error) {
@@ -73,7 +77,6 @@ System.register(['@angular/core', './project.class'], function(exports_1, contex
                                     color: newProject.color,
                                     id: newprojectsRef.key.toString()
                                 });
-                                console.log("new projects", self.projects);
                                 resolve(newprojectsRef.key.toString());
                             }
                         });

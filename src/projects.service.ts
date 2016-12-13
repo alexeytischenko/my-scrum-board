@@ -10,9 +10,13 @@ export class ProjectsService {
   
   errorHandler = error => console.error('ProjectsService error', error);
   
-  constructor() {}
+  constructor() {
+    console.info ("ProjectsService:constructor");
+  }
 
   loadProjects(url) {
+    console.info ("ProjectsService:loadProjects(url)", url);
+
     let self = this;
     var projectsRef = firebase.database().ref(`${url}/projects/`);
     projectsRef.off(); 
@@ -22,7 +26,6 @@ export class ProjectsService {
             self.projects = self.convert(snapshot.val());
 
             if (self.projects.length > 0) {
-              console.log("projects", self.projects);
               resolve(true);
             }
             else reject("Couldn't retrive projects list");
@@ -32,6 +35,7 @@ export class ProjectsService {
   }
 
   getProject(project : string) : Project {
+    console.info ("ProjectsService:getProject(project)", project);
 
     let projectData = new Project();
     this.projects.forEach(element => {
@@ -42,6 +46,8 @@ export class ProjectsService {
   }
 
   addProject(url: string, newProject : Project) {
+    console.info ("ProjectsService:addProject(url: string, newProject : Project)", url, newProject);
+    
     let self = this;
     let projectsRef = firebase.database().ref(`${url}/projects/`);
 
@@ -50,8 +56,6 @@ export class ProjectsService {
       sname: newProject.sname,
       color: newProject.color
     };
-
-    console.log("project add data", postData);
 
     return new Promise(function(resolve, reject) {
       let newprojectsRef = projectsRef.push();
@@ -67,7 +71,6 @@ export class ProjectsService {
             id: newprojectsRef.key.toString()
           });
 
-          console.log("new projects", self.projects);
           resolve(newprojectsRef.key.toString());
       }
       }); 

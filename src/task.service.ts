@@ -33,6 +33,8 @@ export class TaskService {
   }
 
   saveTask(url: string, task) {
+    console.info("TaskService:saveTask(url: string, task)", url, task);
+
     let postData; 
     let self = this;
     let taskRef = firebase.database().ref(`${url}/backlog/`);
@@ -48,6 +50,7 @@ export class TaskService {
             postData = {
               name: task.name,
               estimate: task.estimate,
+              commentsNum: 0,
               sortnum : Date.now(),
               status: task.status,
               type: "b",
@@ -75,6 +78,7 @@ export class TaskService {
         postData = {
           name: task.name,
           estimate: task.estimate,
+          commentsNum: task.commentsNum,
           status: task.status,
           description: task.description,
           project: task.project,

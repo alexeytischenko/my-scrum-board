@@ -41,6 +41,7 @@ System.register(['@angular/core'], function(exports_1, context_1) {
                     });
                 };
                 TaskService.prototype.saveTask = function (url, task) {
+                    console.info("TaskService:saveTask(url: string, task)", url, task);
                     var postData;
                     var self = this;
                     var taskRef = firebase.database().ref(url + "/backlog/");
@@ -55,6 +56,7 @@ System.register(['@angular/core'], function(exports_1, context_1) {
                                 postData = {
                                     name: task.name,
                                     estimate: task.estimate,
+                                    commentsNum: 0,
                                     sortnum: Date.now(),
                                     status: task.status,
                                     type: "b",
@@ -83,6 +85,7 @@ System.register(['@angular/core'], function(exports_1, context_1) {
                         postData = {
                             name: task.name,
                             estimate: task.estimate,
+                            commentsNum: task.commentsNum,
                             status: task.status,
                             description: task.description,
                             project: task.project,
@@ -100,6 +103,20 @@ System.register(['@angular/core'], function(exports_1, context_1) {
                             });
                         });
                     }
+                };
+                TaskService.prototype.removeTask = function (url, taskId) {
+                    var self = this;
+                    var taskRef = firebase.database().ref(url + "/backlog/" + taskId);
+                    console.log("taskRef", url + "/backlog/" + taskId);
+                    //removing task
+                    return new Promise(function (resolve, reject) {
+                        taskRef.remove(function (error) {
+                            if (error)
+                                reject(error);
+                            resolve(true);
+                        })
+                            .catch(function (error) { return reject(error); });
+                    });
                 };
                 TaskService.prototype.getMaxCodeNum = function (url) {
                     var tasksRef = firebase.database().ref(url + "/backlog/");

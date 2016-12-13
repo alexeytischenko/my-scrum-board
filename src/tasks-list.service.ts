@@ -5,12 +5,16 @@ import { Project } from './project.class';
 @Injectable()
 export class TasksListService {
 
-  errorHandler = error => console.error('TaskService error', error);
+  errorHandler = error => console.error('TaskListService error', error);
   tasks = [];
   
-  constructor(private projectsService : ProjectsService) {}
+  constructor(private projectsService : ProjectsService) {
+    console.info ("TasksListService:constructor");
+  }
 
   getBackLog(url) {
+    console.info ("TasksListService:getBackLog(url)", url);
+
     let self = this;
     let taskscount = 0;
     let tasksRef = firebase.database().ref(`${url}/backlog/`);
@@ -32,6 +36,7 @@ export class TasksListService {
   }
 
   resortBackLog(url, jsonData) {
+    console.info ("TasksListService:resortBackLog(url, jsonData)", url, jsonData);
     
     let self = this;
     let resolveCounter = jsonData.length;

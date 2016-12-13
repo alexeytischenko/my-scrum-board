@@ -27,10 +27,12 @@ System.register(['@angular/core', './projects.service', './project.class'], func
             TasksListService = (function () {
                 function TasksListService(projectsService) {
                     this.projectsService = projectsService;
-                    this.errorHandler = function (error) { return console.error('TaskService error', error); };
+                    this.errorHandler = function (error) { return console.error('TaskListService error', error); };
                     this.tasks = [];
+                    console.info("TasksListService:constructor");
                 }
                 TasksListService.prototype.getBackLog = function (url) {
+                    console.info("TasksListService:getBackLog(url)", url);
                     var self = this;
                     var taskscount = 0;
                     var tasksRef = firebase.database().ref(url + "/backlog/");
@@ -50,6 +52,7 @@ System.register(['@angular/core', './projects.service', './project.class'], func
                     });
                 };
                 TasksListService.prototype.resortBackLog = function (url, jsonData) {
+                    console.info("TasksListService:resortBackLog(url, jsonData)", url, jsonData);
                     var self = this;
                     var resolveCounter = jsonData.length;
                     //return Promise to record new tasks order

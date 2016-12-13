@@ -78,7 +78,6 @@ export class TaskEditComponent implements OnInit, OnDestroy {
   task;
   taskUrl;
   taskId;
-  //project : Project;
   projects;
   taskStatuses : string[];
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
@@ -98,7 +97,6 @@ export class TaskEditComponent implements OnInit, OnDestroy {
 
       this.task = {};
       this.projects = [];
-      //this.project = new Project();
       this.taskStatuses = this.taskService.taskSatuses;
 
       //load projects if ness
