@@ -8,7 +8,9 @@ import { TaskService } from './task.service';
 import { Project } from './project.class';
 import { ProjectsService } from './projects.service';
 import { CommentsListService } from './comments-list.service';
+import { WorkLogService } from './work-log.service';
 import { CommentsListComponent } from './comments-list.component';
+import { WorkLogComponent } from './work-log.component';
 import { AppComponent } from './app.component';
 import { TaskComponent } from './task.component';
 import { TaskEditComponent } from './task-edit.component';
@@ -49,8 +51,8 @@ const routerModule = RouterModule.forRoot([
 
 @NgModule({
   imports: [BrowserModule, FormsModule, routerModule],
-  declarations: [AppComponent, BackLogComponent, TaskComponent, TaskEditComponent, NewProject, EditProject, ProjectsListComponent, CommentsListComponent],
-  providers: [TasksListService, TaskService, ProjectsService, Project, CommentsListService],
+  declarations: [AppComponent, BackLogComponent, TaskComponent, TaskEditComponent, NewProject, EditProject, ProjectsListComponent, CommentsListComponent, WorkLogComponent],
+  providers: [TasksListService, TaskService, ProjectsService, Project, CommentsListService, WorkLogService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

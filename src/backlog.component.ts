@@ -24,7 +24,7 @@ import { Project } from './project.class';
                 <li *ngIf="taskElement.type=='s'" class="list-group-item" id="{{taskElement.id}}">
                   <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code}}</span> 
-                  <span class="badge">{{taskElement.estimate ? taskElement.estimate : '0'}}h / 0h</span>
+                  <span class="badge">{{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
                 </li>
               </template>
   
@@ -37,7 +37,7 @@ import { Project } from './project.class';
                 <li *ngIf="taskElement.type=='b'" class="list-group-item" id="{{taskElement.id}}">
                   <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code}}</span> 
-                  <span class="badge">{{taskElement.estimate ? taskElement.estimate : '0'}}h / 0h</span>
+                  <span class="badge">{{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
                 </li>
               </template>  
           </ul>

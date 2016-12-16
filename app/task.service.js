@@ -56,6 +56,7 @@ System.register(['@angular/core'], function(exports_1, context_1) {
                                 postData = {
                                     name: task.name,
                                     estimate: task.estimate,
+                                    worked: 0,
                                     commentsNum: 0,
                                     sortnum: Date.now(),
                                     status: task.status,
@@ -85,7 +86,6 @@ System.register(['@angular/core'], function(exports_1, context_1) {
                         postData = {
                             name: task.name,
                             estimate: task.estimate,
-                            commentsNum: task.commentsNum,
                             status: task.status,
                             description: task.description,
                             project: task.project,
@@ -103,6 +103,22 @@ System.register(['@angular/core'], function(exports_1, context_1) {
                             });
                         });
                     }
+                };
+                TaskService.prototype.savePropery = function (url, taskid, postData) {
+                    console.info("TaskService:savePropery(url: string, taskid: string, postData : any)", url, taskid, postData);
+                    var self = this;
+                    var taskRef = firebase.database().ref(url + "/backlog/");
+                    return new Promise(function (resolve, reject) {
+                        taskRef.child(taskid).update(postData, function (error) {
+                            if (error) {
+                                console.error('Update failed');
+                                reject(error);
+                            }
+                            else {
+                                resolve(true);
+                            }
+                        });
+                    });
                 };
                 TaskService.prototype.removeTask = function (url, taskId) {
                     var self = this;

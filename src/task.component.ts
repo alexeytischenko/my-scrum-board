@@ -3,6 +3,7 @@ import { AfterViewInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaskService } from './task.service';
 import { CommentsListComponent } from './comments-list.component';
+import { WorkLogComponent } from './work-log.component';
 import { ProjectsService } from './projects.service';
 import { Project } from './project.class';
 // import { Task } from './task.class';
@@ -26,9 +27,9 @@ import { Subscription } from 'rxjs/Subscription';
                 <li *ngIf="taskCurrentStatus=='resolved'"><a href="javascript:void(0);" (click)="reopenTask()">Reopen task</a></li>
                 <li><a href="javascript:void(0);" onClick="$('#delModal').modal();">Delete task</a></li>
                 <li class="divider"></li>
-                <li><a href="javascript:void(0);">Add comment</a></li>
+                <li><a href="javascript:void(0);" (click)="clc.setEditorField(-1)">Add comment</a></li>
                 <li><a href="javascript:void(0);">Add attachment</a></li>
-                <li><a href="javascript:void(0);">Log work</a></li>
+                <li><a href="javascript:void(0);" (click)="wlc.setEditorField(-1)">Log work</a></li>
               </ul>
             </span>
             <a [routerLink]="['/tasks/edit/'+ taskId]" class="btn btn-default btn-sm">
@@ -46,7 +47,7 @@ import { Subscription } from 'rxjs/Subscription';
         <div class="panel-body">
             <div>
               <label>Estimate</label>
-              <span>{{task.estimate ? task.estimate : '0'}}</span>h / 0h
+              <span>{{task.estimate ? task.estimate : '0'}}</span>h / worked: {{task.worked ? task.worked : '0'}}h
             </div>
             <div>
                 <label>Project</label>
@@ -106,19 +107,24 @@ import { Subscription } from 'rxjs/Subscription';
                 <div *ngIf="openComments" (click)="clc.loadComments()" class="glyphicon glyphicon-repeat" alt="reload" title="reload"></div>
             </span> 
             <p *ngIf="!task.commentsNum || task.commentsNum == 0" class="norecords">There are no comments</p>
-            <add-edit-comment (setCount) = "updateTaskCommentsCounts($event)" [editComment]="editComment" [openComments]="openComments" [taskId]="taskId"></add-edit-comment>
+            <comments (setCount) = "updateTaskCommentsCounts($event)" [openComments]="openComments" [taskId]="taskId"></comments>
           </div>       
       </div>
       <div class="panel-body">
           <div style="float:right;">
-            <button class="btn btn-default">
+            <button class="btn btn-default" (click)="wlc.setEditorField(-1)">
               <span class="glyphicon glyphicon-time"></span>
               <span class="hidden-xs">Log work</span>
             </button>
           </div>
           <div>
             <label>Worklogs</label>
-            <p class="norecords">There are no worklogs</p>
+            <span *ngIf="task.worked > 0" class="commentsToggle">
+                <div (click)="toggleLogs()" [class]="openLog ? 'glyphicon glyphicon-menu-up' : 'glyphicon glyphicon-menu-down'"></div>
+                <div *ngIf="openLog" (click)="wlc.loadRecords()" class="glyphicon glyphicon-repeat" alt="reload" title="reload"></div>
+            </span> 
+            <p *ngIf="!task.worked || task.worked == 0" class="norecords">There are no worklogs</p>
+            <worklog (setCount) = "updateTaskLogsCounts($event)" [openLog]="openLog" [taskId]="taskId"></worklog>
           </div>       
       </div>
   
@@ -161,11 +167,11 @@ export class TaskComponent implements OnInit, OnDestroy {
   project : Project;
   taskStatuses : string[];
   openComments: boolean;
-  editComment: number;
+  openLog: boolean;
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
 
-
   @ViewChild(CommentsListComponent) private clc : CommentsListComponent;
+  @ViewChild(WorkLogComponent) private wlc : WorkLogComponent;
 
   paramsSubscription: Subscription;
 
@@ -174,6 +180,7 @@ export class TaskComponent implements OnInit, OnDestroy {
               private projectsService : ProjectsService,
               private router: Router) {
       
+      // loads task data
       console.info ("TaskComponent:constructor");
 
       this.taskService.errorHandler = error => {
@@ -185,7 +192,7 @@ export class TaskComponent implements OnInit, OnDestroy {
       this.project = new Project();
       this.taskStatuses = this.taskService.taskSatuses;
       this.openComments = false;
-      this.editComment = 0;
+      this.openLog = false;
 
       //load projects if ness
       if (this.projectsService.projects && this.projectsService.projects.length > 0) {
@@ -206,29 +213,9 @@ export class TaskComponent implements OnInit, OnDestroy {
               }
           )
           .catch((error)=>this.taskService.errorHandler(error))
-          .then (() => {
-            //finally
-            progress_end();
-          });
+          .then (() => progress_end());
         }
       );
-
-  }
-
-  get diagnostic() {
-    return JSON.stringify(this.task);
-  }
-
-  get taskCurrentStatus() : string {
-    return this.task.status ? this.task.status : '';
-  }
-
-  ngOnInit() {
-    console.info ("TaskComponent:ngOnInit");
-
-    // $(document).ready(function(){
-    //     $('[data-toggle="popover"]').popover();
-    // });
   }
 
   resolveTask() : void {
@@ -240,11 +227,7 @@ export class TaskComponent implements OnInit, OnDestroy {
     this.task.updated = Date.now();
     this.taskService.saveTask(this.userId, this.task)
       .catch((error)=>this.taskService.errorHandler(error))
-      .then(()=> {    
-        //finally / default  
-        progress_end();
-      });
-    
+      .then(()=> progress_end());
   }
   
   reopenTask() : void {
@@ -256,49 +239,82 @@ export class TaskComponent implements OnInit, OnDestroy {
     this.task.updated = Date.now();
     this.taskService.saveTask(this.userId, this.task)
       .catch((error)=>this.taskService.errorHandler(error))
-      .then(()=> {    
-        //finally / default  
-        progress_end();
-      });
+      .then(()=> progress_end());
   }
 
   updateTaskCommentsCounts (val : number) {
+    // updates comments count if ness
     console.info ("TaskComponent:updateTaskCommentsCounts($event)", val);
 
+    if (this.task.commentsNum == val) return false;  // no need to update
+
     this.task.commentsNum = val;
-    this.taskService.saveTask(this.userId, this.task)
-      .catch((error)=>this.taskService.errorHandler(error));
-      // .then(()=> {    
-      //   //finally / default  
-      // });
+    this.taskService.savePropery(this.userId, this.task.id, {"commentsNum" : val}) 
+      .catch((error)=>this.taskService.errorHandler(error))
+      .then(()=> {    
+        this.openComments = true; //open comments list  
+      });
+  }
+
+  updateTaskLogsCounts (val : number) {
+    // updates recoreds count if ness
+    console.info ("TaskComponent:updateTaskLogsCounts($event)", val);
+
+    if (this.task.worked == val) return false;  // no need to update
+
+    this.task.worked = val;
+    this.taskService.savePropery(this.userId, this.task.id, {"worked" : val}) 
+      .catch((error) => this.taskService.errorHandler(error))
+      .then(() => {    
+        this.openLog = true; //open worklog list  
+      });
   }
 
   deleteTask() {
+    //delete task from drop-down menu
     console.info ("TaskComponent:deleteTask()");
 
-    //dismiss alert window
-    $('#delModal').modal("hide");
-    //start red progress
-    progress_start("red");
+    $('#delModal').modal("hide");   //dismiss alert window
+    progress_start("red");          //start red progress
 
-    //service requesdt
     this.taskService.removeTask(this.userId, this.task.id)
       .catch((error)=>this.taskService.errorHandler(error))
       .then(()=> {    
-        //finally / default  
         progress_end();
         setTimeout(() => document.location.href= "/tasks", 1000);
-        //setTimeout(() => this.router.navigateByUrl('/tasks'), 1000);
       });
   }
 
   toggleComments() {
+    // open/close comments list 
     console.info ("TaskComponent:toggleComments()");
 
     this.openComments = (this.openComments) ? false : true;
     if (this.openComments) {
       this.clc.loadComments();
     }
+  }
+
+  toggleLogs() {
+    // open/close logs list 
+    console.info ("TaskComponent:toggleLogs()");
+
+    this.openLog = (this.openLog) ? false : true;
+    if (this.openLog) {
+      this.wlc.loadRecords();
+    }
+  }
+
+  // get diagnostic() {
+  //   return JSON.stringify(this.task);
+  // }
+
+  get taskCurrentStatus() : string {
+    return this.task.status ? this.task.status : '';
+  }
+
+  ngOnInit() {
+    console.info ("TaskComponent:ngOnInit");
   }
 
   ngOnDestroy() {

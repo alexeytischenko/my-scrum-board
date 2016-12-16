@@ -1,24 +1,26 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
-// import { Task } from './task.class';
 import { CommentsListService } from './comments-list.service';
 
 
 @Component({
-  selector: 'add-edit-comment',
+  selector: 'comments',
   template: `
     <section>
-          <div *ngIf="loading" class="loader"></div>
           <div class="edit_div" [hidden]="!showEditField">
-            <textarea name="commentBody" id="commentBody" class="form-control input-sm" style="margin-bottom:10px;" [(ngModel)]="commentBody" rows="2"></textarea>
-            <button class="btn btn-warning btn-sm" (click)="editComment = ''">
-              <span class="glyphicon glyphicon-remove"></span>
-              <span class="hidden-xs">Cancel</span>
-            </button>
-            <button class="btn btn-primary btn-sm" (click)="saveComment()">
-              <span class="glyphicon glyphicon-ok"></span>
-              <span class="hidden-xs">Save</span>
-            </button>
+            <form (ngSubmit)="saveComment()" #editForm="ngForm" novalidate>
+              <textarea name="commentBody" id="commentBody" class="form-control input-sm" required #commentValidation="ngModel" style="margin-bottom:10px;" [(ngModel)]="commentBody" placeholder="Comment" rows="2"></textarea>
+              <div class="alert alert-danger" [hidden]="commentValidation.valid || commentValidation.pristine">Comment is required</div>
+              <a class="btn btn-warning btn-sm" (click)="editCommentId = ''">
+                <span class="glyphicon glyphicon-remove"></span>
+                <span class="hidden-xs">Cancel</span>
+              </a>
+              <button class="btn btn-primary btn-sm" type="submit" [disabled]="!editForm.form.valid">
+                <span class="glyphicon glyphicon-ok"></span>
+                <span class="hidden-xs">Save</span>
+              </button>
+            </form>
           </div>
+          <div *ngIf="loading" class="loader"></div>
           <ul [hidden]="!openComments || loading">
                <template ngFor let-comment [ngForOf]="comments">
                 <li id="{{comment.id}}" 
@@ -32,7 +34,7 @@ import { CommentsListService } from './comments-list.service';
                     <span (click)="setEditorField(comment.id)" class="glyphicon glyphicon-pencil"></span>
                     <span (click)="openDeleteModal(comment.id)" class="glyphicon glyphicon-trash"></span>
                   </span>
-                  <div class="commentslist_date">{{comment.created | date:'medium'}}</div>
+                  <div class="commentslist_date">{{comment.created | date:'medium'}} <span *ngIf="comment.edited" style="margin-left:10px;">edited: {{comment.edited | date:'medium'}}</span></div>
                 </li>
               </template>  
           </ul>
@@ -64,27 +66,30 @@ import { CommentsListService } from './comments-list.service';
   li {margin-bottom: 10px;}
   .commentslist_username {color:#284289; margin: 0 10px;}
   li .glyphicon-user{border: 1px solid #F2F2F2; padding: 5px 5px 3px 5px;}
-  .commentslist_date { color: #999; font-style: italic;}
+  .commentslist_date { color: #999; font-style: italic; font-size:11px;}
   .edit_div {width: 80%; padding: 20px 0px 20px 40px;}
   .comment_context_menu {display:none; margin-left: 10px;}
   .comment_context_menu span {cursor: pointer; color: #999;}
   .modal-dialog {margin: 100px auto!important;}
   .modal-header {padding:25px 30px;}
   .modal-body {padding:40px 50px;}
+  
+  .ng-valid[required], .ng-valid.required  { border-left: 5px solid #42A948; /* green */}
+  .ng-invalid:not(form)  {border-left: 5px solid #a94442; /* red */}
   `]
 })
 export class CommentsListComponent {
 
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
   comments = [];
+  @Output() setCount = new EventEmitter();    // set comment count value in outter component  
   @Input() taskId : string;
-  @Input() openComments: boolean;
-  @Input() editComment: string;
-  @Output() setCount = new EventEmitter();
-  deleteId: string;
-  loading: boolean;
-  commentBody: string;
-
+  @Input() openComments: boolean;             // comments list status
+  editCommentId: string;                      // id of comment to be edited
+  deleteCommentId: string;                    // id of comment to be deleted
+  commentBody: string;                        // editor field value
+  loading: boolean;                           // loader status
+  
 
   constructor(private commentsListService: CommentsListService) {
     console.info("CommentsListComponent:constructor");
@@ -94,8 +99,8 @@ export class CommentsListComponent {
       window.alert('An error occurred while processing this page! Try again later.');
     }
     this.loading = false;
-    this.editComment = '';
-    this.deleteId = '';
+    this.editCommentId = '';  
+    this.deleteCommentId = '';       
     this.commentBody = '';
   }
 
@@ -105,72 +110,55 @@ export class CommentsListComponent {
     
     this.loading = true;
     this.commentsListService.getComments(this.userId, this.taskId)
-      .then ( () => this.comments = this.commentsListService.comments)
-      .catch((error)=>this.commentsListService.errorHandler(error))
-      .then(()=> {    
-        //finally / default     
-        this.loading = false;
-       });
+      .then (() => this.comments = this.commentsListService.comments)
+      .then (() => this.setCount.emit(this.comments.length))
+      .then(() => {    
+        setTimeout(() => {
+          this.loading = false;
+          this.editCommentId = '';
+        }, 1000);  
+      })
+      .catch((error) => this.commentsListService.errorHandler(error));
   }
 
   setEditorField(val: any) {
+    // sets editor field value, sets comment to edit ID
     console.info("CommentsListComponent:setEditorField(val: any)", val);
 
     this.commentBody = this.commentsListService.getText(val); 
-    this.editComment = val;
+    this.editCommentId = val;
   }
-
 
   saveComment() {
+    // saves new/update comment
     console.info("CommentsListComponent:saveComment()");
 
-    progress_start("red");
-    this.commentsListService.saveComment(this.userId, this.taskId, this.editComment, this.commentBody)
-      .catch((error)=>this.commentsListService.errorHandler(error))
-      .then((newurl)=> {    
-        
-        progress_end();
-        //empty editor field
-        this.editComment = '';
-        //set count in outer component in case of new comment
-        if (newurl.toString().length > 0)
-          this.setCount.emit(this.comments.length + 1);
-        setTimeout(() => this.loadComments(), 1000);
-      });
-
+    this.commentsListService.saveComment(this.userId, this.taskId, this.editCommentId, this.commentBody)
+      .then(() => this.loadComments())   // reload updated comments list
+      .catch((error) => this.commentsListService.errorHandler(error));
   }
 
-
   openDeleteModal(val: any) {
+    // opens dialog window, sets comment to delete ID 
     console.info("CommentsListComponent:openDeleteModal(val: any)", val);
 
-    this.deleteId = val;
+    this.deleteCommentId = val;
     $('#delCommentModal').modal();
   }
 
   deleteComment() {
+    // closes dialog window, calls service to delete comment
     console.info("CommentsListComponent:deleteComment()");
 
-    //set count in outer component
-    this.setCount.emit(this.comments.length - 1);
+    $('#delCommentModal').modal("hide");    //dismiss alert window
 
-    //dismiss alert window
-    $('#delCommentModal').modal("hide");
-    //start red progress
-    progress_start("red");
-
-    //service requesdt
-    this.commentsListService.removeComment(this.userId, this.taskId, this.deleteId)
-      .catch((error)=>this.commentsListService.errorHandler(error))
-      .then(()=> {    
-        //finally / default  
-        progress_end();
-        setTimeout(() => this.loadComments(), 1000);
-      });
+    this.commentsListService.removeComment(this.userId, this.taskId, this.deleteCommentId)
+      .then(() => this.loadComments())                        // reload updated comments list
+      .catch((error) => this.commentsListService.errorHandler(error));
   }
 
   get showEditField() {
-    if (!this.editComment || this.editComment.length ==  0) return false;
+    if (!this.editCommentId || this.editCommentId.length ==  0) return false;
     return true;
   }
 

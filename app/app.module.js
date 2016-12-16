@@ -1,4 +1,4 @@
-System.register(['@angular/core', '@angular/platform-browser', '@angular/forms', '@angular/router', './tasks-list.service', './task.service', './project.class', './projects.service', './comments-list.service', './comments-list.component', './app.component', './task.component', './task-edit.component', './backlog.component', './new-project.component', './edit-project.component', './projects-list.component'], function(exports_1, context_1) {
+System.register(['@angular/core', '@angular/platform-browser', '@angular/forms', '@angular/router', './tasks-list.service', './task.service', './project.class', './projects.service', './comments-list.service', './work-log.service', './comments-list.component', './work-log.component', './app.component', './task.component', './task-edit.component', './backlog.component', './new-project.component', './edit-project.component', './projects-list.component'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,7 +10,7 @@ System.register(['@angular/core', '@angular/platform-browser', '@angular/forms',
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, platform_browser_1, forms_1, router_1, tasks_list_service_1, task_service_1, project_class_1, projects_service_1, comments_list_service_1, comments_list_component_1, app_component_1, task_component_1, task_edit_component_1, backlog_component_1, new_project_component_1, edit_project_component_1, projects_list_component_1;
+    var core_1, platform_browser_1, forms_1, router_1, tasks_list_service_1, task_service_1, project_class_1, projects_service_1, comments_list_service_1, work_log_service_1, comments_list_component_1, work_log_component_1, app_component_1, task_component_1, task_edit_component_1, backlog_component_1, new_project_component_1, edit_project_component_1, projects_list_component_1;
     var routerModule, AppModule;
     return {
         setters:[
@@ -41,8 +41,14 @@ System.register(['@angular/core', '@angular/platform-browser', '@angular/forms',
             function (comments_list_service_1_1) {
                 comments_list_service_1 = comments_list_service_1_1;
             },
+            function (work_log_service_1_1) {
+                work_log_service_1 = work_log_service_1_1;
+            },
             function (comments_list_component_1_1) {
                 comments_list_component_1 = comments_list_component_1_1;
+            },
+            function (work_log_component_1_1) {
+                work_log_component_1 = work_log_component_1_1;
             },
             function (app_component_1_1) {
                 app_component_1 = app_component_1_1;
@@ -98,8 +104,8 @@ System.register(['@angular/core', '@angular/platform-browser', '@angular/forms',
                 AppModule = __decorate([
                     core_1.NgModule({
                         imports: [platform_browser_1.BrowserModule, forms_1.FormsModule, routerModule],
-                        declarations: [app_component_1.AppComponent, backlog_component_1.BackLogComponent, task_component_1.TaskComponent, task_edit_component_1.TaskEditComponent, new_project_component_1.NewProject, edit_project_component_1.EditProject, projects_list_component_1.ProjectsListComponent, comments_list_component_1.CommentsListComponent],
-                        providers: [tasks_list_service_1.TasksListService, task_service_1.TaskService, projects_service_1.ProjectsService, project_class_1.Project, comments_list_service_1.CommentsListService],
+                        declarations: [app_component_1.AppComponent, backlog_component_1.BackLogComponent, task_component_1.TaskComponent, task_edit_component_1.TaskEditComponent, new_project_component_1.NewProject, edit_project_component_1.EditProject, projects_list_component_1.ProjectsListComponent, comments_list_component_1.CommentsListComponent, work_log_component_1.WorkLogComponent],
+                        providers: [tasks_list_service_1.TasksListService, task_service_1.TaskService, projects_service_1.ProjectsService, project_class_1.Project, comments_list_service_1.CommentsListService, work_log_service_1.WorkLogService],
                         bootstrap: [app_component_1.AppComponent]
                     }), 
                     __metadata('design:paramtypes', [])

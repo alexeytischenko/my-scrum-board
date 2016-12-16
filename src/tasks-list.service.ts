@@ -22,16 +22,17 @@ export class TasksListService {
 
     //retrun Promise to get the backLog
     return new Promise(function(resolve, reject) {
-          tasksRef.orderByChild("sortnum").once('value', function(snapshot) {
-
+          tasksRef.orderByChild("sortnum").once('value')
+          .then(function(snapshot) {
               snapshot.forEach(function(child) {
                   self.tasks[taskscount] = self.convertObject(child.val(), child.getKey());
                   taskscount++;
               });
-
-              if (taskscount > 0) resolve(true);
-              else reject("No tasks yet");
-          }); 
+              resolve(taskscount);
+          })
+          .catch(function(error){
+            reject(error);
+          });
     });
   }
 
@@ -81,6 +82,7 @@ export class TasksListService {
         project_color : project.color,
         sortnum: objectedResponse.sortnum,
         estimate: objectedResponse.estimate,
+        worked: objectedResponse.worked,
         status: objectedResponse.status,
         type: objectedResponse.type
     };

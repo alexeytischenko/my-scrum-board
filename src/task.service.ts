@@ -50,6 +50,7 @@ export class TaskService {
             postData = {
               name: task.name,
               estimate: task.estimate,
+              worked: 0,
               commentsNum: 0,
               sortnum : Date.now(),
               status: task.status,
@@ -78,7 +79,6 @@ export class TaskService {
         postData = {
           name: task.name,
           estimate: task.estimate,
-          commentsNum: task.commentsNum,
           status: task.status,
           description: task.description,
           project: task.project,
@@ -98,6 +98,26 @@ export class TaskService {
     }
 
   }
+
+  savePropery(url: string, taskid: string, postData : any) {
+    console.info("TaskService:savePropery(url: string, taskid: string, postData : any)", url, taskid, postData);
+
+    let self = this;
+    let taskRef = firebase.database().ref(`${url}/backlog/`);
+
+    return new Promise(function(resolve, reject) {
+        taskRef.child(taskid).update(postData, function(error) {
+            if (error) {
+              console.error('Update failed');
+              reject(error);
+            } else {
+              resolve(true);
+            }
+        }); 
+    });
+    
+  }
+
 
   removeTask(url: string, taskId: string) {
     let self = this;

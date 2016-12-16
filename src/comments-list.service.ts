@@ -7,11 +7,12 @@ export class CommentsListService {
   comments = [];
   
   constructor() {
-    console.info ("CommentsListService:constructor");
+    console.debug ("CommentsListService:constructor");
   }
 
   getComments(url, task) {
-    console.info ("CommentsListService:getComments(url, task)", url, task);
+    //retrun Promise to get comments list
+    console.debug ("CommentsListService:getComments(url, task)", url, task);
 
     let self = this;
     let commentscount = 0;
@@ -19,24 +20,22 @@ export class CommentsListService {
     tasksRef.off(); 
     self.comments = [];
 
-    //retrun Promise to get the backLog
     return new Promise(function(resolve, reject) {
-          tasksRef.orderByChild("created").once('value', function(snapshot) {
+          tasksRef.orderByChild("created").once('value')
+            .then(function(snapshot) {
               snapshot.forEach(function(child) {
                   self.comments[commentscount] = self.convertObject(child.val(), child.getKey());
                   commentscount++;
               });
-
-              if (commentscount > 0) resolve(true);
-              else reject("No comments yet");
-          }); 
+              resolve(commentscount);
+            })
+            .catch((error) => reject(error)); 
     });
   }
 
   getText(id : any) : string {
 
     var commentText = '';
-    
     if (id != -1) {
       this.comments.forEach(element => {
           if (element.id == id)  commentText = element.text;
@@ -47,7 +46,8 @@ export class CommentsListService {
   }
 
  saveComment(url: string, task: any, commentid: any, commenytext: string) {
-    console.info("CommentsListService:saveComment(url: string, task: any, commentid: any, commenytext: string)", url, task, commentid, commenytext);
+    // save new/update comment
+    console.debug("CommentsListService:saveComment(url: string, task: any, commentid: any, commenytext: string)", url, task, commentid, commenytext);
 
     let postData; 
     let self = this;
@@ -59,17 +59,12 @@ export class CommentsListService {
             postData = {
               text: commenytext,
               user: 'User',
-              created : Date.now(),
+              created : Date.now()
             }
             let newcommRef = taskRef.push();
             newcommRef.set(postData, function(error) {
-              if (error) {
-                reject(error);
-              } else {
-                  console.log("new comment", postData);
-                  console.log("newcomRef", newcommRef.key.toString());
-                  resolve(newcommRef.key.toString());
-              }
+              if (error) reject(error)
+              else resolve(newcommRef.key.toString());
             }); 
       });
 
@@ -77,6 +72,7 @@ export class CommentsListService {
         //existing comment text
         postData = {
           text: commenytext,
+          edited : Date.now()
         }
 
         return new Promise(function(resolve, reject) {
@@ -95,12 +91,12 @@ export class CommentsListService {
 
 
   removeComment(url: string, taskId: string, commId: string) {
-    console.info ("CommentsListService:removeComment(url, taskId, commId)", url, taskId, commId);
+    // remove comment
+    console.debug ("CommentsListService:removeComment(url, taskId, commId)", url, taskId, commId);
 
     let self = this;
     let taskRef = firebase.database().ref(`${url}/comments/${taskId}/${commId}`);
 
-    //removing task
     return new Promise(function(resolve, reject) {
         taskRef.remove(function(error) {
             if (error) reject(error);
@@ -116,7 +112,8 @@ export class CommentsListService {
         id : id,
         text: objectedResponse.text,
         user : objectedResponse.user,
-        created : objectedResponse.created
+        created : objectedResponse.created,
+        edited : objectedResponse.edited
     };
   }
 
