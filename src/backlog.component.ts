@@ -16,7 +16,7 @@ import { Project } from './project.class';
                     <span class="glyphicon glyphicon-align-justify accord nodrug"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-menu-right nodrug">
-                    <li class="nodrug"><a href="#">Remove resolved items from Active tasks</a></li>
+                    <li class="nodrug"><a href="#">Move resolved items to Backlog</a></li>
                   </ul>
                 </span>
               </li>

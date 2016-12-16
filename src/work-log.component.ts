@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnDestroy } from '@angular/core';
+import { ReactiveFormsModule, FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { WorkLogService } from './work-log.service';
+
 
 
 @Component({
@@ -7,22 +9,28 @@ import { WorkLogService } from './work-log.service';
   template: `
     <section>
           <div class="edit_div" [hidden]="!showEditField">
-            <form (ngSubmit)="saveRecord()" #editWForm="ngForm" novalidate>
+            <form (ngSubmit)="saveRecord()" [formGroup]="wleditForm" novalidate>
             <div class="form-inline" style="width:100%;">
                 <div class="input-group" style="width:100px;">
-                    <input type="number" id="hours" name="hours" class="form-control input-sm" [(ngModel)]="record.hours" />
+                    <input type="number" id="hours" formControlName="hours" class="form-control input-sm" required [ngModel]="record.hours"/>
                     <div class="input-group-addon">h</div>
                 </div>
-                <input type="text" id="dt" name="dt" class="form-control input-sm" [(ngModel)]="record.dt" placeholder="Date mm/dd/yyyy">
+                <div class="input-group date" data-provide="datepicker">
+                    <input type="text" class="form-control input-sm datepicker" formControlName="dt" placeholder="Date mm/dd/yyyy" [ngModel]="record.dt">
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-th"></span>
+                    </div>
+                </div>
             </div>
-            <textarea id="text" name="text" class="form-control input-sm" style="margin:10px 0;" [(ngModel)]="record.text" rows="2"  placeholder="Description" required #recordValidation="ngModel"></textarea>
-            <div class="alert alert-danger" [hidden]="recordValidation.valid || recordValidation.pristine">Description is required</div>
+            <div class="alert alert-danger w50" *ngIf="formErrors.dt">{{ formErrors.dt }}</div>
+            <div class="alert alert-danger w50" *ngIf="formErrors.hours">{{ formErrors.hours }}</div>
+            <textarea id="text" formControlName="text" class="form-control input-sm" style="margin:10px 0;" rows="2"  placeholder="Description" [ngModel]="record.text"></textarea>
 
             <a class="btn btn-warning btn-sm" (click)="editRecId = ''">
               <span class="glyphicon glyphicon-remove"></span>
               <span class="hidden-xs">Cancel</span>
             </a>
-            <button class="btn btn-primary btn-sm" (click)="saveRecord()" [disabled]="!editWForm.form.valid">
+            <button class="btn btn-primary btn-sm" [disabled]="!wleditForm.valid">
               <span class="glyphicon glyphicon-ok"></span>
               <span class="hidden-xs">Save</span>
             </button>
@@ -88,6 +96,7 @@ import { WorkLogService } from './work-log.service';
 
   .ng-valid[required], .ng-valid.required  { border-left: 5px solid #42A948; /* green */}
   .ng-invalid:not(form)  {border-left: 5px solid #a94442; /* red */}
+  div.alert-danger {height: 40px; padding: 8px 15px; font-size: 12px;}
   `]
 })
 export class WorkLogComponent {
@@ -102,8 +111,22 @@ export class WorkLogComponent {
   record;                                   // object to edit
   loading: boolean;                         // loader status
   
+  wleditForm: FormGroup;
+  formErrors = {'dt': '', 'hours': ''};  // properties to display validation error messages
+  validationMessages = {
+    'dt': {
+      'required': 'Date is required.', 
+      'pattern' : 'Date format should be MM/DD/YYYY, ie 03/21/2016'
+    },
+    'hours': {
+      'required': 'Log is required.',
+      'pattern' : 'Log is a number between 0 and 999 and one digit after the decimal'
+    },
+  };
 
-  constructor(private workLogService: WorkLogService) {
+
+  constructor(private workLogService: WorkLogService,
+              private fb: FormBuilder) {
     console.info("WorkLogComponent:constructor");
 
     this.workLogService.errorHandler = error => {
@@ -114,7 +137,12 @@ export class WorkLogComponent {
     this.loading = false;
     this.editRecId = '';  
     this.deleteRecId = '';   
-    this.record = {dt: '', text: '', hours: 0}; 
+    this.record = {dt: '', text: '', hours: ''}; 
+
+    this.wleditForm = new FormGroup({
+      dt: new FormControl(),
+      hours: new FormControl()
+    });
   }
 
   loadRecords() {
@@ -138,20 +166,75 @@ export class WorkLogComponent {
     // sets editor field value, sets record to edit ID
     console.info("WorkLogComponent:setEditorField(val: any)", val);
 
-    this.record = {dt: '', text: '', hours: 0};
+    this.record = {dt: '', text: '', hours: ''};
     if (val != -1) 
       this.record = this.workLogService.getRecord(val); 
     this.editRecId = val;
+
   }
 
   saveRecord() {
     // saves new/update record
-    console.info("WorkLogComponent:saveComment()");
+    console.info("WorkLogComponent:saveRecord()");
+
+    this.record.dt = this.wleditForm.value.dt;        // renew model with form.value
+    this.record.hours = this.wleditForm.value.hours;
+    this.record.text = this.wleditForm.value.text;
 
     this.workLogService.saveRecord(this.userId, this.taskId, this.record, this.editRecId)
-      .then(() => this.loadRecords())   // reload updated records list
+      .then(() => this.loadRecords())                 // reload updated records list
       .catch((error) => this.workLogService.errorHandler(error));
   }
+
+  buildForm(): void {
+    //build form,controls and validators for them
+    console.info("WorkLogComponent:buildForm()");
+
+    this.wleditForm = this.fb.group({
+      'dt': [this.record.dt, [
+          Validators.required,
+          Validators.pattern("^[0-1][0-9]\\/[0-9]{2}\\/[0-9]{4}$"),
+      ]],
+      'hours': [this.record.hours, [
+        Validators.required,
+        Validators.pattern("^(([0-9]{0,3})|([0-9]{1,3}\\.[0-9]{1}))$"),
+      ]],
+      'text':  [this.record.text]
+    });
+
+    this.wleditForm.valueChanges.subscribe(data => this.onValueChanged(data));  // calls onValueChanged every time form has changed
+    this.onValueChanged();                                                      // (re)set validation messages now
+
+    // $('.datepicker').datepicker({
+    //     format: 'mm/dd/yyyy',
+    //     startDate: '-3y',
+    //     autocimmediateUpdates: true,
+    //     todayHighlight: true
+    // })
+    // .on("changeDate", function(e) {data-date-format="mm/dd/yyyy"
+    //     console.log("ddd");
+    //     this.onValueChanged(this.wleditForm.value);     // calls onValueChanged every time date changes in datepicker
+    // });
+  }
+
+ onValueChanged(data?: any) {
+    //build form,controls and validators for them
+    console.info("WorkLogComponent:onValueChanged(data?: any)", data);
+  
+    if (!this.wleditForm) return; 
+
+    const form = this.wleditForm;
+    for (const field in this.formErrors) {
+      this.formErrors[field] = '';  // clear previous error message (if any)
+      const control = form.get(field);
+      if (control && control.dirty && !control.valid) {
+        const messages = this.validationMessages[field];
+        for (const key in control.errors) {
+          this.formErrors[field] += messages[key] + ' ';
+        }
+      }
+    }
+  }  
 
   openDeleteModal(val: any) {
     // opens dialog window, sets record to delete ID 
@@ -175,6 +258,8 @@ export class WorkLogComponent {
 
   ngOnInit() {
     console.info ("WorkLogComponent:ngOnInit");
+
+    this.buildForm();
   }
 
   get showEditField() {

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 // import { HttpModule } from '@angular/http';
 import { TasksListService } from './tasks-list.service';
@@ -50,7 +50,7 @@ const routerModule = RouterModule.forRoot([
 ]);
 
 @NgModule({
-  imports: [BrowserModule, FormsModule, routerModule],
+  imports: [BrowserModule, FormsModule, ReactiveFormsModule, routerModule],
   declarations: [AppComponent, BackLogComponent, TaskComponent, TaskEditComponent, NewProject, EditProject, ProjectsListComponent, CommentsListComponent, WorkLogComponent],
   providers: [TasksListService, TaskService, ProjectsService, Project, CommentsListService, WorkLogService],
   bootstrap: [AppComponent]

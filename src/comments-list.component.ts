@@ -8,16 +8,18 @@ import { CommentsListService } from './comments-list.service';
     <section>
           <div class="edit_div" [hidden]="!showEditField">
             <form (ngSubmit)="saveComment()" #editForm="ngForm" novalidate>
-              <textarea name="commentBody" id="commentBody" class="form-control input-sm" required #commentValidation="ngModel" style="margin-bottom:10px;" [(ngModel)]="commentBody" placeholder="Comment" rows="2"></textarea>
+              <textarea name="commentBody" id="commentBody" class="form-control input-sm" required #commentValidation="ngModel" [(ngModel)]="commentBody" placeholder="Comment" rows="2"></textarea>
               <div class="alert alert-danger" [hidden]="commentValidation.valid || commentValidation.pristine">Comment is required</div>
-              <a class="btn btn-warning btn-sm" (click)="editCommentId = ''">
-                <span class="glyphicon glyphicon-remove"></span>
-                <span class="hidden-xs">Cancel</span>
-              </a>
-              <button class="btn btn-primary btn-sm" type="submit" [disabled]="!editForm.form.valid">
-                <span class="glyphicon glyphicon-ok"></span>
-                <span class="hidden-xs">Save</span>
-              </button>
+              <div class="buttons-block">
+                <a class="btn btn-warning btn-sm" (click)="editCommentId = ''">
+                  <span class="glyphicon glyphicon-remove"></span>
+                  <span class="hidden-xs">Cancel</span>
+                </a>
+                <button class="btn btn-primary btn-sm" type="submit" [disabled]="!editForm.form.valid">
+                  <span class="glyphicon glyphicon-ok"></span>
+                  <span class="hidden-xs">Save</span>
+                </button>
+              </div>
             </form>
           </div>
           <div *ngIf="loading" class="loader"></div>
@@ -73,9 +75,11 @@ import { CommentsListService } from './comments-list.service';
   .modal-dialog {margin: 100px auto!important;}
   .modal-header {padding:25px 30px;}
   .modal-body {padding:40px 50px;}
+  .buttons-block {margin-top:10px;}
   
   .ng-valid[required], .ng-valid.required  { border-left: 5px solid #42A948; /* green */}
   .ng-invalid:not(form)  {border-left: 5px solid #a94442; /* red */}
+  div.alert-danger {height: 40px; padding: 8px 15px; font-size: 12px;}
   `]
 })
 export class CommentsListComponent {
