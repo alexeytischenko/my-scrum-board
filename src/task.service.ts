@@ -122,6 +122,8 @@ export class TaskService {
   removeTask(url: string, taskId: string) {
     let self = this;
     let taskRef = firebase.database().ref(`${url}/backlog/${taskId}`);
+    let wlRef = firebase.database().ref(`${url}/worklog/${taskId}`);
+    let comRef = firebase.database().ref(`${url}/comments/${taskId}`);
     console.log("taskRef", `${url}/backlog/${taskId}`);
 
     //removing task
@@ -130,6 +132,8 @@ export class TaskService {
             if (error) reject(error);
             resolve(true);
           })
+        .then(wlRef.remove())
+        .then(comRef.remove())
         .catch((error)=>reject(error));
     });
   }

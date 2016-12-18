@@ -15,10 +15,10 @@ import { WorkLogService } from './work-log.service';
                     <input type="number" id="hours" formControlName="hours" class="form-control input-sm" required [ngModel]="record.hours"/>
                     <div class="input-group-addon">h</div>
                 </div>
-                <div class="input-group date" data-provide="datepicker">
-                    <input type="text" class="form-control input-sm datepicker" formControlName="dt" placeholder="Date mm/dd/yyyy" [ngModel]="record.dt">
+                <div class="input-group" style="width:150px;">
+                    <input type="text" class="form-control input-sm datepicker" required formControlName="dt" placeholder="mm/dd/yyyy" [ngModel]="record.dt">
                     <div class="input-group-addon">
-                        <span class="glyphicon glyphicon-th"></span>
+                        <span class="glyphicon glyphicon-calendar"></span>
                     </div>
                 </div>
             </div>
@@ -141,7 +141,8 @@ export class WorkLogComponent {
 
     this.wleditForm = new FormGroup({
       dt: new FormControl(),
-      hours: new FormControl()
+      hours: new FormControl(),
+      text: new FormControl()
     });
   }
 
@@ -166,7 +167,7 @@ export class WorkLogComponent {
     // sets editor field value, sets record to edit ID
     console.info("WorkLogComponent:setEditorField(val: any)", val);
 
-    this.record = {dt: '', text: '', hours: ''};
+    this.record = {dt: '', text: '', hours: 1};
     if (val != -1) 
       this.record = this.workLogService.getRecord(val); 
     this.editRecId = val;
@@ -193,7 +194,7 @@ export class WorkLogComponent {
     this.wleditForm = this.fb.group({
       'dt': [this.record.dt, [
           Validators.required,
-          Validators.pattern("^[0-1][0-9]\\/[0-9]{2}\\/[0-9]{4}$"),
+          Validators.pattern("^[0-1]{0,1}[0-9]\\/[0-9]{1,2}\\/[0-9]{4}$"),
       ]],
       'hours': [this.record.hours, [
         Validators.required,
@@ -205,16 +206,16 @@ export class WorkLogComponent {
     this.wleditForm.valueChanges.subscribe(data => this.onValueChanged(data));  // calls onValueChanged every time form has changed
     this.onValueChanged();                                                      // (re)set validation messages now
 
-    // $('.datepicker').datepicker({
-    //     format: 'mm/dd/yyyy',
-    //     startDate: '-3y',
-    //     autocimmediateUpdates: true,
-    //     todayHighlight: true
-    // })
-    // .on("changeDate", function(e) {data-date-format="mm/dd/yyyy"
-    //     console.log("ddd");
-    //     this.onValueChanged(this.wleditForm.value);     // calls onValueChanged every time date changes in datepicker
-    // });
+
+    $('.datepicker').datepicker({
+        format: 'mm/dd/yyyy',
+        startDate: '-3y',
+        autocimmediateUpdates: true,
+        todayHighlight: true,
+        autoclose: true
+    })
+    .on("changeDate", (e) => this.record.dt = e.currentTarget.value);   // calls onValueChanged every time date changes in datepicker
+
   }
 
  onValueChanged(data?: any) {
@@ -260,6 +261,13 @@ export class WorkLogComponent {
     console.info ("WorkLogComponent:ngOnInit");
 
     this.buildForm();
+  }
+
+  ngAfterViewInit() {
+    console.info ("WorkLogComponent:ngAfterViewInit");
+
+
+
   }
 
   get showEditField() {

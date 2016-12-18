@@ -33,7 +33,7 @@ import { Component } from '@angular/core';
       </div>
     </div>
     </div>
-    <div class="container" style="margin-top:90px;">
+    <div class="container" style="padding-top:90px;">
       <router-outlet></router-outlet>
     </div>
   `,
