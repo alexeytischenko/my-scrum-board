@@ -12,9 +12,11 @@ export class TasksListService {
     console.info ("TasksListService:constructor");
   }
 
-  getBackLog(url) {
-    console.info ("TasksListService:getBackLog(url)", url);
+  getBackLog(url, filter) {
+    console.info ("TasksListService:getBackLog(url, filter)", url, filter);
 
+    const filter_length = Object.keys(filter).length;
+    console.info ("filter_length", filter_length);
     let self = this;
     let taskscount = 0;
     let tasksRef = firebase.database().ref(`${url}/backlog/`);
@@ -24,9 +26,15 @@ export class TasksListService {
     return new Promise(function(resolve, reject) {
           tasksRef.orderByChild("sortnum").once('value')
           .then(function(snapshot) {
+
+              self.tasks = [];  // empty the list
               snapshot.forEach(function(child) {
-                  self.tasks[taskscount] = self.convertObject(child.val(), child.getKey());
+                // checking if there's a filter and if this task match the condition
+                let tmpTask = self.convertObject(child.val(), child.getKey());
+                if (filter_length == 0 || tmpTask.project_id in filter) {    //obj.hasOwnProperty(prop)
+                  self.tasks[taskscount] = tmpTask;
                   taskscount++;
+                }
               });
               resolve(taskscount);
           })
@@ -56,6 +64,8 @@ export class TasksListService {
           .then(function() {
             //checking if it's time to call resolve : resolve only after last success callback
             resolveCounter--;
+            self.updateTaskWJson(child);
+
             if (resolveCounter <= 0)  resolve(true); 
           })
           .catch((error) => reject("Backlog sorting failed: {"+error+"}"));
@@ -79,6 +89,7 @@ export class TasksListService {
         name: objectedResponse.name,
         code : objectedResponse.code,
         project: project.sname,
+        project_id : project.id,
         project_color : project.color,
         sortnum: objectedResponse.sortnum,
         estimate: objectedResponse.estimate,
@@ -86,6 +97,21 @@ export class TasksListService {
         status: objectedResponse.status,
         type: objectedResponse.type
     };
+  }
+
+  private updateTaskWJson (js: any) {
+    // updates service propetry tasks[] values
+    console.debug("TasksListService:updateTaskWJson (js: any)", js);
+
+    for (let i = 0; i < this.tasks.length; i++) {
+      if (this.tasks[i].id == js.id) {
+        this.tasks[i].type = js.type;
+        this.tasks[i].sortnum = js.sortnum;
+
+        return;
+      }
+    }
+
   }
 
 }

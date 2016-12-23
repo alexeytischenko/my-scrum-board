@@ -33,7 +33,7 @@ export class TaskService {
   }
 
   saveTask(url: string, task) {
-    console.info("TaskService:saveTask(url: string, task)", url, task);
+    console.debug("TaskService:saveTask(url: string, task)", url, task);
 
     let postData; 
     let self = this;
@@ -45,19 +45,18 @@ export class TaskService {
         self.getMaxCodeNum(url)
           .catch((error)=>reject(error))
           .then((maxnum : any)=> { 
-            console.error("maxnum", maxnum);
             const newmaxnum = maxnum.code + 1;
             postData = {
-              name: task.name,
-              estimate: task.estimate,
+              name: task.name ? task.name : "",
+              estimate: task.estimate ? task.estimate : 0,
               worked: 0,
               commentsNum: 0,
               sortnum : Date.now(),
-              status: task.status,
+              status: task.status ? task.status : "idle",
               type: "b",
               code: newmaxnum,
-              description: task.description,
-              project: task.project,
+              description: task.description ? task.description : "",
+              project: task.project ? task.project : "",
               updated: Date.now(),
               created: Date.now()
             }
@@ -74,14 +73,14 @@ export class TaskService {
           });
       });
 
-    } else {
+    } else {      
         //existing task properties
         postData = {
-          name: task.name,
-          estimate: task.estimate,
-          status: task.status,
-          description: task.description,
-          project: task.project,
+          name: task.name ? task.name : "",
+          estimate: task.estimate ? task.estimate : 0,
+          status: task.status ? task.status : "idle",
+          description: task.description ? task.description : "",
+          project: task.project ? task.project : "",
           updated: Date.now()
         }
 
@@ -100,7 +99,7 @@ export class TaskService {
   }
 
   savePropery(url: string, taskid: string, postData : any) {
-    console.info("TaskService:savePropery(url: string, taskid: string, postData : any)", url, taskid, postData);
+    console.debug("TaskService:savePropery(url: string, taskid: string, postData : any)", url, taskid, postData);
 
     let self = this;
     let taskRef = firebase.database().ref(`${url}/backlog/`);

@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-// import { HttpModule } from '@angular/http';
 import { TasksListService } from './tasks-list.service';
 import { TaskService } from './task.service';
 import { Project } from './project.class';
@@ -11,6 +10,8 @@ import { CommentsListService } from './comments-list.service';
 import { WorkLogService } from './work-log.service';
 import { CommentsListComponent } from './comments-list.component';
 import { WorkLogComponent } from './work-log.component';
+import { AttachmentsService } from './attachments.service';
+import { AttachmentsComponent } from './attachments.component';
 import { AppComponent } from './app.component';
 import { TaskComponent } from './task.component';
 import { TaskEditComponent } from './task-edit.component';
@@ -51,8 +52,9 @@ const routerModule = RouterModule.forRoot([
 
 @NgModule({
   imports: [BrowserModule, FormsModule, ReactiveFormsModule, routerModule],
-  declarations: [AppComponent, BackLogComponent, TaskComponent, TaskEditComponent, NewProject, EditProject, ProjectsListComponent, CommentsListComponent, WorkLogComponent],
-  providers: [TasksListService, TaskService, ProjectsService, Project, CommentsListService, WorkLogService],
-  bootstrap: [AppComponent]
+  declarations: [AppComponent, BackLogComponent, TaskComponent, TaskEditComponent, NewProject, EditProject, ProjectsListComponent, CommentsListComponent, WorkLogComponent, AttachmentsComponent],
+  providers: [TasksListService, TaskService, ProjectsService, Project, CommentsListService, WorkLogService, AttachmentsService],
+  bootstrap: [AppComponent],
+  
 })
 export class AppModule { }

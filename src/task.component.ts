@@ -84,12 +84,16 @@ import { Subscription } from 'rxjs/Subscription';
           <div style="float:right;">
             <button class="btn btn-default">
               <span class="glyphicon glyphicon-file"></span>
-              <span class="hidden-xs">Add files</span>
+              <span class="hidden-xs">Add file</span>
             </button>
           </div>
           <div>
             <label>Attachments</label>
-            <p class="norecords">There are no attachments</p>
+            <span *ngIf="task.attachments && task.attachments.length > 0" class="commentsToggle">
+                ({{task.attachments.length}}) 
+            </span> 
+            <p *ngIf="!task.attachments || task.attachments.length == 0" class="norecords">There are no attachments</p>
+            <attachments (setCount) = "updateTaskAttachmentCounts($event)" [taskId]="taskId"></attachments>
           </div>
         </div>
         <div class="panel-body">
