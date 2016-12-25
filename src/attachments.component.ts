@@ -5,21 +5,22 @@ import { AttachmentsService } from './attachments.service';
   selector: 'attachments',
   template: `
     <section>
-          <div class="edit_div" [hidden]="!showEditField">
-            <!--form (ngSubmit)="saveFile()" #loadFile="ngForm" novalidate>
-                <input type="file" id="file" required #fileValidation="ngModel" name="file" placeholder="Add file"/>
-                <div class="alert alert-danger" [hidden]="fileValidation.valid || fileValidation.pristine">File is required</div>
-              <div class="buttons-block">
-                <a class="btn btn-warning btn-sm" (click)="editCommentId = ''">
-                  <span class="glyphicon glyphicon-remove"></span>
-                  <span class="hidden-xs">Cancel</span>
-                </a>
-                <button class="btn btn-primary btn-sm" type="submit" [disabled]="!loadFile.form.valid">
-                  <span class="glyphicon glyphicon-ok"></span>
-                  <span class="hidden-xs">Save</span>
-                </button>
+          <div class="edit_div" [hidden]="!showEditField"> 
+            <form (ngSubmit)="saveFile()" novalidate>
+                <input type="text" name="name" id="name" [(ngModel)]="editFilename" placeholder="Add short comment or name" class="form-control input-sm">
+                <div class="form-inline">
+                  <input type="file" id="file" required  name="file" placeholder="Add file" class="form-control input-sm" />
+                  <!--div class="alert alert-danger" [hidden]="fileValidation.valid || fileValidation.pristine">File is required</div-->
+                  <a class="btn btn-warning btn-sm" (click)="editFileId = ''">
+                    <span class="glyphicon glyphicon-remove"></span>
+                    <span class="hidden-xs">Cancel</span>
+                  </a>
+                  <button class="btn btn-primary btn-sm" type="submit">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    <span class="hidden-xs">Save</span>
+                  </button>
               </div>
-            </form-->
+            </form>
           </div>
           <div *ngIf="loading" class="loader"></div>
           <!--ul>
@@ -74,7 +75,7 @@ import { AttachmentsService } from './attachments.service';
   .modal-dialog {margin: 100px auto!important;}
   .modal-header {padding:25px 30px;}
   .modal-body {padding:40px 50px;}
-  .buttons-block {margin-top:10px;}
+  .form-inline {margin-top: 10px;}
   
   .ng-valid[required], .ng-valid.required  { border-left: 5px solid #42A948; /* green */}
   .ng-invalid:not(form)  {border-left: 5px solid #a94442; /* red */}
@@ -84,85 +85,113 @@ import { AttachmentsService } from './attachments.service';
 export class AttachmentsComponent {
 
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
-  comments = [];
-  @Output() setCount = new EventEmitter();    // set comment count value in outter component  
+  attachments = [];
+  @Output() setCount = new EventEmitter();    // set attachments count value in outter component  
   @Input() taskId : string;
-  @Input() openComments: boolean;             // comments list status
-  editCommentId: string;                      // id of comment to be edited
-  deleteCommentId: string;                    // id of comment to be deleted
-  commentBody: string;                        // editor field value
+  editFileId: string;                      // id of attachment to be edited
+  editFilename: string;
+  deleteFileId: string;                    // id of attachment to be deleted
   loading: boolean;                           // loader status
   
 
-  constructor(private commentsListService: AttachmentsService) {
+  constructor(private attachmentsService: AttachmentsService) {
     console.info("AttachmentsComponent:constructor");
 
-    this.commentsListService.errorHandler = error => {
+    this.attachmentsService.errorHandler = error => {
       console.error('Comments component (AttachmentsService) error! ' + error);
       window.alert('An error occurred while processing this page! Try again later.');
     }
     this.loading = false;
-    this.editCommentId = '';  
-    this.deleteCommentId = '';       
-    this.commentBody = '';
+    this.editFileId = ''; 
+    this.editFilename = '';  
+    this.deleteFileId = '';
   }
 
-  loadComments() {
-    //load list of comments into commentsListService commetns property 
-    console.info("CommentsListComponent:loadComments()");
+  loadAttachments() {
+    //load list of attachments into attachmentsService attachments property 
+    console.info("AttachmentsComponent:loadAttachments()");
     
     this.loading = true;
-    this.commentsListService.getComments(this.userId, this.taskId)
-      .then (() => this.comments = this.commentsListService.comments)
-      .then (() => this.setCount.emit(this.comments.length))
+    this.attachmentsService.getAttachments(this.userId, this.taskId)
+      .then (() => this.attachments = this.attachmentsService.attachments)
+      .then (() => this.setCount.emit(this.attachments.length))
       .then(() => {    
         setTimeout(() => {
           this.loading = false;
-          this.editCommentId = '';
+          this.editFileId = '';
         }, 1000);  
       })
-      .catch((error) => this.commentsListService.errorHandler(error));
+      .catch((error) => this.attachmentsService.errorHandler(error));
   }
 
   setEditorField(val: any) {
-    // sets editor field value, sets comment to edit ID
-    console.info("CommentsListComponent:setEditorField(val: any)", val);
+    // sets editor field value, sets file to edit ID
+    console.info("AttachmentsComponent:setEditorField(val: any)", val);
 
-    this.commentBody = this.commentsListService.getText(val); 
-    this.editCommentId = val;
+    this.editFileId = val;
   }
 
   saveFile() {
-    // saves new/update comment
-    console.info("CommentsListComponent:saveComment()");
+    // saves new/update attachment
+    console.info("AttachmentsComponent:saveFile()");
 
-    this.commentsListService.saveFile(this.userId, this.taskId, this.editCommentId, this.commentBody)
-      .then(() => this.loadComments())   // reload updated comments list
-      .catch((error) => this.commentsListService.errorHandler(error));
+    this.attachmentsService.saveFile(this.userId, this.taskId, this.editFileId, this.editFilename)
+      .then(() => this.loadAttachments())   // reload updated list
+      .catch((error) => this.attachmentsService.errorHandler(error));
+  }
+
+  private handleFileSelect = (evt) => {  //When you need to pass functions around use the new lambda syntax for member variables 
+     console.info("AttachmentsComponent:handleFileSelect(evt)", this.userId, this.taskId);
+
+      evt.stopPropagation();
+      evt.preventDefault();
+      var file = evt.target.files[0];
+      var metadata = {
+        'contentType': file.type
+      };
+      // [START oncomplete]
+      var storageRef = firebase.storage().ref();
+      storageRef.child(this.userId+'/'+ this.taskId + "/" + file.name).put(file, metadata).then(function(snapshot) {
+        console.log('Uploaded', snapshot.totalBytes, 'bytes.');
+        console.log(snapshot.metadata);
+        var url = snapshot.metadata.downloadURLs[0];
+        console.log('File available at', url);
+
+      }).catch(function(error) {
+        // [START onfailure]
+        console.error('Upload failed:', error);
+        // [END onfailure]
+      });
   }
 
   openDeleteModal(val: any) {
     // opens dialog window, sets comment to delete ID 
-    console.info("CommentsListComponent:openDeleteModal(val: any)", val);
+    console.info("AttachmentsComponent:openDeleteModal(val: any)", val);
 
-    this.deleteCommentId = val;
-    $('#delCommentModal').modal();
+    this.deleteFileId = val;
+    $('#delFileModal').modal();
   }
 
-  deleteComment() {
-    // closes dialog window, calls service to delete comment
-    console.info("CommentsListComponent:deleteComment()");
+  deleteAttachment() {
+    // closes dialog window, calls service to delete attachment
+    console.info("AttachmentsComponent:deleteAttachment()");
 
-    $('#delCommentModal').modal("hide");    //dismiss alert window
+    $('#delFileModal').modal("hide");    //dismiss alert window
 
-    this.commentsListService.removeComment(this.userId, this.taskId, this.deleteCommentId)
-      .then(() => this.loadComments())                        // reload updated comments list
-      .catch((error) => this.commentsListService.errorHandler(error));
+    this.attachmentsService.removeAttachment(this.userId, this.taskId, this.deleteFileId)
+      .then(() => this.loadAttachments())                        // reload updated comments list
+      .catch((error) => this.attachmentsService.errorHandler(error));
   }
 
   get showEditField() {
-    if (!this.editCommentId || this.editCommentId.length ==  0) return false;
+    if (!this.editFileId || this.editFileId.length ==  0) return false;
     return true;
   }
+
+  ngAfterViewInit() {
+  console.info("AttachmentsComponent:ngAfterViewInit()", this.userId);
+    //document.getElementById('file').addEventListener('change', this.handleFileSelect, false);
+  
+}
 
 }

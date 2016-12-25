@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TaskService } from './task.service';
 import { CommentsListComponent } from './comments-list.component';
 import { WorkLogComponent } from './work-log.component';
+import { AttachmentsComponent } from './attachments.component';
 import { ProjectsService } from './projects.service';
 import { Project } from './project.class';
 // import { Task } from './task.class';
@@ -82,7 +83,7 @@ import { Subscription } from 'rxjs/Subscription';
 
         <div class="panel-body">
           <div style="float:right;">
-            <button class="btn btn-default">
+            <button class="btn btn-default" (click)="atc.setEditorField(-1)">
               <span class="glyphicon glyphicon-file"></span>
               <span class="hidden-xs">Add file</span>
             </button>
@@ -124,6 +125,7 @@ import { Subscription } from 'rxjs/Subscription';
           <div>
             <label>Worklogs</label>
             <span *ngIf="task.worked > 0" class="commentsToggle">
+                ({{task.worked}}h)
                 <div (click)="toggleLogs()" [class]="openLog ? 'glyphicon glyphicon-menu-up' : 'glyphicon glyphicon-menu-down'"></div>
                 <div *ngIf="openLog" (click)="wlc.loadRecords()" class="glyphicon glyphicon-repeat" alt="reload" title="reload"></div>
             </span> 
@@ -176,6 +178,7 @@ export class TaskComponent implements OnInit, OnDestroy {
 
   @ViewChild(CommentsListComponent) private clc : CommentsListComponent;
   @ViewChild(WorkLogComponent) private wlc : WorkLogComponent;
+  @ViewChild(AttachmentsComponent) private atc : AttachmentsComponent;
 
   paramsSubscription: Subscription;
 

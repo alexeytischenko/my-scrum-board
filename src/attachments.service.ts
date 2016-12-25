@@ -34,19 +34,19 @@ export class AttachmentsService {
   }
 
 
- saveFile(url: string, task: any, commentid: any, commenytext: string) {
+ saveFile(url: string, task: any, fileid: any, filename: string) {
     // save new/update comment
-    console.debug("AttachmentsService:saveComment(url: string, task: any, commentid: any, commenytext: string)", url, task, commentid, commenytext);
+    console.debug("AttachmentsService:saveFile(url: string, task: any, fileid: any, filename: string)", url, task, fileid, filename);
 
     let postData; 
     let self = this;
     let taskRef = firebase.database().ref(`${url}/comments/${task}`);
 
-    if (commentid == -1) {
+    if (fileid == -1) {
       //new comment properties
       return new Promise(function(resolve, reject) {
             postData = {
-              text: commenytext,
+              text: filename,
               user: 'User',
               created : Date.now()
             }
@@ -60,12 +60,12 @@ export class AttachmentsService {
     } else {
         //existing comment text
         postData = {
-          text: commenytext,
+          text: filename,
           edited : Date.now()
         }
 
         return new Promise(function(resolve, reject) {
-            taskRef.child(commentid).update(postData, function(error) {
+            taskRef.child(fileid).update(postData, function(error) {
                 if (error) {
                   console.error('Update failed');
                   reject(error);
@@ -99,10 +99,9 @@ export class AttachmentsService {
 
     return {
         id : id,
-        text: objectedResponse.text,
-        user : objectedResponse.user,
-        created : objectedResponse.created,
-        edited : objectedResponse.edited
+        name: objectedResponse.name,
+        fileURl : objectedResponse.fileURl,
+        created : objectedResponse.created
     };
   }
 
