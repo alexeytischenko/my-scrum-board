@@ -94,7 +94,7 @@ import { Subscription } from 'rxjs/Subscription';
                 ({{task.attachments.length}}) 
             </span> 
             <p *ngIf="!task.attachments || task.attachments.length == 0" class="norecords">There are no attachments</p>
-            <attachments (setCount) = "updateTaskAttachmentCounts($event)" [taskId]="taskId"></attachments>
+            <attachments (setAttachments) = "updateTaskAttachments($event)" [taskId]="taskId"></attachments>
           </div>
         </div>
         <div class="panel-body">
@@ -248,6 +248,15 @@ export class TaskComponent implements OnInit, OnDestroy {
       .catch((error)=>this.taskService.errorHandler(error))
       .then(()=> progress_end());
   }
+
+  updateTaskAttachments (val : any) {
+    // updates task attachments after attachment update
+    console.info ("TaskComponent:updateTaskAttachments($event)", val);
+
+    //update attachments array
+    this.task.attachments = val;
+  }
+
 
   updateTaskCommentsCounts (val : number) {
     // updates comments count if ness

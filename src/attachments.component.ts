@@ -9,13 +9,12 @@ import { AttachmentsService } from './attachments.service';
             <form (ngSubmit)="saveFile()" novalidate>
                 <input type="text" name="name" id="name" [(ngModel)]="editFilename" placeholder="Add short comment or name" class="form-control input-sm">
                 <div class="form-inline">
-                  <input type="file" id="file" required  name="file" placeholder="Add file" class="form-control input-sm" />
-                  <!--div class="alert alert-danger" [hidden]="fileValidation.valid || fileValidation.pristine">File is required</div-->
+                  <input type="file" id="file" required name="file" placeholder="Add file" class="form-control input-sm {{(checkFileExists)? 'ng-valid' : 'ng-invalid' }}" />
                   <a class="btn btn-warning btn-sm" (click)="editFileId = ''">
                     <span class="glyphicon glyphicon-remove"></span>
                     <span class="hidden-xs">Cancel</span>
                   </a>
-                  <button class="btn btn-primary btn-sm" type="submit">
+                  <button class="btn btn-primary btn-sm" type="submit" [disabled]="!checkFileExists">
                     <span class="glyphicon glyphicon-ok"></span>
                     <span class="hidden-xs">Save</span>
                   </button>
@@ -34,7 +33,7 @@ import { AttachmentsService } from './attachments.service';
                   <span class="commentslist_text">{{comment.text}}</span> 
                   <span class="comment_context_menu">
                     <span (click)="setEditorField(comment.id)" class="glyphicon glyphicon-pencil"></span>
-                    <span (click)="openDeleteModal(comment.id)" class="glyphicon glyphicon-trash"></span>
+                    <span (click)="openDeleteAttModal(comment.id)" class="glyphicon glyphicon-trash"></span>
                   </span>
                   <div class="commentslist_date">{{comment.created | date:'medium'}} <span *ngIf="comment.edited" style="margin-left:10px;">edited: {{comment.edited | date:'medium'}}</span></div>
                 </li>
@@ -43,7 +42,7 @@ import { AttachmentsService } from './attachments.service';
     </section>
 
     <!-- Modal Delete Comment Popup -->
-    <div class="modal fade" id="delCommentModal" role="dialog">
+    <div class="modal fade" id="delFileModal" role="dialog">
       <div class="modal-dialog modal-sm">
       
         <!-- Modal content-->
@@ -52,7 +51,7 @@ import { AttachmentsService } from './attachments.service';
             <h4 style="text-align: center;"><span class="glyphicon glyphicon-fire"></span> Delete the comment?</h4>
           </div>
           <div class="modal-body">
-                <button class="btn btn-danger btn-block" (click)="deleteComment()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                <button class="btn btn-danger btn-block" (click)="deleteAttachment()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
           </div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-success btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
@@ -77,8 +76,8 @@ import { AttachmentsService } from './attachments.service';
   .modal-body {padding:40px 50px;}
   .form-inline {margin-top: 10px;}
   
-  .ng-valid[required], .ng-valid.required  { border-left: 5px solid #42A948; /* green */}
-  .ng-invalid:not(form)  {border-left: 5px solid #a94442; /* red */}
+  input[type=file].ng-valid, .ng-valid.required  { border-left: 5px solid #42A948; /* green */}
+  input[type=file].ng-invalid  {border-left: 5px solid #a94442; /* red */}
   div.alert-danger {height: 40px; padding: 8px 15px; font-size: 12px;}
   `]
 })
@@ -86,10 +85,11 @@ export class AttachmentsComponent {
 
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
   attachments = [];
-  @Output() setCount = new EventEmitter();    // set attachments count value in outter component  
+  @Output() setAttachments = new EventEmitter();    // set attachments count value in outter component  
   @Input() taskId : string;
   editFileId: string;                      // id of attachment to be edited
   editFilename: string;
+  editFileInput: string;
   deleteFileId: string;                    // id of attachment to be deleted
   loading: boolean;                           // loader status
   
@@ -102,32 +102,17 @@ export class AttachmentsComponent {
       window.alert('An error occurred while processing this page! Try again later.');
     }
     this.loading = false;
-    this.editFileId = ''; 
-    this.editFilename = '';  
-    this.deleteFileId = '';
-  }
-
-  loadAttachments() {
-    //load list of attachments into attachmentsService attachments property 
-    console.info("AttachmentsComponent:loadAttachments()");
-    
-    this.loading = true;
-    this.attachmentsService.getAttachments(this.userId, this.taskId)
-      .then (() => this.attachments = this.attachmentsService.attachments)
-      .then (() => this.setCount.emit(this.attachments.length))
-      .then(() => {    
-        setTimeout(() => {
-          this.loading = false;
-          this.editFileId = '';
-        }, 1000);  
-      })
-      .catch((error) => this.attachmentsService.errorHandler(error));
+    this.clearFields();
   }
 
   setEditorField(val: any) {
     // sets editor field value, sets file to edit ID
     console.info("AttachmentsComponent:setEditorField(val: any)", val);
 
+    //clear fielda
+    this.clearFields();
+    (<HTMLInputElement> document.getElementById("file")).value = "";
+    //set id (nowdays only -1, option to edit name-description will be added ?)
     this.editFileId = val;
   }
 
@@ -135,36 +120,24 @@ export class AttachmentsComponent {
     // saves new/update attachment
     console.info("AttachmentsComponent:saveFile()");
 
-    this.attachmentsService.saveFile(this.userId, this.taskId, this.editFileId, this.editFilename)
-      .then(() => this.loadAttachments())   // reload updated list
+    // File or Blob
+    var file = (<HTMLInputElement>document.getElementById('file')).files[0];  // cast to <HTMLInputElement> to avoid TypeScript error that there's no such property like "files" 
+
+    this.loading = true;
+    this.attachmentsService.saveFile(this.userId, this.taskId, this.editFileId, this.editFilename, file)
+      .then(() => this.attachmentsService.getAttachments(this.userId, this.taskId))
+      .then((attachments) => { 
+        this.setAttachments.emit(attachments);
+        setTimeout(() => {
+          this.editFileId = '';
+          this.loading = false;
+        }, 1000);
+      })
       .catch((error) => this.attachmentsService.errorHandler(error));
   }
 
-  private handleFileSelect = (evt) => {  //When you need to pass functions around use the new lambda syntax for member variables 
-     console.info("AttachmentsComponent:handleFileSelect(evt)", this.userId, this.taskId);
 
-      evt.stopPropagation();
-      evt.preventDefault();
-      var file = evt.target.files[0];
-      var metadata = {
-        'contentType': file.type
-      };
-      // [START oncomplete]
-      var storageRef = firebase.storage().ref();
-      storageRef.child(this.userId+'/'+ this.taskId + "/" + file.name).put(file, metadata).then(function(snapshot) {
-        console.log('Uploaded', snapshot.totalBytes, 'bytes.');
-        console.log(snapshot.metadata);
-        var url = snapshot.metadata.downloadURLs[0];
-        console.log('File available at', url);
-
-      }).catch(function(error) {
-        // [START onfailure]
-        console.error('Upload failed:', error);
-        // [END onfailure]
-      });
-  }
-
-  openDeleteModal(val: any) {
+  openDeleteAttModal(val: any) {
     // opens dialog window, sets comment to delete ID 
     console.info("AttachmentsComponent:openDeleteModal(val: any)", val);
 
@@ -177,10 +150,16 @@ export class AttachmentsComponent {
     console.info("AttachmentsComponent:deleteAttachment()");
 
     $('#delFileModal').modal("hide");    //dismiss alert window
-
+    this.loading = true;
     this.attachmentsService.removeAttachment(this.userId, this.taskId, this.deleteFileId)
-      .then(() => this.loadAttachments())                        // reload updated comments list
+      .then(() => setTimeout(() => this.loading = false, 1000))                        // reload updated comments list
       .catch((error) => this.attachmentsService.errorHandler(error));
+  }
+
+  private clearFields () {
+    this.editFileId = ''; 
+    this.editFilename = '';  
+    this.deleteFileId = '';
   }
 
   get showEditField() {
@@ -188,10 +167,22 @@ export class AttachmentsComponent {
     return true;
   }
 
+  get checkFileExists() {
+
+    if ((<HTMLInputElement>document.getElementById('file')).files.length > 0) return true;
+
+    return false;
+  }
+
   ngAfterViewInit() {
-  console.info("AttachmentsComponent:ngAfterViewInit()", this.userId);
-    //document.getElementById('file').addEventListener('change', this.handleFileSelect, false);
-  
-}
+    //fire standart event to star the Angular Digest loop -- for input[type=file] validation 
+    console.info("AttachmentsComponent:ngAfterViewInit()", this.userId);
+    document.getElementById('file').addEventListener('change', function () {
+          var e = document.createEvent('HTMLEvents');
+          e.initEvent('input', false, true);
+          this.dispatchEvent(e);
+    }, false); 
+      
+  }
 
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 // import { Http } from '@angular/http';
 import { Task } from './task.class';
+import { AttachmentsService } from './attachments.service';
 
 @Injectable()
 export class TaskService {
@@ -11,7 +12,7 @@ export class TaskService {
   task;
   taskSatuses = ['idle', 'in progress', 'review', 'resolved'];
   
-  constructor() { }
+  constructor(private attachmentsService : AttachmentsService) { }
 
   getTask(url: string, id:string) {
     let self = this;
@@ -24,6 +25,7 @@ export class TaskService {
             if (snapshot.exists()) {
               self.task = snapshot.val();
               self.task.id = id;
+              self.task.attachments = self.attachmentsService.getAttachmentsArray(self.task.attachments);
               resolve(true);
             }
             else reject("Couldn't get task data");
