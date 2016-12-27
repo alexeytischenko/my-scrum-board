@@ -22,23 +22,24 @@ import { AttachmentsService } from './attachments.service';
             </form>
           </div>
           <div *ngIf="loading" class="loader"></div>
-          <!--ul>
+          <ul>
                <template ngFor let-file [ngForOf]="attachments">
                 <li id="{{file.id}}" 
                       onmouseOver="$(this).find('span.comment_context_menu').show();"
                       onmouseOut="$(this).find('span.comment_context_menu').hide();"
                 >
-                  <span class="glyphicon glyphicon-user"></span>
-                  <span class="commentslist_username">{{comment.user}}</span>
-                  <span class="commentslist_text">{{comment.text}}</span> 
+                  <span class="glyphicon glyphicon-file icn"></span>
+                  <span class="commentslist_username">{{file.user}}</span>
+                  <span class="commentslist_date">{{file.created | date:'medium'}}</span>
+                   
                   <span class="comment_context_menu">
-                    <span (click)="setEditorField(comment.id)" class="glyphicon glyphicon-pencil"></span>
-                    <span (click)="openDeleteAttModal(comment.id)" class="glyphicon glyphicon-trash"></span>
+                    <span (click)="openDeleteAttModal(file.id)" class="glyphicon glyphicon-trash"></span>
                   </span>
-                  <div class="commentslist_date">{{comment.created | date:'medium'}} <span *ngIf="comment.edited" style="margin-left:10px;">edited: {{comment.edited | date:'medium'}}</span></div>
+                  <div class="commentslist_text">{{file.name}}</div>
+                  <div style="clear:both;"></div>
                 </li>
               </template>  
-          </ul-->
+          </ul>
     </section>
 
     <!-- Modal Delete Comment Popup -->
@@ -65,8 +66,7 @@ import { AttachmentsService } from './attachments.service';
   .loader {margin: 0 auto;} 
   ul {list-style: none;}
   li {margin-bottom: 10px;}
-  .commentslist_username {color:#284289; margin: 0 10px;}
-  li .glyphicon-user{border: 1px solid #F2F2F2; padding: 5px 5px 3px 5px;}
+  .commentslist_username {color:#284289;}
   .commentslist_date { color: #999; font-style: italic; font-size:11px;}
   .edit_div {width: 80%; padding: 20px 0px 20px 40px;}
   .comment_context_menu {display:none; margin-left: 10px;}
@@ -75,6 +75,7 @@ import { AttachmentsService } from './attachments.service';
   .modal-header {padding:25px 30px;}
   .modal-body {padding:40px 50px;}
   .form-inline {margin-top: 10px;}
+  .icn {font-size: 40px; color: #cccccc; float:left; margin-right:10px;}
   
   input[type=file].ng-valid, .ng-valid.required  { border-left: 5px solid #42A948; /* green */}
   input[type=file].ng-invalid  {border-left: 5px solid #a94442; /* red */}
@@ -84,15 +85,16 @@ import { AttachmentsService } from './attachments.service';
 export class AttachmentsComponent {
 
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
-  attachments = [];
+
   @Output() setAttachments = new EventEmitter();    // set attachments count value in outter component  
   @Input() taskId : string;
+  @Input()attachments : any;
   editFileId: string;                      // id of attachment to be edited
   editFilename: string;
   editFileInput: string;
   deleteFileId: string;                    // id of attachment to be deleted
   loading: boolean;                           // loader status
-  
+
 
   constructor(private attachmentsService: AttachmentsService) {
     console.info("AttachmentsComponent:constructor");
@@ -101,6 +103,7 @@ export class AttachmentsComponent {
       console.error('Comments component (AttachmentsService) error! ' + error);
       window.alert('An error occurred while processing this page! Try again later.');
     }
+
     this.loading = false;
     this.clearFields();
   }

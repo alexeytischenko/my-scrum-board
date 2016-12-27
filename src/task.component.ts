@@ -94,7 +94,7 @@ import { Subscription } from 'rxjs/Subscription';
                 ({{task.attachments.length}}) 
             </span> 
             <p *ngIf="!task.attachments || task.attachments.length == 0" class="norecords">There are no attachments</p>
-            <attachments (setAttachments) = "updateTaskAttachments($event)" [taskId]="taskId"></attachments>
+            <attachments (setAttachments) = "updateTaskAttachments($event)" [taskId]="taskId" [attachments]="task.attachments"></attachments>
           </div>
         </div>
         <div class="panel-body">

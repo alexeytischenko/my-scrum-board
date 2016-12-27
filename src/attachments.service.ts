@@ -4,7 +4,11 @@ import { Injectable } from '@angular/core';
 export class AttachmentsService {
 
   errorHandler = error => console.error('AttachmentsService error', error);
-  
+  fileIcons = ['film', 'music', 'picture', 'compressed', 'list-alt']; //'file'
+  fileTypesMap: any = {'jpg': 'picture', 'jpeg': 'picture', 'gif': 'picture', 'bmp': 'picture', 'png': 'picture','mov': 'film', 'avi' : 'film', 'mpeg4' : 'film', 'wav' : 'music', 'aiff' : 'music', 'mp3' : 'music', 'zip' : 'compressed', 'rar' : 'compressed', 'doc' : 'list-alt', 'docx' : 'list-alt', 'rtf' : 'list-alt', 'txt' : 'list-alt', 'pdf' : 'list-alt'};  //, '' : ''
+
+
+
   constructor() {
     console.debug ("AttachmentsService:constructor");
   }
