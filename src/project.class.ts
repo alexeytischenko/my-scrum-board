@@ -26,13 +26,14 @@ export class Project {
         this.sname = this.generateShortName(name);
     }
 
-    private generateShortName (name: string) : string {
+    generateShortName (name: string) : string {
         //creating short name. Only Latin characters
         // JS5 doesn't understand 'u' - modifier in regexp
         // JS6 does, but need special transpiler to. Maybe later 
         let sname = name.replace(/(\w)\w*\W*/g, function (_, i) {
             return i.toUpperCase();
         });
+        console.log("generateShortName", name, sname);
         return sname;
     }
 

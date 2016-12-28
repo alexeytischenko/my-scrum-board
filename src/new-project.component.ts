@@ -31,7 +31,7 @@ import { Project } from './project.class';
 
   `]
 })
-export class NewProject implements OnInit {  
+export class NewProject {  
 
     newproject : string;
     newcolor : string;
@@ -58,7 +58,7 @@ export class NewProject implements OnInit {
         
         //add new Project 
         progress_start("red");
-        this.projectsService.addProject(this.userId, projectToAdd)
+        this.projectsService.saveProject(this.userId, projectToAdd)
             .catch((error)=>this.projectsService.errorHandler(error))
             .then((newId)=> {    
                 //finally / default    
@@ -82,11 +82,4 @@ export class NewProject implements OnInit {
         this.newcolor = "";
     }
 
-    ngOnInit() {
-
-    }
-
-    get diagnostic() {
-        return this.newcolor;
-    }
 }            
