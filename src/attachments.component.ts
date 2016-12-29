@@ -28,7 +28,7 @@ import { AttachmentsService } from './attachments.service';
                       onmouseOver="$(this).find('span.comment_context_menu').show();"
                       onmouseOut="$(this).find('span.comment_context_menu').hide();"
                 >
-                  <span class="glyphicon glyphicon-file icn"></span>
+                  <span class="icn"><a href='' id='link_{{file.id}}' target='_blank'><img src='/images/empty.png' id="{{file.id}}" border='0'></a></span>
                   <span class="commentslist_username">{{file.user}}</span>
                   <span class="commentslist_date">{{file.created | date:'medium'}}</span>
                    
@@ -95,6 +95,7 @@ export class AttachmentsComponent {
   deleteFileId: string;                    // id of attachment to be deleted
   loading: boolean;                           // loader status
 
+  imgIcons = ['image/jpeg', 'image/png'];
 
   constructor(private attachmentsService: AttachmentsService) {
     console.info("AttachmentsComponent:constructor");
@@ -134,11 +135,11 @@ export class AttachmentsComponent {
         setTimeout(() => {
           this.editFileId = '';
           this.loading = false;
+
         }, 1000);
       })
       .catch((error) => this.attachmentsService.errorHandler(error));
   }
-
 
   openDeleteAttModal(val: any) {
     // opens dialog window, sets comment to delete ID 
@@ -157,6 +158,28 @@ export class AttachmentsComponent {
     this.attachmentsService.removeAttachment(this.userId, this.taskId, this.deleteFileId)
       .then(() => setTimeout(() => this.loading = false, 1000))                        // reload updated comments list
       .catch((error) => this.attachmentsService.errorHandler(error));
+  }
+
+  getIconsNLinks() {
+    // get Icons and links to attached documents in attachment list
+    console.info("AttachmentsComponent:getIconsNLinks()");
+
+    this.attachments.forEach((element) => {
+      this.attachmentsService.getIconsNLinks(this.userId, this.taskId, element)
+          .then((link) => {
+              let img = <HTMLImageElement> document.getElementById(element.id);
+              let a =  <HTMLLinkElement> document.getElementById('link_' + element.id);
+              if (this.imgIcons.indexOf(element.type) > -1) {
+                img.src = link.toString();
+                a.href = link.toString();
+              } else {
+                img.src = "/images/pdf.png";
+                a.href = link.toString();
+              }  
+              
+          })
+          .catch((error) => this.attachmentsService.errorHandler(error));
+    });  
   }
 
   private clearFields () {
@@ -178,14 +201,17 @@ export class AttachmentsComponent {
   }
 
   ngAfterViewInit() {
-    //fire standart event to star the Angular Digest loop -- for input[type=file] validation 
     console.info("AttachmentsComponent:ngAfterViewInit()", this.userId);
+    
+    //fire standart event to start the Angular Digest loop -- for input[type=file] validation 
     document.getElementById('file').addEventListener('change', function () {
           var e = document.createEvent('HTMLEvents');
           e.initEvent('input', false, true);
           this.dispatchEvent(e);
     }, false); 
       
+    //get icons and links
+    this.getIconsNLinks();    
   }
 
 }

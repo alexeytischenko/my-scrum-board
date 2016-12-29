@@ -8,7 +8,6 @@ export class AttachmentsService {
   fileTypesMap: any = {'jpg': 'picture', 'jpeg': 'picture', 'gif': 'picture', 'bmp': 'picture', 'png': 'picture','mov': 'film', 'avi' : 'film', 'mpeg4' : 'film', 'wav' : 'music', 'aiff' : 'music', 'mp3' : 'music', 'zip' : 'compressed', 'rar' : 'compressed', 'doc' : 'list-alt', 'docx' : 'list-alt', 'rtf' : 'list-alt', 'txt' : 'list-alt', 'pdf' : 'list-alt'};  //, '' : ''
 
 
-
   constructor() {
     console.debug ("AttachmentsService:constructor");
   }
@@ -48,8 +47,22 @@ export class AttachmentsService {
    
   }
 
+  getIconsNLinks(url: string, task: string, file: any) {
+    // get Icons and links to attached documents in attachment list
+    console.debug ("AttachmentsService:getIconsNLinks(url: string, task: string, file: any)", url, task, file);
 
- saveFile(url: string, task: any, fileid: any, filedesc: string, file: any ) {
+    let self = this;
+    let storageRef = firebase.storage().ref(`${url}/${task}`);
+
+    return new Promise(function(resolve, reject) {
+      storageRef.child(file.fileURl)
+            .getDownloadURL()
+            .then((url) => resolve(url))
+            .catch((error) => reject(error));
+    });
+  }  
+
+  saveFile(url: string, task: any, fileid: any, filedesc: string, file: any ) {
     // save new/update comment
     console.debug("AttachmentsService:saveFile(url: string, task: any, fileid: any, filedesc: string)", url, task, fileid, filedesc, file);
 
@@ -70,13 +83,14 @@ export class AttachmentsService {
             .put(file, metadata)
             .then(function(snapshot) {
                 console.log('Uploaded', snapshot.totalBytes, 'bytes.');
-                var fileurl = snapshot.downloadURL;//metadata.downloadURLs[0];
-                console.log('File available at', fileurl);
+                //var fileurl = snapshot.downloadURL;//metadata.downloadURLs[0];
+                //console.log('File available at', fileurl.toString(), `${url}/${task}/${file.name}`);
                 postData = {
-                  fileURl: fileurl,
+                  fileURl: file.name,
                   name: filedesc,
                   user: 'User',
-                  created : Date.now()
+                  created : Date.now(),
+                  type: file.type
                 }
                 let newAttRef = newattachRef.push();
                 newAttRef.set(postData, function(error) {
