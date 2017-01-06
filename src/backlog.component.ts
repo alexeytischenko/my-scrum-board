@@ -1,5 +1,4 @@
 import { Component, ChangeDetectorRef, Pipe, PipeTransform } from '@angular/core';
-// import { Task } from './task.class';
 import { TasksListService } from './tasks-list.service';
 import { ProjectsService } from './projects.service';
 import { Project } from './project.class';
@@ -112,8 +111,9 @@ export class BackLogComponent {
       //load projects into property of the ProjectsService then loads list of tasks into tasksListService tasks property 
 
       progress_start("");
-      this.tasksListService.getBackLog(this.userId, this.filter)
+      this.tasksListService.getBackLog(this.userId)
         .then ( () => this.backLog = this.tasksListService.tasks)
+        .then ( () => this.filter = this.tasksListService.filter)
         .catch((error)=>this.tasksListService.errorHandler(error))
         .then(()=> {    
           //finally / default     
@@ -200,30 +200,20 @@ export class BackLogComponent {
         this.sprintLength = asLength;
 
         // forcing Angular to detect changes in model, otherwise it takes much time to update them
-        this.ref.detectChanges();
+        if (this.ref) this.ref.detectChanges();
       }
   }
 
   private addToFilter(key : string, value: string) {
-    //prepare JSON for UPDATE sortnum and type (active sprint / backlog) after resort of the elements
-    console.info ("BackLogComponent:addToFilter(key : string, value: string)", key, value);
-
-    if( !this.filter.hasOwnProperty(key) ){
-      this.filter[key] = value;
-      console.info("this.filter", this.filter);
-    }
+    //call service to add project to filter
+    this.tasksListService.addToFilter(key, value);
     
     this.getTaskList();
   }
 
   private removeFromFilter(key : string) {
-    //prepare JSON for UPDATE sortnum and type (active sprint / backlog) after resort of the elements
-    console.info ("BackLogComponent:removeFromFilter(key : string)",key);
-
-    if( this.filter.hasOwnProperty(key) ){
-      delete this.filter[key];
-      console.info("this.filter", this.filter);
-    }
+    //call service to remove project from filter
+    this.tasksListService.removeFromFilter(key);
     
     this.getTaskList();
   }

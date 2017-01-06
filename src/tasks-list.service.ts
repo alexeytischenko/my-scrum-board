@@ -7,15 +7,16 @@ export class TasksListService {
 
   errorHandler = error => console.error('TaskListService error', error);
   tasks = [];
+  filter = {};
   
   constructor(private projectsService : ProjectsService) {
     console.info ("TasksListService:constructor");
   }
 
-  getBackLog(url, filter) {
-    console.info ("TasksListService:getBackLog(url, filter)", url, filter);
+  getBackLog(url) {
+    console.info ("TasksListService:getBackLog(url), filter", url, this.filter);
 
-    const filter_length = Object.keys(filter).length;
+    const filter_length = Object.keys(this.filter).length;
     console.info ("filter_length", filter_length);
     let self = this;
     let taskscount = 0;
@@ -31,7 +32,7 @@ export class TasksListService {
               snapshot.forEach(function(child) {
                 // checking if there's a filter and if this task match the condition
                 let tmpTask = self.convertObject(child.val(), child.getKey());
-                if (filter_length == 0 || tmpTask.project_id in filter) {    //obj.hasOwnProperty(prop)
+                if (filter_length == 0 || tmpTask.project_id in self.filter) {    //obj.hasOwnProperty(prop)
                   self.tasks[taskscount] = tmpTask;
                   taskscount++;
                 }
@@ -116,6 +117,28 @@ export class TasksListService {
 
         return;
       }
+    }
+
+  }
+
+  addToFilter(key : string, value: string) {
+    //add project ("id" : "short name") to filter object
+    console.info ("TasksListService:addToFilter(key : string, value: string)", key, value);
+
+    if(!this.filter.hasOwnProperty(key)) {
+        this.filter[key] = value;
+        console.info("this.filter", this.filter);
+    }
+
+  }
+
+  removeFromFilter(key : string) {
+    //remove project ("id" : "short name") from filter object
+    console.info ("TasksListService:removeFromFilter(key : string)", key);
+
+    if( this.filter.hasOwnProperty(key) ){
+      delete this.filter[key];
+      console.info("this.filter", this.filter);
     }
 
   }

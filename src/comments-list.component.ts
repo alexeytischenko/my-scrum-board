@@ -108,17 +108,17 @@ export class CommentsListComponent {
     this.commentBody = '';
   }
 
-  loadComments() {
+  loadComments(indication? : boolean) {
     //load list of comments into commentsListService commetns property 
-    console.info("CommentsListComponent:loadComments()");
+    console.info("CommentsListComponent:loadComments(indication? : boolean)", indication);
     
-    this.loading = true;
+    if (indication) this.loading = true;
     this.commentsListService.getComments(this.userId, this.taskId)
       .then (() => this.comments = this.commentsListService.comments)
       .then (() => this.setCount.emit(this.comments.length))
       .then(() => {    
         setTimeout(() => {
-          this.loading = false;
+          if (indication) this.loading = false;
           this.editCommentId = '';
         }, 1000);  
       })

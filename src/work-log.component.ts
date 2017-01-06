@@ -146,17 +146,17 @@ export class WorkLogComponent {
     });
   }
 
-  loadRecords() {
+  loadRecords(indication? : boolean) {
     //load list of comments into commentsListService commetns property 
-    console.info("WorkLogComponent:loadRecords()");
+    console.info("WorkLogComponent:loadRecords(indication? : boolean)", indication);
     
-    this.loading = true;
+    if (indication) this.loading = true;
     this.workLogService.getLog(this.userId, this.taskId)
       .then (() => this.logs = this.workLogService.logs)
       .then (() => this.setCount.emit(this.workLogService.getFullLog()))
       .then(() => {   
         setTimeout(() => {
-          this.loading = false;
+          if (indication) this.loading = false;
           this.editRecId = '';
         }, 1000);  
       })
