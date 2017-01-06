@@ -24,8 +24,9 @@ import { Subscription } from 'rxjs/Subscription';
             <span class="dropdown">
               <button class="btn btn-default dropdown-toggle btn-sm" type="button" data-toggle="dropdown">...</button>
               <ul class="dropdown-menu dropdown-menu-right">
-                <li *ngIf="taskCurrentStatus!='resolved'"><a href="javascript:void(0);" (click)="resolveTask()">Resolve</a></li>
-                <li *ngIf="taskCurrentStatus=='resolved'"><a href="javascript:void(0);" (click)="reopenTask()">Reopen task</a></li>
+                <li *ngIf="taskCurrentStatus=='idle'"><a href="javascript:void(0);" (click)="changeTaskStatus('in progress')">Start</a></li>
+                <li *ngIf="taskCurrentStatus!='resolved'"><a href="javascript:void(0);" (click)="changeTaskStatus('resolved')">Resolve</a></li>
+                <li *ngIf="taskCurrentStatus=='resolved'"><a href="javascript:void(0);" (click)="changeTaskStatus('in progress')">Reopen task</a></li>
                 <li><a href="javascript:void(0);" onClick="$('#delModal').modal();">Delete task</a></li>
                 <li class="divider"></li>
                 <li><a href="javascript:void(0);" (click)="clc.setEditorField(-1)">Add comment</a></li>
@@ -40,7 +41,7 @@ import { Subscription } from 'rxjs/Subscription';
         </div>
         <div class="form-inline">               
                 <label>{{task.name}}</label> 
-                <button class="btn btn-{{project.color}} btn-xs hidden-xs" disabled="true">{{project.sname}} - {{task.code}}</button>           
+                <span class="label label-{{project.color}}">{{project.sname}} - {{task.code}}</span>          
         </div>
   </div>
     <div class="panel-body">
@@ -225,29 +226,53 @@ export class TaskComponent implements OnInit, OnDestroy {
       );
   }
 
-  resolveTask() : void {
+  changeTaskStatus(status: string) : void {
     //task resolve from drop-down menu
-    console.info ("TaskComponent:resolveTask()");
+    console.info ("TaskComponent:changeTaskStatus(status: string)", status);
 
     progress_start("red");
-    this.task.status = 'resolved';
+    this.task.status = status;
     this.task.updated = Date.now();
     this.taskService.saveTask(this.userId, this.task)
       .catch((error)=>this.taskService.errorHandler(error))
       .then(()=> progress_end());
   }
+
+  // resolveTask() : void {
+  //   //task resolve from drop-down menu
+  //   console.info ("TaskComponent:resolveTask()");
+
+  //   progress_start("red");
+  //   this.task.status = 'resolved';
+  //   this.task.updated = Date.now();
+  //   this.taskService.saveTask(this.userId, this.task)
+  //     .catch((error)=>this.taskService.errorHandler(error))
+  //     .then(()=> progress_end());
+  // }
   
-  reopenTask() : void {
-    //task reopen from drop-down menu
-    console.info ("TaskComponent:reopenTask()");
+  // startTask() : void {
+  //   //task start from drop-down menu
+  //   console.info ("TaskComponent:startTask()");
 
-    progress_start("red");
-    this.task.status = 'in progress';
-    this.task.updated = Date.now();
-    this.taskService.saveTask(this.userId, this.task)
-      .catch((error)=>this.taskService.errorHandler(error))
-      .then(()=> progress_end());
-  }
+  //   progress_start("red");
+  //   this.task.status = 'in progress';
+  //   this.task.updated = Date.now();
+  //   this.taskService.saveTask(this.userId, this.task)
+  //     .catch((error)=>this.taskService.errorHandler(error))
+  //     .then(()=> progress_end());
+  // }
+
+  // reopenTask() : void {
+  //   //task reopen from drop-down menu
+  //   console.info ("TaskComponent:reopenTask()");
+
+  //   progress_start("red");
+  //   this.task.status = 'in progress';
+  //   this.task.updated = Date.now();
+  //   this.taskService.saveTask(this.userId, this.task)
+  //     .catch((error)=>this.taskService.errorHandler(error))
+  //     .then(()=> progress_end());
+  // }
 
   updateTaskCommentsCounts (val : number) {
     // updates comments count if ness

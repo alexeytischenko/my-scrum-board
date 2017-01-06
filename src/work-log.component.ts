@@ -220,7 +220,7 @@ export class WorkLogComponent {
 
  onValueChanged(data?: any) {
     //build form,controls and validators for them
-    console.info("WorkLogComponent:onValueChanged(data?: any)", data);
+    //console.info("WorkLogComponent:onValueChanged(data?: any)", data); -- too much garbage in console
   
     if (!this.wleditForm) return; 
 

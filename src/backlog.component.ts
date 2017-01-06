@@ -48,6 +48,7 @@ import { Project } from './project.class';
                 <li *ngIf="taskElement.type=='s'" class="list-group-item" id="{{taskElement.id}}">
                   <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code ? taskElement.code : 0}}</span> 
+                  <span *ngIf="taskElement.commentsNum > 0" class="label label-white "><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>
                   <span class="badge">{{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
                 </li>
               </template>
@@ -61,7 +62,8 @@ import { Project } from './project.class';
                 <li *ngIf="taskElement.type=='b'" class="list-group-item" id="{{taskElement.id}}">
                   <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code ? taskElement.code : 0}}</span> 
-                  <span class="badge">{{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
+                  <span *ngIf="taskElement.commentsNum > 0" class="label label-white "><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>                  
+                  <span class="badge"> {{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h </span>
                 </li>
               </template>  
           </ul>
@@ -74,6 +76,8 @@ import { Project } from './project.class';
     .list-group-item:hover {background: #e9e9e9;}
     .filters {margin-bottom: 10px;}
     .cant_choose {margin-left: 20px;color: #ccc;}
+    .label-white {background-color: #fff; color: #bbb; border: 1px solid #ccc;}
+    .badge {background-color: #bbb;}
   `]
 })
 export class BackLogComponent {
@@ -113,13 +117,13 @@ export class BackLogComponent {
         .catch((error)=>this.tasksListService.errorHandler(error))
         .then(()=> {    
           //finally / default     
-          setTimeout(() => this.rebuildSortable(), 1000);
+          setTimeout(() => this.createSortable(), 1000);
           progress_end();
         });
   }
 
-  rebuildSortable() {
-      console.info ("BackLogComponent:rebuildSortable()");
+  private createSortable() {
+      console.info ("BackLogComponent:createSortable()");
 
       $('.list-group-sortable').sortable({
           placeholderClass: 'list-group-item',
@@ -167,7 +171,7 @@ export class BackLogComponent {
     console.info ("BackLogComponent:prepareJSON(recordType : string, domNode : string)",recordType ,domNode);
 
     let updatedData = [];
-    $('#' + domNode + ' li').each(function( index ) {
+    $('#' + domNode + ' li.list-group-item').each(function( index ) {
           updatedData[index] = {
             "id" : this.id,
             "sortnum": index,
@@ -212,7 +216,7 @@ export class BackLogComponent {
     this.getTaskList();
   }
 
-    private removeFromFilter(key : string) {
+  private removeFromFilter(key : string) {
     //prepare JSON for UPDATE sortnum and type (active sprint / backlog) after resort of the elements
     console.info ("BackLogComponent:removeFromFilter(key : string)",key);
 

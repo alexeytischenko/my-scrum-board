@@ -66,7 +66,11 @@ export class TasksListService {
             resolveCounter--;
             self.updateTaskWJson(child);
 
-            if (resolveCounter <= 0)  resolve(true); 
+            if (resolveCounter <= 0)  {
+              // when sortnumbers assigned, tasks array should be resorted according the new sortnumbers
+              self.tasks.sort((a, b) => {return a.sortnum == b.sortnum ? 0 : +(a.sortnum > b.sortnum) || -1});
+              resolve(true); 
+            }
           })
           .catch((error) => reject("Backlog sorting failed: {"+error+"}"));
         }
@@ -75,6 +79,7 @@ export class TasksListService {
           if (jsonData.length == 1) resolve(true); //if the only element is disable-section_header or just empty, then resolving immidiately
         }       
       }
+
     });
 
   }
@@ -95,7 +100,8 @@ export class TasksListService {
         estimate: objectedResponse.estimate,
         worked: objectedResponse.worked,
         status: objectedResponse.status,
-        type: objectedResponse.type
+        type: objectedResponse.type,
+        commentsNum: objectedResponse.commentsNum
     };
   }
 
