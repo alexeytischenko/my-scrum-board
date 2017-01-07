@@ -66,9 +66,10 @@ import { CommentsListService } from './comments-list.service';
   .loader {margin: 0 auto;} 
   ul {list-style: none;}
   li {margin-bottom: 10px;}
-  .commentslist_username {color:#284289; margin: 0 10px;}
   li .glyphicon-user{border: 1px solid #F2F2F2; padding: 5px 5px 3px 5px;}
+  .commentslist_username {color:#284289; margin: 0 10px;}
   .commentslist_date { color: #999; font-style: italic; font-size:11px;}
+  .commentslist_text { white-space: pre-line;}
   .edit_div {width: 80%; padding: 20px 0px 20px 40px;}
   .comment_context_menu {display:none; margin-left: 10px;}
   .comment_context_menu span {cursor: pointer; color: #999;}

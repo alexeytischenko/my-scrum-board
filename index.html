@@ -42,12 +42,15 @@
   h2 {font-size: 14px;}
   
   .progress {
-    height: 10px;
-    margin-top: 5px;
-    width: 100px;
+    height: 5px;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    z-index: 1000;
   }
   .w50 {
-    width:50%;
+    width:30%;
   }
   .w100 {
     width:100%;
@@ -82,24 +85,24 @@
     100% { -webkit-transform: rotate(360deg); }
   }  
 
-  #jquery-script-menu {
+  #topmenu-menu {
     position: fixed;
     height: 40px;
     width: 100%;
     top: 0;
     left: 0;
-    border-top: 5px solid #316594;
+    border-top: 5px solid #337ab7;
     background: #fff;
     -moz-box-shadow: 0 2px 3px 0px rgba(0, 0, 0, 0.16);
     -webkit-box-shadow: 0 2px 3px 0px rgba(0, 0, 0, 0.16);
     box-shadow: 0 2px 3px 0px rgba(0, 0, 0, 0.16);
-    z-index: 999999;
+    z-index: 999;
     padding: 10px 0;
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
     box-sizing: content-box;
   }
-  .jquery-script-center {
+  .topmenu-center {
       width: 90%;
       margin: 0 auto;
   }

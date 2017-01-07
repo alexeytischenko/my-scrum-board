@@ -10,7 +10,7 @@ import { Project } from './project.class';
     <div class="form-inline filters">
         <span class="dropdown">
           <button class="btn btn-default dropdown-toggle btn-sm" type="button" data-toggle="dropdown">
-            <span class="glyphicon glyphicon-plus"></span>
+            <span class="glyphicon glyphicon-filter"></span>
             <span class="hidden-xs">Add filter by project</span>
           </button>
           <ul class="dropdown-menu dropdown-menu-left">
@@ -47,8 +47,8 @@ import { Project } from './project.class';
                 <li *ngIf="taskElement.type=='s'" class="list-group-item" id="{{taskElement.id}}">
                   <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code ? taskElement.code : 0}}</span> 
-                  <span *ngIf="taskElement.commentsNum > 0" class="label label-white "><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>
-                  <span class="badge">{{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
+                  <span *ngIf="taskElement.commentsNum > 0" class="label label-white hidden-xs"><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>
+                  <span class="badge hidden-xs">{{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
                 </li>
               </template>
   
@@ -61,8 +61,8 @@ import { Project } from './project.class';
                 <li *ngIf="taskElement.type=='b'" class="list-group-item" id="{{taskElement.id}}">
                   <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code ? taskElement.code : 0}}</span> 
-                  <span *ngIf="taskElement.commentsNum > 0" class="label label-white "><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>                  
-                  <span class="badge"> {{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h </span>
+                  <span *ngIf="taskElement.commentsNum > 0" class="label label-white hidden-xs"><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>                  
+                  <span class="badge hidden-xs"> {{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h </span>
                 </li>
               </template>  
           </ul>
