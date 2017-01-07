@@ -15,7 +15,7 @@ import { EditProject } from './edit-project.component';
               <li class="list-group-item disabled">Projects</li>
               <template ngFor let-prElement [ngForOf]="projects">
                 <li class="list-group-item" id="{{prElement.id}}">
-                  <button class="btn btn-link" (click)="epc.editProject(prElement)">{{prElement.name}}</button>
+                  <a href="javascript:void(0);" (click)="epc.editProject(prElement)">{{prElement.name}}</a>
                   <span class="label label-{{prElement.color}}">{{prElement.sname}}</span> 
                 </li>
               </template>
