@@ -36,7 +36,7 @@ import { Project } from './project.class';
                     <span class="glyphicon glyphicon-align-justify accord nodrug"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-menu-right nodrug">
-                    <li class="nodrug"><a href="javascript:void(0);">Move resolved items to Backlog</a></li>
+                    <li class="nodrug"><a href="javascript:void(0);" (click)="moveResolvedToBackLog()">Move resolved items to Backlog</a></li>
                     <li class="nodrug"><span class="cant_choose">Move resolved items to Archive</span></li>
                     <li class="nodrug"><span class="cant_choose">Delete resolved items</span></li>
                     
@@ -166,6 +166,41 @@ export class BackLogComponent {
       this.countListsLength();
   }
 
+  moveResolvedToBackLog() {
+    //chnage type and sort number for resolved items in active sprint
+    console.info("BackLogComponent:moveResolvedToBackLog()");
+
+    progress_start("red");
+    //call resortBackLog method to update tasks list
+    this.tasksListService.resortBackLog(this.userId, this.prepareResolvedJSON())
+      .catch((error)=>this.tasksListService.errorHandler(error))
+      .then(() => {
+        progress_end();
+        this.countListsLength();
+      });  
+  }
+
+  private prepareResolvedJSON() {
+    //prepare JSON for UPDATE sortnum and type (active sprint / backlog) after moved resolved elements
+    console.info ("BackLogComponent:prepareResolvedJSON()");
+
+    let updatedData = [];
+    let index = 0;
+    let maxSort = this.getMaxSortNumber("b");
+    
+    this.backLog.forEach((element) => {
+      if(element.type == "s" && element.status == "resolved") {
+        updatedData[index++] = {
+            "id" : element.id,
+            "sortnum": maxSort,
+            "type": "b"
+        };
+      }
+    });
+
+    return updatedData;
+  }
+
   private prepareJSON(recordType : string, domNode : string) {
     //prepare JSON for UPDATE sortnum and type (active sprint / backlog) after resort of the elements
     console.info ("BackLogComponent:prepareJSON(recordType : string, domNode : string)",recordType ,domNode);
@@ -180,6 +215,20 @@ export class BackLogComponent {
     });
 
     return updatedData;
+  }
+
+  private getMaxSortNumber(tp : string) {
+    //get max sortnumber
+    console.info ("BackLogComponent:getMaxSortNumber(tp : string)", tp);   
+
+    let msn : number = 0;
+
+    this.backLog.forEach((element) => {
+      if(element.type == tp && element.sortnum > msn) 
+        msn = element.sortnum;
+    });
+
+    return msn;
   }
 
   private countListsLength() {
