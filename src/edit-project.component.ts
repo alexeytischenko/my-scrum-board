@@ -94,7 +94,7 @@ export class EditProject {
 
     buildForm(): void {
         //build form,controls and validators for them
-        console.info("TaskEditComponent:buildForm()");
+        console.info("EditProject:buildForm()");
 
         this.projeditForm = this.fb.group({
         'newproject': [this.prj.name, [
@@ -111,7 +111,7 @@ export class EditProject {
 
     onValueChanged(data?: any) {
         //build form,controls and validators for them
-        console.info("TaskEditComponent:onValueChanged(data?: any)", data);
+        //console.info("EditProject:onValueChanged(data?: any)", data); //  -- to much garbage to console
     
         if (!this.projeditForm) return; 
 

@@ -28,7 +28,7 @@ import { AttachmentsService } from './attachments.service';
                       onmouseOver="$(this).find('span.comment_context_menu').show();"
                       onmouseOut="$(this).find('span.comment_context_menu').hide();"
                 >
-                  <span class="icn"><a href='' id='link_{{file.id}}' target='_blank'><img src='/images/empty.png' id="{{file.id}}" border='0'></a></span>
+                  <span class="icn"><a href='' id='link_{{file.id}}' target='_blank'><img src='/images/empty.png' width="50" height="50" id="img_{{file.id}}" border='0'></a></span>
                   <span class="commentslist_username">{{file.user}}</span>
                   <span class="commentslist_date">{{file.created | date:'medium'}}</span>
                    
@@ -49,7 +49,7 @@ import { AttachmentsService } from './attachments.service';
         <!-- Modal content-->
         <div class="modal-content">
           <div class="modal-header">
-            <h4 style="text-align: center;"><span class="glyphicon glyphicon-fire"></span> Delete the comment?</h4>
+            <h4 style="text-align: center;"><span class="glyphicon glyphicon-fire"></span> Delete the attachment?</h4>
           </div>
           <div class="modal-body">
                 <button class="btn btn-danger btn-block" (click)="deleteAttachment()"><span class="glyphicon glyphicon-trash"></span> Delete</button>
@@ -95,7 +95,6 @@ export class AttachmentsComponent {
   deleteFileId: string;                    // id of attachment to be deleted
   loading: boolean;                           // loader status
 
-  imgIcons = ['image/jpeg', 'image/png'];
 
   constructor(private attachmentsService: AttachmentsService) {
     console.info("AttachmentsComponent:constructor");
@@ -143,7 +142,7 @@ export class AttachmentsComponent {
 
   openDeleteAttModal(val: any) {
     // opens dialog window, sets comment to delete ID 
-    console.info("AttachmentsComponent:openDeleteModal(val: any)", val);
+    console.info("AttachmentsComponent:openDeleteAttModal(val: any)", val);
 
     this.deleteFileId = val;
     $('#delFileModal').modal();
@@ -162,20 +161,21 @@ export class AttachmentsComponent {
 
   getIconsNLinks() {
     // get Icons and links to attached documents in attachment list
-    console.info("AttachmentsComponent:getIconsNLinks()");
+    console.info("AttachmentsComponent:getIconsNLinks()", this.attachments);
 
     this.attachments.forEach((element) => {
       this.attachmentsService.getIconsNLinks(this.userId, this.taskId, element)
           .then((link) => {
-              let img = <HTMLImageElement> document.getElementById(element.id);
+              let img = <HTMLImageElement> document.getElementById('img_' + element.id);
               let a =  <HTMLLinkElement> document.getElementById('link_' + element.id);
-              if (this.imgIcons.indexOf(element.type) > -1) {
+              a.href = link.toString();
+              if (this.attachmentsService.imgIcons.indexOf(element.type) > -1) {
                 img.src = link.toString();
-                a.href = link.toString();
               } else {
-                img.src = "/images/pdf.png";
-                a.href = link.toString();
-              }  
+                if (this.attachmentsService.fileTypesMap.hasOwnProperty(element.type)) {
+                  img.src = "/images/" + this.attachmentsService.fileTypesMap[element.type] + ".png";
+                }
+              }
               
           })
           .catch((error) => this.attachmentsService.errorHandler(error));

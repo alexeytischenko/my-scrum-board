@@ -4,9 +4,45 @@ import { Injectable } from '@angular/core';
 export class AttachmentsService {
 
   errorHandler = error => console.error('AttachmentsService error', error);
-  fileIcons = ['film', 'music', 'picture', 'compressed', 'list-alt']; //'file'
-  fileTypesMap: any = {'jpg': 'picture', 'jpeg': 'picture', 'gif': 'picture', 'bmp': 'picture', 'png': 'picture','mov': 'film', 'avi' : 'film', 'mpeg4' : 'film', 'wav' : 'music', 'aiff' : 'music', 'mp3' : 'music', 'zip' : 'compressed', 'rar' : 'compressed', 'doc' : 'list-alt', 'docx' : 'list-alt', 'rtf' : 'list-alt', 'txt' : 'list-alt', 'pdf' : 'list-alt'};  //, '' : ''
 
+  imgIcons = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp']; 
+
+  //fileTypes = ['application/pdf', 'text/rtf', '', '']; //'', '', '', ''
+  fileTypesMap: any = {'application/pdf': 'pdf', 'text/rtf' : 'rtf', 'application/vnd.oasis.opendocument.text' : 'odt', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'docx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'xls'};// '' : '', '' : '', '' : '', '' : ''
+
+// .doc      application/msword
+// .dot      application/msword
+
+// .docx     application/vnd.openxmlformats-officedocument.wordprocessingml.document
+// .dotx     application/vnd.openxmlformats-officedocument.wordprocessingml.template
+// .docm     application/vnd.ms-word.document.macroEnabled.12
+// .dotm     application/vnd.ms-word.template.macroEnabled.12
+
+// .xls      application/vnd.ms-excel
+// .xlt      application/vnd.ms-excel
+// .xla      application/vnd.ms-excel
+
+// .xlsx     application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+// .xltx     application/vnd.openxmlformats-officedocument.spreadsheetml.template
+// .xlsm     application/vnd.ms-excel.sheet.macroEnabled.12
+// .xltm     application/vnd.ms-excel.template.macroEnabled.12
+// .xlam     application/vnd.ms-excel.addin.macroEnabled.12
+// .xlsb     application/vnd.ms-excel.sheet.binary.macroEnabled.12
+
+// .ppt      application/vnd.ms-powerpoint
+// .pot      application/vnd.ms-powerpoint
+// .pps      application/vnd.ms-powerpoint
+// .ppa      application/vnd.ms-powerpoint
+
+// .pptx     application/vnd.openxmlformats-officedocument.presentationml.presentation
+// .potx     application/vnd.openxmlformats-officedocument.presentationml.template
+// .ppsx     application/vnd.openxmlformats-officedocument.presentationml.slideshow
+// .ppam     application/vnd.ms-powerpoint.addin.macroEnabled.12
+// .pptm     application/vnd.ms-powerpoint.presentation.macroEnabled.12
+// .potm     application/vnd.ms-powerpoint.template.macroEnabled.12
+// .ppsm     application/vnd.ms-powerpoint.slideshow.macroEnabled.12
+
+// .mdb      application/vnd.ms-access
 
   constructor() {
     console.debug ("AttachmentsService:constructor");
@@ -152,12 +188,12 @@ export class AttachmentsService {
   }
 
 
-  removeAttachment(url: string, taskId: string, commId: string) {
+  removeAttachment(url: string, taskId: string, attId: string) {
     // remove comment
-    console.debug ("AttachmentsService:removeComment(url, taskId, commId)", url, taskId, commId);
+    console.debug ("AttachmentsService:removeComment(url, taskId, attId)", url, taskId, attId);
 
     let self = this;
-    let taskRef = firebase.database().ref(`${url}/comments/${taskId}/${commId}`);
+    let taskRef = firebase.database().ref(`${url}/backlog/${taskId}/attachments/${attId}`);
 
     return new Promise(function(resolve, reject) {
         taskRef.remove(function(error) {
