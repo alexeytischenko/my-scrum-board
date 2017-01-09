@@ -45,36 +45,65 @@ export class ProjectsService {
     return projectData;
   }
 
-  addProject(url: string, newProject : Project) {
-    console.info ("ProjectsService:addProject(url: string, newProject : Project)", url, newProject);
+  saveProject(url: string, project : Project) {
+    console.info ("ProjectsService:saveProject(url: string, project : Project)", url, project);
     
     let self = this;
     let projectsRef = firebase.database().ref(`${url}/projects/`);
 
+    // generate sname if missing
+    if(project.sname.length == 0) project.sname = project.generateShortName(project.name);
+    if(project.color.length == 0) project.color = this.colorsMap.white;
+    // data to post
     let postData = {
-      name: newProject.name,
-      sname: newProject.sname,
-      color: newProject.color
+      name: project.name,
+      sname: project.sname,
+      color: project.color
     };
 
-    return new Promise(function(resolve, reject) {
-      let newprojectsRef = projectsRef.push();
-      newprojectsRef.set(postData, function(error) {
-      if (error) {
-        console.log('Synchronization failed');
-        reject(error);
-      } else {
-          self.projects.push({
-            name: newProject.name,
-            sname: newProject.sname,
-            color: newProject.color,
-            id: newprojectsRef.key.toString()
-          });
+    if (project.id.length > 0) {
 
-          resolve(newprojectsRef.key.toString());
-      }
-      }); 
-    });
+      return new Promise(function(resolve, reject) {
+        
+        projectsRef.child(project.id).update(postData, function(error) {
+          if (error) {
+            console.log('Synchronization failed');
+            reject(error);
+          } else {
+              for (let i = 0; i < self.projects.length; i++) {
+                if (self.projects[i].id == project.id) {
+                    self.projects[i].name = project.name;
+                    self.projects[i].sname = project.sname;
+                    self.projects[i].color = project.color;
+
+                }
+              }
+              resolve(project.id);
+          }
+        }); 
+      });
+
+    } else {
+
+      return new Promise(function(resolve, reject) {
+        let newprojectsRef = projectsRef.push();
+        newprojectsRef.set(postData, function(error) {
+        if (error) {
+          console.log('Synchronization failed');
+          reject(error);
+        } else {
+            self.projects.push({
+              name: project.name,
+              sname: project.sname,
+              color: project.color,
+              id: newprojectsRef.key.toString()
+            });
+
+            resolve(newprojectsRef.key.toString());
+        }
+        }); 
+      });
+    }
 
   }
 
