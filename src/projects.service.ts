@@ -5,8 +5,8 @@ import { Project } from './project.class';
 export class ProjectsService {
    
   projects = [];
-  colors = ['white', 'orange', 'dark blue', 'blue', 'red', 'green'];
-  colorsMap: any = {'white': 'default', 'orange': 'warning', 'dark blue': 'primary', 'blue': 'info', 'red': 'danger','green': 'success'};
+  colors = ['grey', 'orange', 'dark blue', 'blue', 'red', 'green'];
+  colorsMap: any = {'grey': 'default', 'orange': 'warning', 'dark blue': 'primary', 'blue': 'info', 'red': 'danger','green': 'success'};
   
   errorHandler = error => console.error('ProjectsService error', error);
   
@@ -35,7 +35,7 @@ export class ProjectsService {
   }
 
   getProject(project : string) : Project {
-    console.info ("ProjectsService:getProject(project)", project);
+    //console.info ("ProjectsService:getProject(project)", project)  -- too many logs in console
 
     let projectData = new Project();
     this.projects.forEach(element => {

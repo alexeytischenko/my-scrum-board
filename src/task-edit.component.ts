@@ -181,7 +181,7 @@ export class TaskEditComponent implements OnInit, OnDestroy {
 
  onValueChanged(data?: any) {
     //build form,controls and validators for them
-    console.info("TaskEditComponent:onValueChanged(data?: any)", data);
+    ///console.info("TaskEditComponent:onValueChanged(data?: any)", data); --too much garbage
   
     if (!this.taskeditForm) return; 
 

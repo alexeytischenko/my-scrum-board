@@ -84,8 +84,9 @@ import { WorkLogService } from './work-log.service';
   .loader {margin: 0 auto;} 
   ul {list-style: none;}
   li {margin-bottom: 10px;}
-  .commentslist_username {color:#284289; margin: 0 10px;}
   li .glyphicon-user{border: 1px solid #F2F2F2; padding: 5px 5px 3px 5px;}
+  .commentslist_username {color:#284289; margin: 0 10px;}
+  .commentslist_text { white-space: pre-line;}
   .commentslist_date { color: #999; font-style: italic; font-size:11px;}
   .edit_div {width: 80%; padding: 20px 0px 20px 40px;}
   .comment_context_menu {display:none; margin-left: 10px;}
@@ -146,17 +147,17 @@ export class WorkLogComponent {
     });
   }
 
-  loadRecords() {
+  loadRecords(indication? : boolean) {
     //load list of comments into commentsListService commetns property 
-    console.info("WorkLogComponent:loadRecords()");
+    console.info("WorkLogComponent:loadRecords(indication? : boolean)", indication);
     
-    this.loading = true;
+    if (indication) this.loading = true;
     this.workLogService.getLog(this.userId, this.taskId)
       .then (() => this.logs = this.workLogService.logs)
       .then (() => this.setCount.emit(this.workLogService.getFullLog()))
       .then(() => {   
         setTimeout(() => {
-          this.loading = false;
+          if (indication) this.loading = false;
           this.editRecId = '';
         }, 1000);  
       })
@@ -220,7 +221,7 @@ export class WorkLogComponent {
 
  onValueChanged(data?: any) {
     //build form,controls and validators for them
-    console.info("WorkLogComponent:onValueChanged(data?: any)", data);
+    //console.info("WorkLogComponent:onValueChanged(data?: any)", data); -- too much garbage in console
   
     if (!this.wleditForm) return; 
 

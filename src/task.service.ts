@@ -11,6 +11,8 @@ export class TaskService {
   private baseUrl = 'https://myscrum-f606c.firebaseio.com';
   task;
   taskSatuses = ['idle', 'in progress', 'review', 'resolved'];
+  openComments = [];
+  openLogs = [];
   
   constructor(private attachmentsService : AttachmentsService) { }
 
@@ -119,7 +121,6 @@ export class TaskService {
     
   }
 
-
   removeTask(url: string, taskId: string) {
     let self = this;
     let taskRef = firebase.database().ref(`${url}/backlog/${taskId}`);
@@ -151,6 +152,45 @@ export class TaskService {
             resolve(maxnum);
           });        
     });
+  }
+
+  ifOpenComments(taskId) : boolean {
+    //check if show comments in curnet task
+    if (this.openComments.indexOf(taskId) !== -1) return true;
+    else return false;
+
+  }
+
+  removeFromOpenComments(taskId) {
+    //removes element from check array
+    const i = this.openComments.indexOf(taskId);
+    if (i > -1) this.openComments.splice(i, 1);
+    console.log("this.openComments remove", this.openComments);
+  }
+
+  addToOpenComments(taskId) {
+    //adds task to check array
+    if (this.openComments.indexOf(taskId) == -1) this.openComments.push(taskId);
+    console.log("this.openComments add", this.openComments);
+  }
+
+  ifOpenLogs(taskId) : boolean {
+    //check if show logs in curnet task
+    if (this.openLogs.indexOf(taskId) !== -1) return true;
+    else return false;
+  }
+
+  removeFromOpenLogs(taskId) {
+    //removes element from check array
+    const i = this.openLogs.indexOf(taskId);
+    if (i > -1) this.openLogs.splice(i, 1);
+    console.log("this.openLogs remove", this.openLogs);
+  }
+
+  addToOpenLogs(taskId) {
+    //adds task to check array
+    if (this.openLogs.indexOf(taskId) == -1) this.openLogs.push(taskId);
+    console.log("this.openLogs add", this.openLogs);
   }
 
 }

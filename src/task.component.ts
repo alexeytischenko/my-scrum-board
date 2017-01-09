@@ -7,7 +7,6 @@ import { WorkLogComponent } from './work-log.component';
 import { AttachmentsComponent } from './attachments.component';
 import { ProjectsService } from './projects.service';
 import { Project } from './project.class';
-// import { Task } from './task.class';
 import { Subscription } from 'rxjs/Subscription';
 
 
@@ -24,8 +23,9 @@ import { Subscription } from 'rxjs/Subscription';
             <span class="dropdown">
               <button class="btn btn-default dropdown-toggle btn-sm" type="button" data-toggle="dropdown">...</button>
               <ul class="dropdown-menu dropdown-menu-right">
-                <li *ngIf="taskCurrentStatus!='resolved'"><a href="javascript:void(0);" (click)="resolveTask()">Resolve</a></li>
-                <li *ngIf="taskCurrentStatus=='resolved'"><a href="javascript:void(0);" (click)="reopenTask()">Reopen task</a></li>
+                <li *ngIf="taskCurrentStatus=='idle'"><a href="javascript:void(0);" (click)="changeTaskStatus('in progress')">Start</a></li>
+                <li *ngIf="taskCurrentStatus!='resolved'"><a href="javascript:void(0);" (click)="changeTaskStatus('resolved')">Resolve</a></li>
+                <li *ngIf="taskCurrentStatus=='resolved'"><a href="javascript:void(0);" (click)="changeTaskStatus('in progress')">Reopen task</a></li>
                 <li><a href="javascript:void(0);" onClick="$('#delModal').modal();">Delete task</a></li>
                 <li class="divider"></li>
                 <li><a href="javascript:void(0);" (click)="clc.setEditorField(-1)">Add comment</a></li>
@@ -40,7 +40,7 @@ import { Subscription } from 'rxjs/Subscription';
         </div>
         <div class="form-inline">               
                 <label>{{task.name}}</label> 
-                <button class="btn btn-{{project.color}} btn-xs hidden-xs" disabled="true">{{project.sname}} - {{task.code}}</button>           
+                <span class="label label-{{project.color}}">{{project.sname}} - {{task.code}}</span>          
         </div>
   </div>
     <div class="panel-body">
@@ -56,13 +56,13 @@ import { Subscription } from 'rxjs/Subscription';
             </div> 
             <div>
               <label>Status</label>
-              <button class="btn btn-xs" 
-                  [class.btn-primary]="task.status==='in progress'" 
-                  [class.btn-success]="task.status==='resolved'" 
-                  [class.btn-info]="task.status==='review'" 
-                  disabled="true">
+              <span class="label label-default" 
+                  [class.label-primary]="task.status==='in progress'" 
+                  [class.label-success]="task.status==='resolved'" 
+                  [class.label-info]="task.status==='review'"
+                  >
                     {{task.status}}
-              </button>
+              </span>
             </div>  
         </div>      
         <div class="panel-body">         
@@ -78,7 +78,7 @@ import { Subscription } from 'rxjs/Subscription';
         
         <div class="panel-body">
           <label>Description</label> 
-          <span>{{task.description}}</span>
+          <span style="white-space: pre-line;">{{task.description}}</span>
         </div>
 
         <div class="panel-body">
@@ -109,7 +109,7 @@ import { Subscription } from 'rxjs/Subscription';
             <span *ngIf="task.commentsNum > 0" class="commentsToggle">
                 ({{task.commentsNum}}) 
                 <div (click)="toggleComments()" [class]="openComments ? 'glyphicon glyphicon-menu-up' : 'glyphicon glyphicon-menu-down'"></div>
-                <div *ngIf="openComments" (click)="clc.loadComments()" class="glyphicon glyphicon-repeat" alt="reload" title="reload"></div>
+                <div *ngIf="openComments" (click)="clc.loadComments(true)" class="glyphicon glyphicon-repeat" alt="reload" title="reload"></div>
             </span> 
             <p *ngIf="!task.commentsNum || task.commentsNum == 0" class="norecords">There are no comments</p>
             <comments (setCount) = "updateTaskCommentsCounts($event)" [openComments]="openComments" [taskId]="taskId"></comments>
@@ -127,7 +127,7 @@ import { Subscription } from 'rxjs/Subscription';
             <span *ngIf="task.worked > 0" class="commentsToggle">
                 ({{task.worked}}h)
                 <div (click)="toggleLogs()" [class]="openLog ? 'glyphicon glyphicon-menu-up' : 'glyphicon glyphicon-menu-down'"></div>
-                <div *ngIf="openLog" (click)="wlc.loadRecords()" class="glyphicon glyphicon-repeat" alt="reload" title="reload"></div>
+                <div *ngIf="openLog" (click)="wlc.loadRecords(true)" class="glyphicon glyphicon-repeat" alt="reload" title="reload"></div>
             </span> 
             <p *ngIf="!task.worked || task.worked == 0" class="norecords">There are no worklogs</p>
             <worklog (setCount) = "updateTaskLogsCounts($event)" [openLog]="openLog" [taskId]="taskId"></worklog>
@@ -216,6 +216,17 @@ export class TaskComponent implements OnInit, OnDestroy {
           .then ( () => {
                 this.task = this.taskService.task;
                 this.project = this.projectsService.getProject(this.task.project);
+
+                //force open comments               
+                if (this.taskService.ifOpenComments(this.taskId)) {
+                  this.openComments = true;
+                  this.clc.loadComments();
+                }
+                //force open logs               
+                if (this.taskService.ifOpenLogs(this.taskId)) {
+                  this.openLog = true;
+                  this.wlc.loadRecords();
+                }
                 console.info("task loaded", this.task);
               }
           )
@@ -225,24 +236,12 @@ export class TaskComponent implements OnInit, OnDestroy {
       );
   }
 
-  resolveTask() : void {
+  changeTaskStatus(status: string) : void {
     //task resolve from drop-down menu
-    console.info ("TaskComponent:resolveTask()");
+    console.info ("TaskComponent:changeTaskStatus(status: string)", status);
 
     progress_start("red");
-    this.task.status = 'resolved';
-    this.task.updated = Date.now();
-    this.taskService.saveTask(this.userId, this.task)
-      .catch((error)=>this.taskService.errorHandler(error))
-      .then(()=> progress_end());
-  }
-  
-  reopenTask() : void {
-    //task reopen from drop-down menu
-    console.info ("TaskComponent:reopenTask()");
-
-    progress_start("red");
-    this.task.status = 'in progress';
+    this.task.status = status;
     this.task.updated = Date.now();
     this.taskService.saveTask(this.userId, this.task)
       .catch((error)=>this.taskService.errorHandler(error))
@@ -297,7 +296,7 @@ export class TaskComponent implements OnInit, OnDestroy {
       .catch((error)=>this.taskService.errorHandler(error))
       .then(()=> {    
         progress_end();
-        setTimeout(() => document.location.href= "/tasks", 1000);
+        setTimeout(() => this.router.navigateByUrl('/tasks'), 1000); //document.location.href= "/tasks"
       });
   }
 
@@ -307,8 +306,10 @@ export class TaskComponent implements OnInit, OnDestroy {
 
     this.openComments = (this.openComments) ? false : true;
     if (this.openComments) {
-      this.clc.loadComments();
+      this.taskService.addToOpenComments(this.taskId);
+      this.clc.loadComments(true);
     }
+    else this.taskService.removeFromOpenComments(this.taskId);
   }
 
   toggleLogs() {
@@ -317,8 +318,10 @@ export class TaskComponent implements OnInit, OnDestroy {
 
     this.openLog = (this.openLog) ? false : true;
     if (this.openLog) {
-      this.wlc.loadRecords();
+      this.taskService.addToOpenLogs(this.taskId);
+      this.wlc.loadRecords(true);
     }
+    else this.taskService.removeFromOpenLogs(this.taskId);
   }
 
   // get diagnostic() {

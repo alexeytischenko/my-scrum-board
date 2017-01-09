@@ -1,5 +1,4 @@
 import { Component, ChangeDetectorRef, Pipe, PipeTransform } from '@angular/core';
-// import { Task } from './task.class';
 import { TasksListService } from './tasks-list.service';
 import { ProjectsService } from './projects.service';
 import { Project } from './project.class';
@@ -11,7 +10,7 @@ import { Project } from './project.class';
     <div class="form-inline filters">
         <span class="dropdown">
           <button class="btn btn-default dropdown-toggle btn-sm" type="button" data-toggle="dropdown">
-            <span class="glyphicon glyphicon-plus"></span>
+            <span class="glyphicon glyphicon-filter"></span>
             <span class="hidden-xs">Add filter by project</span>
           </button>
           <ul class="dropdown-menu dropdown-menu-left">
@@ -37,7 +36,7 @@ import { Project } from './project.class';
                     <span class="glyphicon glyphicon-align-justify accord nodrug"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-menu-right nodrug">
-                    <li class="nodrug"><a href="javascript:void(0);">Move resolved items to Backlog</a></li>
+                    <li class="nodrug"><a href="javascript:void(0);" (click)="moveResolvedToBackLog()">Move resolved items to Backlog</a></li>
                     <li class="nodrug"><span class="cant_choose">Move resolved items to Archive</span></li>
                     <li class="nodrug"><span class="cant_choose">Delete resolved items</span></li>
                     
@@ -48,7 +47,8 @@ import { Project } from './project.class';
                 <li *ngIf="taskElement.type=='s'" class="list-group-item" id="{{taskElement.id}}">
                   <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code ? taskElement.code : 0}}</span> 
-                  <span class="badge">{{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
+                  <span *ngIf="taskElement.commentsNum > 0" class="label label-white hidden-xs"><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>
+                  <span class="badge hidden-xs">{{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
                 </li>
               </template>
   
@@ -61,7 +61,8 @@ import { Project } from './project.class';
                 <li *ngIf="taskElement.type=='b'" class="list-group-item" id="{{taskElement.id}}">
                   <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code ? taskElement.code : 0}}</span> 
-                  <span class="badge">{{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
+                  <span *ngIf="taskElement.commentsNum > 0" class="label label-white hidden-xs"><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>                  
+                  <span class="badge hidden-xs"> {{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h </span>
                 </li>
               </template>  
           </ul>
@@ -74,6 +75,8 @@ import { Project } from './project.class';
     .list-group-item:hover {background: #e9e9e9;}
     .filters {margin-bottom: 10px;}
     .cant_choose {margin-left: 20px;color: #ccc;}
+    .label-white {background-color: #fff; color: #bbb; border: 1px solid #ccc;}
+    .badge {background-color: #bbb;}
   `]
 })
 export class BackLogComponent {
@@ -108,18 +111,19 @@ export class BackLogComponent {
       //load projects into property of the ProjectsService then loads list of tasks into tasksListService tasks property 
 
       progress_start("");
-      this.tasksListService.getBackLog(this.userId, this.filter)
+      this.tasksListService.getBackLog(this.userId)
         .then ( () => this.backLog = this.tasksListService.tasks)
+        .then ( () => this.filter = this.tasksListService.filter)
         .catch((error)=>this.tasksListService.errorHandler(error))
         .then(()=> {    
           //finally / default     
-          setTimeout(() => this.rebuildSortable(), 1000);
+          setTimeout(() => this.createSortable(), 1000);
           progress_end();
         });
   }
 
-  rebuildSortable() {
-      console.info ("BackLogComponent:rebuildSortable()");
+  private createSortable() {
+      console.info ("BackLogComponent:createSortable()");
 
       $('.list-group-sortable').sortable({
           placeholderClass: 'list-group-item',
@@ -162,12 +166,47 @@ export class BackLogComponent {
       this.countListsLength();
   }
 
+  moveResolvedToBackLog() {
+    //chnage type and sort number for resolved items in active sprint
+    console.info("BackLogComponent:moveResolvedToBackLog()");
+
+    progress_start("red");
+    //call resortBackLog method to update tasks list
+    this.tasksListService.resortBackLog(this.userId, this.prepareResolvedJSON())
+      .catch((error)=>this.tasksListService.errorHandler(error))
+      .then(() => {
+        progress_end();
+        this.countListsLength();
+      });  
+  }
+
+  private prepareResolvedJSON() {
+    //prepare JSON for UPDATE sortnum and type (active sprint / backlog) after moved resolved elements
+    console.info ("BackLogComponent:prepareResolvedJSON()");
+
+    let updatedData = [];
+    let index = 0;
+    let maxSort = this.getMaxSortNumber("b");
+    
+    this.backLog.forEach((element) => {
+      if(element.type == "s" && element.status == "resolved") {
+        updatedData[index++] = {
+            "id" : element.id,
+            "sortnum": maxSort,
+            "type": "b"
+        };
+      }
+    });
+
+    return updatedData;
+  }
+
   private prepareJSON(recordType : string, domNode : string) {
     //prepare JSON for UPDATE sortnum and type (active sprint / backlog) after resort of the elements
     console.info ("BackLogComponent:prepareJSON(recordType : string, domNode : string)",recordType ,domNode);
 
     let updatedData = [];
-    $('#' + domNode + ' li').each(function( index ) {
+    $('#' + domNode + ' li.list-group-item').each(function( index ) {
           updatedData[index] = {
             "id" : this.id,
             "sortnum": index,
@@ -176,6 +215,20 @@ export class BackLogComponent {
     });
 
     return updatedData;
+  }
+
+  private getMaxSortNumber(tp : string) {
+    //get max sortnumber
+    console.info ("BackLogComponent:getMaxSortNumber(tp : string)", tp);   
+
+    let msn : number = 0;
+
+    this.backLog.forEach((element) => {
+      if(element.type == tp && element.sortnum > msn) 
+        msn = element.sortnum;
+    });
+
+    return msn;
   }
 
   private countListsLength() {
@@ -196,30 +249,20 @@ export class BackLogComponent {
         this.sprintLength = asLength;
 
         // forcing Angular to detect changes in model, otherwise it takes much time to update them
-        this.ref.detectChanges();
+        if (this.ref) this.ref.detectChanges();
       }
   }
 
   private addToFilter(key : string, value: string) {
-    //prepare JSON for UPDATE sortnum and type (active sprint / backlog) after resort of the elements
-    console.info ("BackLogComponent:addToFilter(key : string, value: string)", key, value);
-
-    if( !this.filter.hasOwnProperty(key) ){
-      this.filter[key] = value;
-      console.info("this.filter", this.filter);
-    }
+    //call service to add project to filter
+    this.tasksListService.addToFilter(key, value);
     
     this.getTaskList();
   }
 
-    private removeFromFilter(key : string) {
-    //prepare JSON for UPDATE sortnum and type (active sprint / backlog) after resort of the elements
-    console.info ("BackLogComponent:removeFromFilter(key : string)",key);
-
-    if( this.filter.hasOwnProperty(key) ){
-      delete this.filter[key];
-      console.info("this.filter", this.filter);
-    }
+  private removeFromFilter(key : string) {
+    //call service to remove project from filter
+    this.tasksListService.removeFromFilter(key);
     
     this.getTaskList();
   }
