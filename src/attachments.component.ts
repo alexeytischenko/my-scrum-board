@@ -65,7 +65,7 @@ import { AttachmentsService } from './attachments.service';
   styles : [`
   .loader {margin: 0 auto;} 
   ul {list-style: none;}
-  li {margin-bottom: 10px;}
+  li {margin-bottom: 10px; width: 300px; border: 1px solid;}
   .commentslist_username {color:#284289;}
   .commentslist_date { color: #999; font-style: italic; font-size:11px;}
   .edit_div {width: 80%; padding: 20px 0px 20px 40px;}

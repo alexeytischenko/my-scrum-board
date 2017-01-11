@@ -19,11 +19,11 @@ import { Component } from '@angular/core';
               <span class="glyphicon glyphicon-plus"></span>
               <span class="hidden-xs">Create task</span>
             </a>
-            <a [routerLink]="['/']" class="btn btn-primary" style="float: right;margin:5px;">
+            <a [routerLink]="['/']" class="btn btn-default" style="float: right;margin:5px;">
               <span class="glyphicon glyphicon-tasks"></span>
               <span class="hidden-xs">Show Tasks</span>
             </a>
-            <a [routerLink]="['/projects/']" class="btn btn-primary" style="float: right;margin:5px;">
+            <a [routerLink]="['/projects/']" class="btn btn-default" style="float: right;margin:5px;">
               <span class="glyphicon glyphicon-tags"></span>
               <span class="hidden-xs">&nbsp;Manage Projects</span>
             </a>

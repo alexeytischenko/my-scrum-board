@@ -55,7 +55,7 @@ export class TaskService {
               estimate: task.estimate ? task.estimate : 0,
               worked: 0,
               commentsNum: 0,
-              sortnum : Date.now(),
+              sortnum : 0,
               status: task.status ? task.status : "idle",
               type: "b",
               code: newmaxnum,

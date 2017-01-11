@@ -29,7 +29,7 @@ import { Subscription } from 'rxjs/Subscription';
                 <li><a href="javascript:void(0);" onClick="$('#delModal').modal();">Delete task</a></li>
                 <li class="divider"></li>
                 <li><a href="javascript:void(0);" (click)="clc.setEditorField(-1)">Add comment</a></li>
-                <li><a href="javascript:void(0);">Add attachment</a></li>
+                <li><a href="javascript:void(0);" (click)="atc.setEditorField(-1)">Add attachment</a></li>
                 <li><a href="javascript:void(0);" (click)="wlc.setEditorField(-1)">Log work</a></li>
               </ul>
             </span>
