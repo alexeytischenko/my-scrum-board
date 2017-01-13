@@ -64,6 +64,28 @@ export class AttachmentsService {
 
   }
 
+  getAttachment(url: string, taskId:string, id: string) {
+     //get one attachment
+    console.debug ("AttachmentsService:getAttachment(url,taskId, id)", url, taskId, id);   
+
+    let self = this;
+    let taskRef = firebase.database().ref(`${url}/backlog/${taskId}/attachments`).child(id);
+    taskRef.off(); 
+
+    return new Promise(function(resolve, reject) {
+          taskRef.once('value', function(snapshot) {
+            if (snapshot.exists()) {
+
+              let att = snapshot.val();
+              att.id = id;
+              resolve(att);
+            }
+            else reject("Couldn't get attachment");
+          }); 
+      }
+    );
+  }
+
   getAttachmentsArray(attObject) {
     //parse attachments object to array
     console.debug ("AttachmentsService:getAttachmentsArray(attObect)", attObject);
@@ -126,11 +148,15 @@ export class AttachmentsService {
                   name: filedesc,
                   user: 'User',
                   created : Date.now(),
-                  type: file.type
+                  type: file.type,
+                  size: snapshot.totalBytes
                 }
                 let newAttRef = newattachRef.push();
                 newAttRef.set(postData, function(error) {
-                  if (!error) resolve(newAttRef.key.toString());
+                  if (!error) {
+                    postData.id = newAttRef.key.toString();
+                    resolve(postData);
+                  }
                 }); 
 
             })
@@ -190,20 +216,20 @@ export class AttachmentsService {
 
   removeAttachment(url: string, taskId: string, attId: string) {
     // remove comment
-    console.debug ("AttachmentsService:removeComment(url, taskId, attId)", url, taskId, attId);
+    console.debug ("AttachmentsService:removeAttachment(url, taskId, attId)", url, taskId, attId);
 
     let self = this;
     let taskRef = firebase.database().ref(`${url}/backlog/${taskId}/attachments/${attId}`);
+    let fileRef = firebase.storage().ref(`${url}/${taskId}`);
 
     return new Promise(function(resolve, reject) {
-        taskRef.remove(function(error) {
-            if (error) reject(error);
-            resolve(true);
-          })
-        .catch((error)=>reject(error));
+        self.getAttachment(url, taskId, attId)
+        .then((att : any) => fileRef.child(att.fileURl).delete())
+        .then(() => taskRef.remove())
+        .then(() => resolve(true))
+        .catch((error) => reject(error));
     });
   }
-
 
   private convertObject(objectedResponse, id) {
 
@@ -212,7 +238,8 @@ export class AttachmentsService {
         text: objectedResponse.text,
         user : objectedResponse.user,
         created : objectedResponse.created,
-        edited : objectedResponse.edited
+        edited : objectedResponse.edited,
+        size : objectedResponse.size
     };
   }
 

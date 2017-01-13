@@ -192,7 +192,7 @@ export class BackLogComponent {
       if(element.type == "s" && element.status == "resolved") {
         updatedData[index++] = {
             "id" : element.id,
-            "sortnum": maxSort,
+            "sortnum": maxSort + 1,
             "type": "b"
         };
       }

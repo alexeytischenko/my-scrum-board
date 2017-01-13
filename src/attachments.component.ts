@@ -31,7 +31,7 @@ import { AttachmentsService } from './attachments.service';
                   <span class="icn"><a href='' id='link_{{file.id}}' target='_blank'><img src='/images/empty.png' width="50" height="50" id="img_{{file.id}}" border='0'></a></span>
                   <span class="commentslist_username">{{file.user}}</span>
                   <span class="commentslist_date">{{file.created | date:'medium'}}</span>
-                   
+                  <div class="commentslist_date">{{file.size}} bytes</div>
                   <span class="comment_context_menu">
                     <span (click)="openDeleteAttModal(file.id)" class="glyphicon glyphicon-trash"></span>
                   </span>
@@ -100,7 +100,7 @@ export class AttachmentsComponent {
     console.info("AttachmentsComponent:constructor");
 
     this.attachmentsService.errorHandler = error => {
-      console.error('Comments component (AttachmentsService) error! ' + error);
+      console.error('AttachmentsComponent (AttachmentsService) error! ' + error);
       window.alert('An error occurred while processing this page! Try again later.');
     }
 
@@ -128,13 +128,15 @@ export class AttachmentsComponent {
 
     this.loading = true;
     this.attachmentsService.saveFile(this.userId, this.taskId, this.editFileId, this.editFilename, file)
-      .then(() => this.attachmentsService.getAttachments(this.userId, this.taskId))
-      .then((attachments) => { 
-        this.setAttachments.emit(attachments);
+      .then((attachment) => {
+       //this.attachmentsService.getAttachments(this.userId, this.taskId))
+      //.then((attachments : Array<any>) => { 
+        this.attachments.push(attachment);
+        this.setAttachments.emit(this.attachments);
         setTimeout(() => {
           this.editFileId = '';
           this.loading = false;
-
+          this.getSingleIconNLink(this.attachments[this.attachments.length-1]); //passing last (just created) element
         }, 1000);
       })
       .catch((error) => this.attachmentsService.errorHandler(error));
@@ -155,8 +157,38 @@ export class AttachmentsComponent {
     $('#delFileModal').modal("hide");    //dismiss alert window
     this.loading = true;
     this.attachmentsService.removeAttachment(this.userId, this.taskId, this.deleteFileId)
-      .then(() => setTimeout(() => this.loading = false, 1000))                        // reload updated comments list
+      .then(() => {
+        for (let i = 0; i < this.attachments.length; i++) {
+          console.error("aaa", this.attachments[i]);
+          if (this.attachments[i] && this.attachments[i].id == this.deleteFileId)
+            this.attachments.slice(i, 1);
+        }
+        console.error("sss",this.attachments, this.deleteFileId );
+      })
+      .then(() => setTimeout(() => this.loading = false, 1000))
       .catch((error) => this.attachmentsService.errorHandler(error));
+  }
+
+  getSingleIconNLink(element: any) {
+    // get Icons and links to attached documents in element
+    console.info("AttachmentsComponent:getSingleIconNLink()", element);
+
+    this.attachmentsService.getIconsNLinks(this.userId, this.taskId, element)
+        .then((link) => {
+            let img = <HTMLImageElement> document.getElementById('img_' + element.id);
+            let a =  <HTMLLinkElement> document.getElementById('link_' + element.id);
+            a.href = link.toString();
+            if (this.attachmentsService.imgIcons.indexOf(element.type) > -1) {
+              img.src = link.toString();
+            } else {
+              if (this.attachmentsService.fileTypesMap.hasOwnProperty(element.type)) {
+                img.src = "/images/" + this.attachmentsService.fileTypesMap[element.type] + ".png";
+              }
+            }
+            
+        })
+        .catch((error) => this.attachmentsService.errorHandler(error));
+ 
   }
 
   getIconsNLinks() {
@@ -164,21 +196,7 @@ export class AttachmentsComponent {
     console.info("AttachmentsComponent:getIconsNLinks()", this.attachments);
 
     this.attachments.forEach((element) => {
-      this.attachmentsService.getIconsNLinks(this.userId, this.taskId, element)
-          .then((link) => {
-              let img = <HTMLImageElement> document.getElementById('img_' + element.id);
-              let a =  <HTMLLinkElement> document.getElementById('link_' + element.id);
-              a.href = link.toString();
-              if (this.attachmentsService.imgIcons.indexOf(element.type) > -1) {
-                img.src = link.toString();
-              } else {
-                if (this.attachmentsService.fileTypesMap.hasOwnProperty(element.type)) {
-                  img.src = "/images/" + this.attachmentsService.fileTypesMap[element.type] + ".png";
-                }
-              }
-              
-          })
-          .catch((error) => this.attachmentsService.errorHandler(error));
+       this.getSingleIconNLink(element);
     });  
   }
 
