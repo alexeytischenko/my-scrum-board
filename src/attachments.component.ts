@@ -25,18 +25,26 @@ import { AttachmentsService } from './attachments.service';
           <ul>
                <template ngFor let-file [ngForOf]="attachments">
                 <li id="{{file.id}}" 
-                      onmouseOver="$(this).find('span.comment_context_menu').show();"
-                      onmouseOut="$(this).find('span.comment_context_menu').hide();"
+                      onmouseOver="$(this).find('div.comment_context_menu').show();"
+                      onmouseOut="$(this).find('div.comment_context_menu').hide();"
                 >
-                  <span class="icn"><a href='' id='link_{{file.id}}' target='_blank'><img src='/images/empty.png' width="50" height="50" id="img_{{file.id}}" border='0'></a></span>
-                  <span class="commentslist_username">{{file.user}}</span>
-                  <span class="commentslist_date">{{file.created | date:'medium'}}</span>
-                  <div class="commentslist_date">{{file.size}} bytes</div>
-                  <span class="comment_context_menu">
-                    <span (click)="openDeleteAttModal(file.id)" class="glyphicon glyphicon-trash"></span>
-                  </span>
-                  <div class="commentslist_text">{{file.name}}</div>
-                  <div style="clear:both;"></div>
+                  <div class="media">
+                    <div class="media-left">
+                      <a href='' id='link_{{file.id}}' target='_blank' class="gl_display">
+                        <img src='' class="icn_img_hide" id="img_{{file.id}}">
+                        <span class="glyphicon glyphicon-file"></span>
+                      </a>
+                      <div class="comment_context_menu">
+                        <span (click)="openDeleteAttModal(file.id)" class="glyphicon glyphicon-trash"></span>
+                      </div>
+                    </div>
+                    <div class="media-body">
+                      <h5 class="media-heading">{{file.user}}</h5>
+                      <span class="commentslist_date">{{file.created | date:'medium'}}</span>
+                      <div class="commentslist_date">{{file.size}} bytes</div>                  
+                      <div class="commentslist_text">{{file.name}}</div>
+                    </div>
+                  </div>
                 </li>
               </template>  
           </ul>
@@ -65,17 +73,21 @@ import { AttachmentsService } from './attachments.service';
   styles : [`
   .loader {margin: 0 auto;} 
   ul {list-style: none;}
-  li {margin-bottom: 10px; width: 300px; border: 1px solid;}
+  li {margin-bottom: 10px; min-height: 70px;}
   .commentslist_username {color:#284289;}
   .commentslist_date { color: #999; font-style: italic; font-size:11px;}
   .edit_div {width: 80%; padding: 20px 0px 20px 40px;}
-  .comment_context_menu {display:none; margin-left: 10px;}
+  .comment_context_menu {display:none; margin: 2px 2px;}
   .comment_context_menu span {cursor: pointer; color: #999;}
   .modal-dialog {margin: 100px auto!important;}
   .modal-header {padding:25px 30px;}
   .modal-body {padding:40px 50px;}
   .form-inline {margin-top: 10px;}
-  .icn {font-size: 40px; color: #cccccc; float:left; margin-right:10px;}
+  a.gl_display, a.gl_display:hover  {text-decoration: none;}
+  a.gl_display span {font-size: 40px; color: #cccccc; margin-right:10px; display:block; text-decoration: none;}
+  a.gl_hide span{display:none;}
+  .icn_img_hide {display:none;}
+  .icn_img_display {width:50px; height:50px; display:block;}
   
   input[type=file].ng-valid, .ng-valid.required  { border-left: 5px solid #42A948; /* green */}
   input[type=file].ng-invalid  {border-left: 5px solid #a94442; /* red */}
@@ -159,11 +171,9 @@ export class AttachmentsComponent {
     this.attachmentsService.removeAttachment(this.userId, this.taskId, this.deleteFileId)
       .then(() => {
         for (let i = 0; i < this.attachments.length; i++) {
-          console.error("aaa", this.attachments[i]);
           if (this.attachments[i] && this.attachments[i].id == this.deleteFileId)
-            this.attachments.slice(i, 1);
+            this.attachments.splice(i, 1);
         }
-        console.error("sss",this.attachments, this.deleteFileId );
       })
       .then(() => setTimeout(() => this.loading = false, 1000))
       .catch((error) => this.attachmentsService.errorHandler(error));
@@ -177,13 +187,18 @@ export class AttachmentsComponent {
         .then((link) => {
             let img = <HTMLImageElement> document.getElementById('img_' + element.id);
             let a =  <HTMLLinkElement> document.getElementById('link_' + element.id);
+            let gl =  <HTMLLinkElement> document.getElementById('gl_' + element.id);
             a.href = link.toString();
             if (this.attachmentsService.imgIcons.indexOf(element.type) > -1) {
               img.src = link.toString();
+              img.className = "icn_img_display";
+              a.className = "gl_hide";
             } else {
-              if (this.attachmentsService.fileTypesMap.hasOwnProperty(element.type)) {
-                img.src = "/images/" + this.attachmentsService.fileTypesMap[element.type] + ".png";
-              }
+              img.className = "icn_img_hide";
+              a.className = "gl_display";
+              //if (this.attachmentsService.fileTypesMap.hasOwnProperty(element.type)) {
+                //img.src = "/images/" + this.attachmentsService.fileTypesMap[element.type] + ".png";
+              //}
             }
             
         })
