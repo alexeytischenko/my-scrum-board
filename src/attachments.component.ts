@@ -30,7 +30,7 @@ import { AttachmentsService } from './attachments.service';
                 >
                   <div class="media">
                     <div class="media-left">
-                      <a href='' id='link_{{file.id}}' target='_blank' class="gl_display">
+                      <a href='javascript:void(0);' id='link_{{file.id}}' target='_blank' class="gl_display">
                         <img src='' class="icn_img_hide" id="img_{{file.id}}">
                         <span class="glyphicon glyphicon-file"></span>
                       </a>
@@ -53,7 +53,6 @@ import { AttachmentsService } from './attachments.service';
     <!-- Modal Delete Comment Popup -->
     <div class="modal fade" id="delFileModal" role="dialog">
       <div class="modal-dialog modal-sm">
-      
         <!-- Modal content-->
         <div class="modal-content">
           <div class="modal-header">
@@ -66,12 +65,11 @@ import { AttachmentsService } from './attachments.service';
             <button type="submit" class="btn btn-success btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
           </div>
         </div>
-        
       </div>
     </div>
   `,
   styles : [`
-  .loader {margin: 0 auto;} 
+  .loader {margin: 0 auto;}
   ul {list-style: none;}
   li {margin-bottom: 10px; min-height: 70px;}
   .commentslist_username {color:#284289;}
@@ -101,11 +99,11 @@ export class AttachmentsComponent {
   @Output() setAttachments = new EventEmitter();    // set attachments count value in outter component  
   @Input() taskId : string;
   @Input()attachments : any;
-  editFileId: string;                      // id of attachment to be edited
+  editFileId: string;                               // id of attachment to be edited
   editFilename: string;
   editFileInput: string;
-  deleteFileId: string;                    // id of attachment to be deleted
-  loading: boolean;                           // loader status
+  deleteFileId: string;                             // id of attachment to be deleted
+  loading: boolean;                                 // loader status
 
 
   constructor(private attachmentsService: AttachmentsService) {
@@ -187,7 +185,7 @@ export class AttachmentsComponent {
         .then((link) => {
             let img = <HTMLImageElement> document.getElementById('img_' + element.id);
             let a =  <HTMLLinkElement> document.getElementById('link_' + element.id);
-            let gl =  <HTMLLinkElement> document.getElementById('gl_' + element.id);
+            //let gl =  <HTMLLinkElement> document.getElementById('gl_' + element.id);
             a.href = link.toString();
             if (this.attachmentsService.imgIcons.indexOf(element.type) > -1) {
               img.src = link.toString();
