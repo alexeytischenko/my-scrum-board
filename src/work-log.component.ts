@@ -40,21 +40,28 @@ import { WorkLogService } from './work-log.service';
           <ul [hidden]="!openLog || loading">
                <template ngFor let-log [ngForOf]="logs">
                 <li id="{{log.id}}" 
-                      onmouseOver="$(this).find('span.comment_context_menu').show();"
-                      onmouseOut="$(this).find('span.comment_context_menu').hide();"
+                      onmouseOver="$(this).find('div.comment_context_menu').show();"
+                      onmouseOut="$(this).find('div.comment_context_menu').hide();"
                 >
-                  <span class="glyphicon glyphicon-user"></span>
-                  <span class="commentslist_username">{{log.user}}</span>
-                  <span class="commentslist_text">{{log.dt | date:'M/d/yyyy'}}</span>
-                  <span class="comment_context_menu">
-                    <span (click)="setEditorField(log.id)" class="glyphicon glyphicon-pencil"></span>
-                    <span (click)="openDeleteModal(log.id)" class="glyphicon glyphicon-trash"></span>
-                  </span>
-                  <div class="commentslist_text">{{log.text}}</div>
-                  <div class="commentslist_date">
-                      Spent : {{log.hours}}h 
-                      <span *ngIf="log.edited" style="margin-left:10px;">edited: {{log.edited | date:'medium'}}</span>
+                  <div class="media">
+                    <div class="media-left">
+                      <span class="glyphicon glyphicon-user"></span>
+                      <div class="commentslist_date">
+                        @{{log.user}}
+                      </div>
+                      <div class="comment_context_menu">
+                        <span (click)="openDeleteModal(log.id)" class="glyphicon glyphicon-trash"></span>
+                        <span (click)="setEditorField(log.id)" class="glyphicon glyphicon-pencil"></span>
+                      </div>
+                    </div>
+                    <div class="media-body">
+                      <h5 class="media-heading">{{log.dt | date:'M/d/yyyy'}} <span class="glyphicon glyphicon-time"></span> {{log.hours}}h</h5>
+                      <div class="commentslist_text">{{log.text}}</div>
+                      <div *ngIf="log.edited" class="commentslist_date">edited: {{log.edited | date:'medium'}}</div>
+                    </div>
                   </div>
+
+
                 </li>
               </template>  
           </ul>
@@ -83,13 +90,13 @@ import { WorkLogService } from './work-log.service';
   styles : [`
   .loader {margin: 0 auto;} 
   ul {list-style: none;}
-  li {margin-bottom: 10px;}
+  li {margin-bottom: 10px;min-height: 75px;}
   li .glyphicon-user{border: 1px solid #F2F2F2; padding: 5px 5px 3px 5px;}
   .commentslist_username {color:#284289; margin: 0 10px;}
   .commentslist_text { white-space: pre-line;}
   .commentslist_date { color: #999; font-style: italic; font-size:11px;}
   .edit_div {width: 80%; padding: 20px 0px 20px 40px;}
-  .comment_context_menu {display:none; margin-left: 10px;}
+  .comment_context_menu {display:none;margin-top:5px;}
   .comment_context_menu span {cursor: pointer; color: #999;}
   .modal-dialog {margin: 100px auto!important;}
   .modal-header {padding:25px 30px;}

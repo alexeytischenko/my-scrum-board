@@ -102,7 +102,6 @@ export class AttachmentsService {
     }
 
     return attArray;
-   
   }
 
   getIconsNLinks(url: string, task: string, file: any) {
@@ -193,29 +192,13 @@ export class AttachmentsService {
       });
 
     } else {
-        //existing file name
-        // postData = {
-        //   text: filename,
-        //   edited : Date.now()
-        // }
-
-        // return new Promise(function(resolve, reject) {
-        //     taskRef.child(fileid).update(postData, function(error) {
-        //         if (error) {
-        //           console.error('Update failed');
-        //           reject(error);
-        //         } else {
-        //           resolve('');
-        //         }
-        //     }); 
-        // });
+        // edit attachment - maybe later
     }
 
   }
 
-
   removeAttachment(url: string, taskId: string, attId: string) {
-    // remove comment
+    // remove attachment
     console.debug ("AttachmentsService:removeAttachment(url, taskId, attId)", url, taskId, attId);
 
     let self = this;
@@ -228,6 +211,32 @@ export class AttachmentsService {
         .then(() => taskRef.remove())
         .then(() => resolve(true))
         .catch((error) => reject(error));
+    });
+  }
+
+  removeAllAttachments(url: string, taskId: string, attachments: any) {
+    // remove all attachments
+    console.debug ("AttachmentsService:removeAllAttachments(url, taskId, attId)", url, taskId);
+    
+    let storageRef = firebase.storage().ref(`${url}/${taskId}`);
+
+    return new Promise(function(resolve, reject) {
+      if (attachments && attachments.length > 0) {
+        
+        let resolveCounter = attachments.length;
+
+        attachments.forEach(element => {
+            storageRef.child(element.fileURl).delete()
+            .then(() => {
+              resolveCounter--;
+              //console.log("resolveCounter", resolveCounter);
+              if (resolveCounter <= 0)  {
+                resolve(true); 
+              }
+            })
+            .catch((error) => reject("Attachment delete failed: {"+error+"}"));
+        });
+      } else resolve(true);
     });
   }
 

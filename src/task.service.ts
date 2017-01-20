@@ -99,7 +99,6 @@ export class TaskService {
             }); 
         });
     }
-
   }
 
   savePropery(url: string, taskid: string, postData : any) {
@@ -118,25 +117,26 @@ export class TaskService {
             }
         }); 
     });
-    
   }
 
   removeTask(url: string, taskId: string) {
+    // remove task
+    console.debug ("TaskService:removeTask(url, taskId)", url, taskId);
+
+
     let self = this;
     let taskRef = firebase.database().ref(`${url}/backlog/${taskId}`);
     let wlRef = firebase.database().ref(`${url}/worklog/${taskId}`);
     let comRef = firebase.database().ref(`${url}/comments/${taskId}`);
-    console.log("taskRef", `${url}/backlog/${taskId}`);
-
+    
     //removing task
     return new Promise(function(resolve, reject) {
-        taskRef.remove(function(error) {
-            if (error) reject(error);
-            resolve(true);
-          })
-        .then(wlRef.remove())
-        .then(comRef.remove())
-        .catch((error)=>reject(error));
+        taskRef.remove()
+        .then(() => wlRef.remove())                       // remove worklogs
+        .then(() => comRef.remove())                      // remove comments
+        .then(() => self.attachmentsService.removeAllAttachments(url, taskId, self.task.attachments))      // remove attachments   
+        .then(() => resolve(true))
+        .catch((error) => reject(error));
     });
   }
 

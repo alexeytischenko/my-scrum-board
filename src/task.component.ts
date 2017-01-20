@@ -78,7 +78,7 @@ import { Subscription } from 'rxjs/Subscription';
         
         <div class="panel-body">
           <label>Description</label> 
-          <span style="white-space: pre-line;">{{task.description}}</span>
+          <div style="white-space: pre-line;">{{task.description}}</div>
         </div>
 
         <div class="panel-body">

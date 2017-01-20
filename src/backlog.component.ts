@@ -48,7 +48,7 @@ import { Project } from './project.class';
                   <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code ? taskElement.code : 0}}</span> 
                   <span *ngIf="taskElement.commentsNum > 0" class="label label-white hidden-xs"><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>
-                  <span class="badge hidden-xs">{{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
+                  <span class="badge hidden-xs {{(isWrongEstimate(taskElement.worked, taskElement.estimate)) ? 'overworked' : ''}}"> {{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
                 </li>
               </template>
   
@@ -62,7 +62,7 @@ import { Project } from './project.class';
                   <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code ? taskElement.code : 0}}</span> 
                   <span *ngIf="taskElement.commentsNum > 0" class="label label-white hidden-xs"><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>                  
-                  <span class="badge hidden-xs"> {{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h </span>
+                  <span class="badge hidden-xs {{(isWrongEstimate(taskElement.worked, taskElement.estimate)) ? 'overworked' : ''}}"> {{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h </span>
                 </li>
               </template>  
           </ul>
@@ -77,6 +77,7 @@ import { Project } from './project.class';
     .cant_choose {margin-left: 20px;color: #ccc;}
     .label-white {background-color: #fff; color: #bbb; border: 1px solid #ccc;}
     .badge {background-color: #bbb;}
+    .overworked {color: #D03B3B;}
   `]
 })
 export class BackLogComponent {
@@ -273,6 +274,14 @@ export class BackLogComponent {
 
     if(id in this.filter) return true;
     else return false;
+
+  }
+
+  private isWrongEstimate(worked : number, estimate : number) {
+    // return true if worked houres amount is greater then estimate
+
+    if (worked && estimate && worked > estimate) return true;
+    return false;
 
   }
 
