@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 // import { Http } from '@angular/http';
 import { Task } from './task.class';
 import { AttachmentsService } from './attachments.service';
+import { CommonService } from './common.service';
 
 @Injectable()
 export class TaskService {
@@ -14,7 +15,8 @@ export class TaskService {
   openComments = [];
   openLogs = [];
   
-  constructor(private attachmentsService : AttachmentsService) { }
+  constructor(private attachmentsService : AttachmentsService,
+              private commonService : CommonService) { }
 
   getTask(url: string, id:string) {
     let self = this;
@@ -27,7 +29,8 @@ export class TaskService {
             if (snapshot.exists()) {
               self.task = snapshot.val();
               self.task.id = id;
-              self.task.attachments = self.attachmentsService.getAttachmentsArray(self.task.attachments);
+              self.task.subtasks = self.commonService.getArrayFromObject(self.task.subtasks);
+              self.task.attachments = self.commonService.getArrayFromObject(self.task.attachments);
               resolve(true);
             }
             else reject("Couldn't get task data");
@@ -35,6 +38,27 @@ export class TaskService {
       }
     );
   }
+
+  getAnyTask(url: string, id:string) {
+    // get parentTask for taskEdit component
+    let self = this;
+    let taskRef = firebase.database().ref(`${url}/backlog/`).child(id);
+    taskRef.off(); 
+
+    var tmpTask;
+
+    return new Promise(function(resolve, reject) {
+          taskRef.once('value', function(snapshot) {
+            if (snapshot.exists()) {
+              tmpTask = snapshot.val();
+              tmpTask.id = id;
+              resolve(tmpTask);
+            }
+            else reject("Couldn't get task name");
+          }); 
+      }
+    );
+  }  
 
   saveTask(url: string, task) {
     console.debug("TaskService:saveTask(url: string, task)", url, task);
@@ -57,7 +81,8 @@ export class TaskService {
               commentsNum: 0,
               sortnum : 0,
               status: task.status ? task.status : "idle",
-              type: "b",
+              parent: (task.parent) ? task.parent : "",
+              type: (task.parent) ? "i" : "b",
               code: newmaxnum,
               description: task.description ? task.description : "",
               project: task.project ? task.project : "",
@@ -69,14 +94,21 @@ export class TaskService {
               if (error) {
                 reject(error);
               } else {
-                  console.log("new task", postData);
-                  console.log("newtaskRef", newtaskRef.key.toString());
+                  if (task.parent) {
+                    self.savePropery(url, task.parent + "/subtasks", {
+                        [newtaskRef.key.toString()] : {
+                            name: task.name, 
+                            estimate: task.estimate,
+                            project: task.project,
+                            status: task.status
+                        }
+                    });
+                  }
                   resolve(newtaskRef.key.toString());
               }
             }); 
           });
       });
-
     } else {      
         //existing task properties
         postData = {
@@ -94,6 +126,16 @@ export class TaskService {
                   console.error('Update failed');
                   reject(error);
                 } else {
+                  if (task.parent) {
+                    self.savePropery(url, task.parent + "/subtasks", {
+                        [task.id] : {
+                            name: task.name, 
+                            estimate: task.estimate,
+                            project: task.project,
+                            status: task.status
+                        }
+                    });
+                  }
                   resolve(true);
                 }
             }); 
@@ -123,7 +165,6 @@ export class TaskService {
     // remove task
     console.debug ("TaskService:removeTask(url, taskId)", url, taskId);
 
-
     let self = this;
     let taskRef = firebase.database().ref(`${url}/backlog/${taskId}`);
     let wlRef = firebase.database().ref(`${url}/worklog/${taskId}`);
@@ -134,7 +175,8 @@ export class TaskService {
         taskRef.remove()
         .then(() => wlRef.remove())                       // remove worklogs
         .then(() => comRef.remove())                      // remove comments
-        .then(() => self.attachmentsService.removeAllAttachments(url, taskId, self.task.attachments))      // remove attachments   
+        .then(() => self.attachmentsService.removeAllAttachments(url, taskId, self.task.attachments))      // remove attachments
+        .then(() => self.removeSubTasks(url, self.task))   
         .then(() => resolve(true))
         .catch((error) => reject(error));
     });
@@ -151,6 +193,51 @@ export class TaskService {
             });
             resolve(maxnum);
           });        
+    });
+  }
+
+  private removeSubTasks(url, task) {
+    // remove subtasks OR parent subtask pointer
+    console.debug ("TaskService:removeSubTasks(url, task)", url, task);
+
+    let tasksRef = firebase.database().ref(`${url}/backlog/`);
+    let self = this;
+
+    return new Promise(function(resolve, reject) {
+
+      if (task.type == "i") {
+        //it is a subtask - update parent
+        tasksRef.child(`${task.parent}/subtasks/${task.id}`).remove()
+        .then(() => resolve(true))
+        .catch((error) => reject(error));
+      }
+      else {
+        //check if the task has subtasks - delete them
+        if (task.subtasks && task.subtasks.length > 0) {
+        
+          let resolveCounter = task.subtasks.length;
+
+          task.subtasks.forEach(element => {
+              let taskRef = firebase.database().ref(`${url}/backlog/${element.id}`);
+              let wlRef = firebase.database().ref(`${url}/worklog/${element.id}`);
+              let comRef = firebase.database().ref(`${url}/comments/${element.id}`);
+
+              self.attachmentsService.getAttachments(url, element.id)
+              .then(() => taskRef.remove())
+              .then((attachments) => self.attachmentsService.removeAllAttachments(url, element.id, attachments))      // remove attachments
+              .then(() => wlRef.remove())                       // remove worklogs
+              .then(() => comRef.remove())                      // remove comments
+              .then(() => {
+                resolveCounter--;
+                //console.log("resolveCounter", resolveCounter);
+                if (resolveCounter <= 0)  {
+                  resolve(true); 
+                }
+              })
+              .catch((error) => reject("Subtask delete failed: {"+error+"}"));
+          });
+        } else resolve(true);
+      }
     });
   }
 

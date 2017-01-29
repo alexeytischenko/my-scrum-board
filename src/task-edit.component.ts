@@ -28,6 +28,13 @@ import { ReactiveFormsModule, FormControl, FormGroup, FormBuilder, Validators } 
       </div>
       <div class="panel-body">
 
+        <div *ngIf = "parentTask.id && parentTask.id.length > 0" class="panel pull-right panel-default panel-sm" style="max-width:50%">
+          <div class="panel-body">
+            <label>Parent task:</label>
+            {{parentTask.name}}
+          </div>
+        </div> 
+
         <div class="form-group w50">   
            <label for="name">Title</label>            
             <input type="text" id="name" formControlName="name" required class="form-control" />  
@@ -79,6 +86,7 @@ import { ReactiveFormsModule, FormControl, FormGroup, FormBuilder, Validators } 
 export class TaskEditComponent implements OnInit, OnDestroy {
 
   task;
+  parentTask;
   taskUrl;
   taskId;
   projects;
@@ -113,6 +121,7 @@ export class TaskEditComponent implements OnInit, OnDestroy {
       }
 
       this.task = {};
+      this.parentTask = {};
       this.projects = [];
       this.taskStatuses = this.taskService.taskSatuses;
 
@@ -212,16 +221,42 @@ export class TaskEditComponent implements OnInit, OnDestroy {
           this.task.estimate = 0;
           this.task.status = "idle";
           this.task.id = -1;
-          this.buildForm();
+
+          // if this is a sub task
+          if (params['parentId'] && params['parentId'].length > 0) {
+            this.taskService.getAnyTask(this.userId, params['parentId'])
+            .then ( (parent : any) => {
+              console.log("parent", parent);
+              if (parent.type != "i") {
+                this.parentTask = parent;
+                this.task.project = parent.project;
+                this.task.parent = parent.id;
+              }
+              this.buildForm();
+            })
+          }
+          else
+            this.buildForm();
         }
         else {
           progress_start ("");
           this.taskId = params['tasktId'];
           this.taskUrl = this.taskId;
-          this.taskService.getTask(this.userId, this.taskId)
+          this.taskService.getTask(this.userId, this.taskId)          
           .then ( () => {
-            this.task = this.taskService.task
+            this.task = this.taskService.task;
             this.buildForm();
+
+            if (this.task.parent && this.task.parent.length > 0) {
+              // get parent task
+              this.taskService.getAnyTask(this.userId, this.task.parent)
+              .then ( (parent : any) => {
+                console.log("parent", parent);
+                if (parent.type != "i") {
+                  this.parentTask = parent;
+                }
+              })
+            }
           })
           .catch((error)=>this.taskService.errorHandler(error))
           .then (() => progress_end());

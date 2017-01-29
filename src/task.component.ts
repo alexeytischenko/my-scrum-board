@@ -15,7 +15,11 @@ import { Subscription } from 'rxjs/Subscription';
   template: `
   <div class="panel panel-default">
   <div class="panel-heading">
-          <div style="float:right;">
+          <div class="pull-right">
+            <a *ngIf = "parentTask.id && parentTask.id.length > 0" [routerLink]="['/tasks/'+ parentTask.id]" class="btn btn-default btn-sm">
+                <span class="glyphicon glyphicon-link"></span>
+                <span class="hidden-xs">Jump to parent</span>
+            </a>
             <a [routerLink]="['/']" class="btn btn-default btn-sm">
               <span class="glyphicon glyphicon-chevron-left"></span>
               <span class="hidden-xs">Back</span>
@@ -27,9 +31,11 @@ import { Subscription } from 'rxjs/Subscription';
                 <li *ngIf="taskCurrentStatus!='resolved'"><a href="javascript:void(0);" (click)="changeTaskStatus('resolved')">Resolve</a></li>
                 <li *ngIf="taskCurrentStatus=='resolved'"><a href="javascript:void(0);" (click)="changeTaskStatus('in progress')">Reopen task</a></li>
                 <li><a href="javascript:void(0);" onClick="$('#delModal').modal();">Delete task</a></li>
+                
                 <li class="divider"></li>
-                <li><a href="javascript:void(0);" (click)="clc.setEditorField(-1)">Add comment</a></li>
                 <li><a href="javascript:void(0);" (click)="atc.setEditorField(-1)">Add attachment</a></li>
+                <li><a href="javascript:void(0);" (click)="clc.setEditorField(-1)">Add comment</a></li>
+                <li><a [routerLink]="['/tasks/edit/'+ taskId +'/-1']">Add subtask</a></li>
                 <li><a href="javascript:void(0);" (click)="wlc.setEditorField(-1)">Log work</a></li>
               </ul>
             </span>
@@ -44,6 +50,13 @@ import { Subscription } from 'rxjs/Subscription';
         </div>
   </div>
     <div class="panel-body">
+
+        <div *ngIf = "parentTask.id && parentTask.id.length > 0" class="panel pull-right panel-default panel-sm" style="max-width:50%">
+          <div class="panel-body">
+            <label>Parent task:</label>
+            {{parentTask.name}}
+          </div>
+        </div> 
 
         <div class="panel-body">
             <div>
@@ -82,7 +95,7 @@ import { Subscription } from 'rxjs/Subscription';
         </div>
 
         <div class="panel-body">
-          <div style="float:right;">
+          <div class="pull-right">
             <button class="btn btn-default" (click)="atc.setEditorField(-1)">
               <span class="glyphicon glyphicon-file"></span>
               <span class="hidden-xs">Add file</span>
@@ -98,7 +111,7 @@ import { Subscription } from 'rxjs/Subscription';
           </div>
         </div>
         <div class="panel-body">
-          <div style="float:right;">
+          <div class="pull-right">
             <button class="btn btn-default" (click)="clc.setEditorField(-1)">
               <span class="glyphicon glyphicon-comment"></span>
               <span class="hidden-xs">Add comment</span>
@@ -115,8 +128,26 @@ import { Subscription } from 'rxjs/Subscription';
             <comments (setCount) = "updateTaskCommentsCounts($event)" [openComments]="openComments" [taskId]="taskId"></comments>
           </div>       
       </div>
+      <div class="panel-body" *ngIf="task.type != 'i'">
+          <div class="pull-right">
+            <a class="btn btn-default" [routerLink]="['/tasks/edit/'+ taskId +'/-1']">
+              <span class="glyphicon glyphicon-list-alt"></span>
+              <span class="hidden-xs">Add subtask</span>
+            </a>
+          </div>
+          <div>
+            <label>Subtasks</label> 
+            <span *ngIf="task.subtasks && task.subtasks.length > 0" class="commentsToggle">
+                ({{task.subtasks.length}}) 
+            </span> 
+            <p *ngIf="!task.subtasks || task.subtasks.length == 0" class="norecords">There are no subtasks</p>
+            <ul>
+              <li *ngFor = "let st of task.subtasks"><a [routerLink]="['/tasks/'+ st.id]">{{st.name}}</a> - {{st.estimate}}h</li>
+            </ul>
+          </div>       
+      </div>
       <div class="panel-body">
-          <div style="float:right;">
+          <div class="pull-right">
             <button class="btn btn-default" (click)="wlc.setEditorField(-1)">
               <span class="glyphicon glyphicon-time"></span>
               <span class="hidden-xs">Log work</span>
@@ -169,6 +200,7 @@ import { Subscription } from 'rxjs/Subscription';
 export class TaskComponent implements OnInit, OnDestroy {
 
   task;
+  parentTask;
   taskId;
   project : Project;
   taskStatuses : string[];
@@ -196,6 +228,7 @@ export class TaskComponent implements OnInit, OnDestroy {
       }
 
       this.task = {};
+      this.parentTask = {};
       this.project = new Project();
       this.taskStatuses = this.taskService.taskSatuses;
       this.openComments = false;
@@ -214,6 +247,7 @@ export class TaskComponent implements OnInit, OnDestroy {
           this.taskId = params['tasktId'];
           this.taskService.getTask(this.userId, this.taskId)
           .then ( () => {
+                this.parentTask = {}; //have to place it here to reinit after 'jump to parent' clicked
                 this.task = this.taskService.task;
                 this.project = this.projectsService.getProject(this.task.project);
 
@@ -226,6 +260,15 @@ export class TaskComponent implements OnInit, OnDestroy {
                 if (this.taskService.ifOpenLogs(this.taskId)) {
                   this.openLog = true;
                   this.wlc.loadRecords();
+                }
+
+                // load parent task info if ness
+                if (this.task.type == "i" && this.task.parent && this.task.parent.length > 0) {
+                  this.taskService.getAnyTask(this.userId, this.task.parent)
+                  .then ( (parent) => {
+                    this.parentTask = parent;
+                  })
+                  
                 }
                 console.info("task loaded", this.task);
               }

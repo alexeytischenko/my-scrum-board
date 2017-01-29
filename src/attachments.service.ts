@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { CommonService } from './common.service';
 
 @Injectable()
 export class AttachmentsService {
@@ -44,7 +45,7 @@ export class AttachmentsService {
 
 // .mdb      application/vnd.ms-access
 
-  constructor() {
+  constructor(private commonService : CommonService) {
     console.debug ("AttachmentsService:constructor");
   }
 
@@ -58,7 +59,7 @@ export class AttachmentsService {
 
     return new Promise(function(resolve, reject) {
           tasksRef.orderByChild("created").once('value')
-            .then((snapshot) => resolve(self.getAttachmentsArray(snapshot.val())))
+            .then((snapshot) => resolve(self.commonService.getArrayFromObject(snapshot.val())))
             .catch((error) => reject(error)); 
     });
 
@@ -86,23 +87,23 @@ export class AttachmentsService {
     );
   }
 
-  getAttachmentsArray(attObject) {
-    //parse attachments object to array
-    console.debug ("AttachmentsService:getAttachmentsArray(attObect)", attObject);
+  // getAttachmentsArray(attObject) {
+  //   //parse attachments object to array
+  //   console.debug ("AttachmentsService:getAttachmentsArray(attObect)", attObject);
 
-    var attArray = [];
-    var i = 0;
+  //   var attArray = [];
+  //   var i = 0;
 
-    for (var key in attObject) {
-        if (!attObject.hasOwnProperty(key)) {
-            continue;
-        }
-        attObject[key].id = key;
-        attArray[i++] = attObject[key];
-    }
+  //   for (var key in attObject) {
+  //       if (!attObject.hasOwnProperty(key)) {
+  //           continue;
+  //       }
+  //       attObject[key].id = key;
+  //       attArray[i++] = attObject[key];
+  //   }
 
-    return attArray;
-  }
+  //   return attArray;
+  // }
 
   getIconsNLinks(url: string, task: string, file: any) {
     // get Icons and links to attached documents in attachment list

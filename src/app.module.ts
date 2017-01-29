@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { CommonService } from './common.service';
 import { TasksListService } from './tasks-list.service';
 import { TaskService } from './task.service';
 import { Project } from './project.class';
@@ -43,6 +44,10 @@ const routerModule = RouterModule.forRoot([
     component: TaskEditComponent
   },
   {
+    path: 'tasks/edit/:parentId/:tasktId',
+    component: TaskEditComponent
+  },
+  {
     path: '',
     component: BackLogComponent,
     // redirectTo: '/tasks',
@@ -53,7 +58,7 @@ const routerModule = RouterModule.forRoot([
 @NgModule({
   imports: [BrowserModule, FormsModule, ReactiveFormsModule, routerModule],
   declarations: [AppComponent, BackLogComponent, TaskComponent, TaskEditComponent, NewProject, EditProject, ProjectsListComponent, CommentsListComponent, WorkLogComponent, AttachmentsComponent],
-  providers: [TasksListService, TaskService, ProjectsService, Project, CommentsListService, WorkLogService, AttachmentsService],
+  providers: [CommonService, TasksListService, TaskService, ProjectsService, Project, CommentsListService, WorkLogService, AttachmentsService],
   bootstrap: [AppComponent],
   
 })
