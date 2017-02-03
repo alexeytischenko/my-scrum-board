@@ -5,7 +5,7 @@ export class CommonService {
 
   getArrayFromObject(attObject) {
     //parse subtasks object to array
-    console.debug ("TaskService:getSubtasksArray(attObect)", attObject);
+    console.debug ("CommonService:getArrayFromObject(attObect)", attObject);
 
     var attArray = [];
     var i = 0;

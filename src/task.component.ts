@@ -137,13 +137,22 @@ import { Subscription } from 'rxjs/Subscription';
           </div>
           <div>
             <label>Subtasks</label> 
-            <span *ngIf="task.subtasks && task.subtasks.length > 0" class="commentsToggle">
+            <span *ngIf="task.subtasks && task.subtasks.length > 0">
                 ({{task.subtasks.length}}) 
+                <div class="total_estimate">total estimate : {{subTasksTotalEstimate}}h</div>
+                <div *ngIf="needToCorrectEstimate()" class="estimate_recalc">
+                  exceeds parent task estimate! click to fix 
+                  <span class="glyphicon glyphicon-alert" (click)="fixEstimate(subTasksTotalEstimate)"></span>
+                </div>
             </span> 
+            
             <p *ngIf="!task.subtasks || task.subtasks.length == 0" class="norecords">There are no subtasks</p>
-            <ul>
-              <li *ngFor = "let st of task.subtasks"><a [routerLink]="['/tasks/'+ st.id]">{{st.name}}</a> - {{st.estimate}}h</li>
-            </ul>
+            <div class="list-group subtasks-group">
+              <a *ngFor = "let st of task.subtasks" [routerLink]="['/tasks/'+ st.id]" class="list-group-item">
+                {{st.name}}
+                <span class="badge hidden-xs {{(isWrongEstimate(st.worked, st.estimate)) ? 'overworked' : ''}}"> {{st.worked ? st.worked : '0'}}h / {{st.estimate ? st.estimate : '0'}}h </span>
+              </a>
+            </div>
           </div>       
       </div>
       <div class="panel-body">
@@ -195,6 +204,11 @@ import { Subscription } from 'rxjs/Subscription';
     .modal-dialog {margin: 100px auto!important;}
     .commentsToggle div {cursor: pointer; color: #999;}
     .commentsToggle div:first-child {margin-left: 10px;}
+    .badge {background-color: #bbb;}
+    .subtasks-group {margin-top: 20px;}
+    .total_estimate {display: inline-block;margin-left: 10px; color: #999;}
+    .estimate_recalc {display: inline-block;margin-left: 10px; color: #999; font-style:italic;}
+    .estimate_recalc span {cursor: pointer;color: #D03B3B;}
   `]
 })
 export class TaskComponent implements OnInit, OnDestroy {
@@ -204,8 +218,8 @@ export class TaskComponent implements OnInit, OnDestroy {
   taskId;
   project : Project;
   taskStatuses : string[];
-  openComments: boolean;
-  openLog: boolean;
+  openComments: boolean = false;
+  openLog: boolean = false;
   userId = "mSmxxvKkt4ei6nL80Krmt9R0m983";
 
   @ViewChild(CommentsListComponent) private clc : CommentsListComponent;
@@ -231,8 +245,7 @@ export class TaskComponent implements OnInit, OnDestroy {
       this.parentTask = {};
       this.project = new Project();
       this.taskStatuses = this.taskService.taskSatuses;
-      this.openComments = false;
-      this.openLog = false;
+
 
       //load projects if ness
       if (this.projectsService.projects && this.projectsService.projects.length > 0) {
@@ -247,20 +260,25 @@ export class TaskComponent implements OnInit, OnDestroy {
           this.taskId = params['tasktId'];
           this.taskService.getTask(this.userId, this.taskId)
           .then ( () => {
+                this.openComments = this.taskService.ifOpenComments(this.taskId);
+                this.openLog = this.taskService.ifOpenLogs(this.taskId);
                 this.parentTask = {}; //have to place it here to reinit after 'jump to parent' clicked
                 this.task = this.taskService.task;
                 this.project = this.projectsService.getProject(this.task.project);
 
                 //force open comments               
-                if (this.taskService.ifOpenComments(this.taskId)) {
-                  this.openComments = true;
+                if (this.openComments) {
                   this.clc.loadComments();
                 }
                 //force open logs               
-                if (this.taskService.ifOpenLogs(this.taskId)) {
-                  this.openLog = true;
+                if (this.openLog) {
                   this.wlc.loadRecords();
                 }
+
+                //force to parse attachments
+                // if (this.task.attachments && this.task.attachments.length > 0) {
+                //   this.atc.getIconsNLinks();
+                // }
 
                 // load parent task info if ness
                 if (this.task.type == "i" && this.task.parent && this.task.parent.length > 0) {
@@ -327,6 +345,11 @@ export class TaskComponent implements OnInit, OnDestroy {
       .then(() => {    
         this.openLog = true; //open worklog list  
       });
+
+    if (this.parentTask.id && this.parentTask.id.length > 0) {
+      //update subtasks/this.task.id/worked node in parent task 
+      this.taskService.savePropery(this.userId, this.parentTask.id + "/subtasks/" + this.task.id, {"worked" : val})
+    }
   }
 
   deleteTask() {
@@ -368,9 +391,38 @@ export class TaskComponent implements OnInit, OnDestroy {
     else this.taskService.removeFromOpenLogs(this.taskId);
   }
 
-  // get diagnostic() {
-  //   return JSON.stringify(this.task);
-  // }
+  private fixEstimate(newEstimate) {
+    //update task.estimate
+    this.taskService.savePropery(this.userId, this.task.id, {"estimate" : newEstimate}) 
+    this.task.estimate = newEstimate;
+
+  }
+  private isWrongEstimate(worked : number, estimate : number) {
+    // return true if worked houres amount is greater then estimate
+
+    if (worked && estimate && worked > estimate) return true;
+    return false;
+
+  }
+
+  private needToCorrectEstimate() : boolean {
+    //show offer to recalc Estimate
+    if (this.task.estimate < this.subTasksTotalEstimate)  return true;
+
+    return false;
+  }
+
+  get subTasksTotalEstimate() : number {
+    let estimate = 0;
+
+    if (this.task.subtasks && this.task.subtasks.length > 0) {
+      this.task.subtasks.forEach(element => {
+        estimate += element.estimate;
+      });
+    }
+
+    return estimate;
+  }
 
   get taskCurrentStatus() : string {
     return this.task.status ? this.task.status : '';

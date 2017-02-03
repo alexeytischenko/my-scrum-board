@@ -100,7 +100,8 @@ export class TaskService {
                             name: task.name, 
                             estimate: task.estimate,
                             project: task.project,
-                            status: task.status
+                            status: task.status,
+                            worked: 0
                         }
                     });
                   }
@@ -212,7 +213,7 @@ export class TaskService {
         .catch((error) => reject(error));
       }
       else {
-        //check if the task has subtasks - delete them
+        //it is not a subtask - check if this task has subtasks - delete them
         if (task.subtasks && task.subtasks.length > 0) {
         
           let resolveCounter = task.subtasks.length;
@@ -223,8 +224,8 @@ export class TaskService {
               let comRef = firebase.database().ref(`${url}/comments/${element.id}`);
 
               self.attachmentsService.getAttachments(url, element.id)
-              .then(() => taskRef.remove())
               .then((attachments) => self.attachmentsService.removeAllAttachments(url, element.id, attachments))      // remove attachments
+              .then(() => taskRef.remove())
               .then(() => wlRef.remove())                       // remove worklogs
               .then(() => comRef.remove())                      // remove comments
               .then(() => {

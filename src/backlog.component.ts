@@ -77,7 +77,6 @@ import { Project } from './project.class';
     .cant_choose {margin-left: 20px;color: #ccc;}
     .label-white {background-color: #fff; color: #bbb; border: 1px solid #ccc;}
     .badge {background-color: #bbb;}
-    .overworked {color: #D03B3B;}
   `]
 })
 export class BackLogComponent {
