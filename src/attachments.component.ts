@@ -31,15 +31,15 @@ import { AttachmentsService } from './attachments.service';
                   <div class="media">
                     <div class="media-left">
                       <a href='javascript:void(0);' id='link_{{file.id}}' target='_blank' class="gl_display">
-                        <img src='' class="icn_img_hide" id="img_{{file.id}}">
-                        <span class="glyphicon glyphicon-file"></span>
+                        <img src="{{file.downloadUrl}}" class="icn_img_display" [hidden]="attachmentsService.imgIcons.indexOf(file.type) == -1">
+                        <span class="glyphicon glyphicon-file" [hidden]="attachmentsService.imgIcons.indexOf(file.type) > -1"></span>
                       </a>
                       <div class="comment_context_menu">
                         <span (click)="openDeleteAttModal(file.id)" class="glyphicon glyphicon-trash" alt="Delete attachment" title="Delete attachment"></span>
-                        <a href="javascript:void(0);" target="_blank" id="new_window_{{file.id}}" class="new_window_hide" alt="Open in a new window" title="Open in a new window">
+                        <a href="{{file.downloadUrl}}" target="_blank" id="new_window_{{file.id}}" [hidden]="attachmentsService.imgIcons.indexOf(file.type) == -1" alt="Open in a new window" title="Open in a new window">
                           <span class="glyphicon glyphicon-new-window"></span>
                         </a>
-                        <a href="javascript:void(0);" target="_blank" id="download_{{file.id}}" class="download_hide" alt="Download" title="Download">
+                        <a href="{{file.downloadUrl}}" target="_blank" id="download_{{file.id}}" [hidden]="attachmentsService.imgIcons.indexOf(file.type) > -1" alt="Download" title="Download">
                           <span class="glyphicon glyphicon-cloud-download"></span>
                         </a>
                       </div>
@@ -149,14 +149,12 @@ export class AttachmentsComponent {
     this.loading = true;
     this.attachmentsService.saveFile(this.userId, this.taskId, this.editFileId, this.editFilename, file)
       .then((attachment) => {
-       //this.attachmentsService.getAttachments(this.userId, this.taskId))
-      //.then((attachments : Array<any>) => { 
         this.attachments.push(attachment);
         this.setAttachments.emit(this.attachments);
         setTimeout(() => {
           this.editFileId = '';
           this.loading = false;
-          this.getSingleIconNLink(this.attachments[this.attachments.length-1]); //passing last (just created) element
+          //this.getSingleIconNLink(this.attachments[this.attachments.length-1]); //passing last (just created) element
         }, 1000);
       })
       .catch((error) => this.attachmentsService.errorHandler(error));
@@ -187,47 +185,44 @@ export class AttachmentsComponent {
       .catch((error) => this.attachmentsService.errorHandler(error));
   }
 
-  getSingleIconNLink(element: any) {
-    // get Icons and links to attached documents in element
-    console.info("AttachmentsComponent:getSingleIconNLink()", element);
+  // getSingleIconNLink(element: any) {
+  //   // get Icons and links to attached documents in element
+  //   console.info("AttachmentsComponent:getSingleIconNLink()", element);
 
-    this.attachmentsService.getIconsNLinks(this.userId, this.taskId, element)
-        .then((link) => {
-            let img = <HTMLImageElement> document.getElementById('img_' + element.id);
-            let a =  <HTMLLinkElement> document.getElementById('link_' + element.id);
-            let anw = <HTMLLinkElement> document.getElementById('new_window_' + element.id);
-            let dnw = <HTMLLinkElement> document.getElementById('download_' + element.id);
+  //   this.attachmentsService.getIconsNLinks(this.userId, this.taskId, element)
+  //       .then((link) => {
+  //           let img = <HTMLImageElement> document.getElementById('img_' + element.id);
+  //           let a =  <HTMLLinkElement> document.getElementById('link_' + element.id);
+  //           let anw = <HTMLLinkElement> document.getElementById('new_window_' + element.id);
+  //           let dnw = <HTMLLinkElement> document.getElementById('download_' + element.id);
             
-            a.href = link.toString();
-            if (this.attachmentsService.imgIcons.indexOf(element.type) > -1) {
-              img.src = link.toString();
-              img.className = "icn_img_display";
-              anw.className = "new_window_show";
-              anw.href = link.toString();
-              a.className = "gl_hide";
-            } else {
-              img.className = "icn_img_hide";
-              dnw.className = "download_show";
-              dnw.href = link.toString();
-              //a.className = "gl_display";
-              //if (this.attachmentsService.fileTypesMap.hasOwnProperty(element.type)) {
-                //img.src = "/images/" + this.attachmentsService.fileTypesMap[element.type] + ".png";
-              //}
-            }
+  //           a.href = link.toString();
+  //           if (this.attachmentsService.imgIcons.indexOf(element.type) > -1) {
+  //             img.src = link.toString();
+  //             img.className = "icn_img_display";
+  //             anw.className = "new_window_show";
+  //             anw.href = link.toString();
+  //             a.className = "gl_hide";
+  //           } else {
+  //             img.className = "icn_img_hide";
+  //             dnw.className = "download_show";
+  //             dnw.href = link.toString();
+
+  //           }
             
-        })
-        .catch((error) => this.attachmentsService.errorHandler(error));
+  //       })
+  //       .catch((error) => this.attachmentsService.errorHandler(error));
  
-  }
+  // }
 
-  getIconsNLinks() {
-    // get Icons and links to attached documents in attachment list
-    console.info("AttachmentsComponent:getIconsNLinks()", this.attachments);
+  // getIconsNLinks() {
+  //   // get Icons and links to attached documents in attachment list
+  //   console.info("AttachmentsComponent:getIconsNLinks()", this.attachments);
 
-    this.attachments.forEach((element) => {
-       this.getSingleIconNLink(element);
-    });  
-  }
+  //   this.attachments.forEach((element) => {
+  //      this.getSingleIconNLink(element);
+  //   });  
+  // }
 
   private clearFields () {
     this.editFileId = ''; 
@@ -258,7 +253,7 @@ export class AttachmentsComponent {
     }, false); 
       
     //get icons and links
-    this.getIconsNLinks();    
+    //this.getIconsNLinks();    
   }
 
 }

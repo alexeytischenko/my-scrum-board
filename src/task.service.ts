@@ -31,7 +31,11 @@ export class TaskService {
               self.task.id = id;
               self.task.subtasks = self.commonService.getArrayFromObject(self.task.subtasks);
               self.task.attachments = self.commonService.getArrayFromObject(self.task.attachments);
-              resolve(true);
+              self.attachmentsService.getDownloadURLs(url, id, self.task.attachments)
+                .then((attach) => {
+                  self.task.attachments = attach;
+                  resolve(true);
+                });
             }
             else reject("Couldn't get task data");
           }); 

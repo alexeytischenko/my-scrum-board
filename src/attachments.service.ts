@@ -105,20 +105,66 @@ export class AttachmentsService {
   //   return attArray;
   // }
 
-  getIconsNLinks(url: string, task: string, file: any) {
-    // get Icons and links to attached documents in attachment list
-    console.debug ("AttachmentsService:getIconsNLinks(url: string, task: string, file: any)", url, task, file);
+  getDownloadURL(url: string, taskId:string, attachment: any) {
+     // get Icons and links to attached document
+    console.debug ("AttachmentsService:getDownloadURL(url: string, taskId: string, attachments: any)", url, taskId, attachment);
 
-    let self = this;
-    let storageRef = firebase.storage().ref(`${url}/${task}`);
+    let storageRef = firebase.storage().ref(`${url}/${taskId}`);
 
     return new Promise(function(resolve, reject) {
-      storageRef.child(file.fileURl)
-            .getDownloadURL()
-            .then((url) => resolve(url))
-            .catch((error) => reject(error));
+            storageRef.child(attachment.fileURl).getDownloadURL()
+            .then((url) => {
+              attachment.downloadUrl = url;
+              resolve(attachment);     
+            })
+            .catch((error) => reject("failed: {"+error+"}"));
     });
-  }  
+  }
+
+  getDownloadURLs(url: string, taskId:string, attachments: any[]) {
+     // get Icons and links to attached documents in attachment list
+    console.debug ("AttachmentsService:getDownloadURLs(url: string, taskId: string, attachments: any[])", url, taskId, attachments);
+
+    let new_attachments : any[] = [];
+    let self = this;
+
+    return new Promise(function(resolve, reject) {
+      if (attachments && attachments.length > 0) {
+        
+        let resolveCounter = attachments.length;
+
+        attachments.forEach((element) => {
+            self.getDownloadURL(url, taskId, element)
+            .then((new_element) => {
+              new_attachments.push(new_element);
+              resolveCounter--;
+
+              //console.log("resolveCounter", resolveCounter);
+              if (resolveCounter <= 0)  {
+                console.log("attachments with URL", new_attachments);
+                resolve(new_attachments); 
+              }
+            })
+        });
+      } else resolve(new_attachments);
+    });
+  
+  }
+
+  // getIconsNLinks(url: string, task: string, file: any) {
+  //   // get Icons and links to attached documents in attachment list
+  //   console.debug ("AttachmentsService:getIconsNLinks(url: string, task: string, file: any)", url, task, file);
+
+  //   let self = this;
+  //   let storageRef = firebase.storage().ref(`${url}/${task}`);
+
+  //   return new Promise(function(resolve, reject) {
+  //     storageRef.child(file.fileURl)
+  //           .getDownloadURL()
+  //           .then((url) => resolve(url))
+  //           .catch((error) => reject(error));
+  //   });
+  // }  
 
   saveFile(url: string, task: any, fileid: any, filedesc: string, file: any ) {
     // save new/update comment
@@ -141,7 +187,7 @@ export class AttachmentsService {
             .put(file, metadata)
             .then(function(snapshot) {
                 console.log('Uploaded', snapshot.totalBytes, 'bytes.');
-                //var fileurl = snapshot.downloadURL;//metadata.downloadURLs[0];
+                var newfileurl = snapshot.downloadURL;//metadata.downloadURLs[0];
                 //console.log('File available at', fileurl.toString(), `${url}/${task}/${file.name}`);
                 postData = {
                   fileURl: file.name,
@@ -155,6 +201,7 @@ export class AttachmentsService {
                 newAttRef.set(postData, function(error) {
                   if (!error) {
                     postData.id = newAttRef.key.toString();
+                    postData.downloadUrl = newfileurl;
                     resolve(postData);
                   }
                 }); 
