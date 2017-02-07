@@ -234,7 +234,6 @@ export class TaskService {
               .then(() => comRef.remove())                      // remove comments
               .then(() => {
                 resolveCounter--;
-                //console.log("resolveCounter", resolveCounter);
                 if (resolveCounter <= 0)  {
                   resolve(true); 
                 }

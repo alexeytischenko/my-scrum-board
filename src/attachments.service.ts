@@ -8,8 +8,7 @@ export class AttachmentsService {
 
   imgIcons = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp']; 
 
-  //fileTypes = ['application/pdf', 'text/rtf', '', '']; //'', '', '', ''
-  fileTypesMap: any = {'application/pdf': 'pdf', 'text/rtf' : 'rtf', 'application/vnd.oasis.opendocument.text' : 'odt', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'docx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'xls'};// '' : '', '' : '', '' : '', '' : ''
+//  fileTypesMap: any = {'application/pdf': 'pdf', 'text/rtf' : 'rtf', 'application/vnd.oasis.opendocument.text' : 'odt', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'docx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'xls'};// '' : '', '' : '', '' : '', '' : ''
 
 // .doc      application/msword
 // .dot      application/msword
@@ -87,24 +86,6 @@ export class AttachmentsService {
     );
   }
 
-  // getAttachmentsArray(attObject) {
-  //   //parse attachments object to array
-  //   console.debug ("AttachmentsService:getAttachmentsArray(attObect)", attObject);
-
-  //   var attArray = [];
-  //   var i = 0;
-
-  //   for (var key in attObject) {
-  //       if (!attObject.hasOwnProperty(key)) {
-  //           continue;
-  //       }
-  //       attObject[key].id = key;
-  //       attArray[i++] = attObject[key];
-  //   }
-
-  //   return attArray;
-  // }
-
   getDownloadURL(url: string, taskId:string, attachment: any) {
      // get Icons and links to attached document
     console.debug ("AttachmentsService:getDownloadURL(url: string, taskId: string, attachments: any)", url, taskId, attachment);
@@ -122,7 +103,7 @@ export class AttachmentsService {
   }
 
   getDownloadURLs(url: string, taskId:string, attachments: any[]) {
-     // get Icons and links to attached documents in attachment list
+     // call getDownloadURL in a loop to get Icons and links to all attached documents in attachment list
     console.debug ("AttachmentsService:getDownloadURLs(url: string, taskId: string, attachments: any[])", url, taskId, attachments);
 
     let new_attachments : any[] = [];
@@ -139,7 +120,6 @@ export class AttachmentsService {
               new_attachments.push(new_element);
               resolveCounter--;
 
-              //console.log("resolveCounter", resolveCounter);
               if (resolveCounter <= 0)  {
                 console.log("attachments with URL", new_attachments);
                 resolve(new_attachments); 

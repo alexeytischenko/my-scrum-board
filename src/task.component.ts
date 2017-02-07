@@ -35,7 +35,7 @@ import { Subscription } from 'rxjs/Subscription';
                 <li class="divider"></li>
                 <li><a href="javascript:void(0);" (click)="atc.setEditorField(-1)">Add attachment</a></li>
                 <li><a href="javascript:void(0);" (click)="clc.setEditorField(-1)">Add comment</a></li>
-                <li><a [routerLink]="['/tasks/edit/'+ taskId +'/-1']">Add subtask</a></li>
+                <li *ngIf="task.type!='i'"><a [routerLink]="['/tasks/edit/'+ taskId +'/-1']">Add subtask</a></li>
                 <li><a href="javascript:void(0);" (click)="wlc.setEditorField(-1)">Log work</a></li>
               </ul>
             </span>
@@ -148,7 +148,7 @@ import { Subscription } from 'rxjs/Subscription';
             
             <p *ngIf="!task.subtasks || task.subtasks.length == 0" class="norecords">There are no subtasks</p>
             <div class="list-group subtasks-group">
-              <a *ngFor = "let st of task.subtasks" [routerLink]="['/tasks/'+ st.id]" class="list-group-item">
+              <a *ngFor = "let st of task.subtasks" [routerLink]="['/tasks/'+ st.id]" class="list-group-item" [style.text-decoration]="st.status==='resolved' ? 'line-through' : 'none'">
                 {{st.name}}
                 <span class="badge hidden-xs {{(isWrongEstimate(st.worked, st.estimate)) ? 'overworked' : ''}}"> {{st.worked ? st.worked : '0'}}h / {{st.estimate ? st.estimate : '0'}}h </span>
               </a>
@@ -275,11 +275,6 @@ export class TaskComponent implements OnInit, OnDestroy {
                   this.wlc.loadRecords();
                 }
 
-                //force to parse attachments
-                // if (this.task.attachments && this.task.attachments.length > 0) {
-                //   this.atc.getIconsNLinks();
-                // }
-
                 // load parent task info if ness
                 if (this.task.type == "i" && this.task.parent && this.task.parent.length > 0) {
                   this.taskService.getAnyTask(this.userId, this.task.parent)
@@ -291,7 +286,6 @@ export class TaskComponent implements OnInit, OnDestroy {
                 console.info("task loaded", this.task);
               }
           )
-         // .then (() => )
           .catch((error)=>this.taskService.errorHandler(error))
           .then (() => progress_end());
         }

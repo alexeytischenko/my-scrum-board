@@ -30,16 +30,16 @@ import { AttachmentsService } from './attachments.service';
                 >
                   <div class="media">
                     <div class="media-left">
-                      <a href='javascript:void(0);' id='link_{{file.id}}' target='_blank' class="gl_display">
-                        <img src="{{file.downloadUrl}}" class="icn_img_display" [hidden]="attachmentsService.imgIcons.indexOf(file.type) == -1">
-                        <span class="glyphicon glyphicon-file" [hidden]="attachmentsService.imgIcons.indexOf(file.type) > -1"></span>
+                      <a href='{{file.downloadUrl}}' id='link_{{file.id}}' target='_blank' class="gl_display">
+                        <img src="{{file.downloadUrl}}" class="icn_img_display" *ngIf="isImage(file.type)">
+                        <span class="glyphicon glyphicon-file" *ngIf="!isImage(file.type)"></span>
                       </a>
                       <div class="comment_context_menu">
                         <span (click)="openDeleteAttModal(file.id)" class="glyphicon glyphicon-trash" alt="Delete attachment" title="Delete attachment"></span>
-                        <a href="{{file.downloadUrl}}" target="_blank" id="new_window_{{file.id}}" [hidden]="attachmentsService.imgIcons.indexOf(file.type) == -1" alt="Open in a new window" title="Open in a new window">
+                        <a href="{{file.downloadUrl}}" target="_blank" id="new_window_{{file.id}}" [hidden]="!isImage(file.type)" alt="Open in a new window" title="Open in a new window">
                           <span class="glyphicon glyphicon-new-window"></span>
                         </a>
-                        <a href="{{file.downloadUrl}}" target="_blank" id="download_{{file.id}}" [hidden]="attachmentsService.imgIcons.indexOf(file.type) > -1" alt="Download" title="Download">
+                        <a href="{{file.downloadUrl}}" target="_blank" id="download_{{file.id}}" [hidden]="isImage(file.type)" alt="Download" title="Download">
                           <span class="glyphicon glyphicon-cloud-download"></span>
                         </a>
                       </div>
@@ -88,14 +88,8 @@ import { AttachmentsService } from './attachments.service';
   .modal-body {padding:40px 50px;}
   .form-inline {margin-top: 10px;}
   a.gl_display, a.gl_display:hover  {text-decoration: none;}
-  a.gl_display span {font-size: 40px; color: #cccccc; margin-right:10px; display:block; text-decoration: none;}
-  a.gl_hide span{display:none;}
-  .icn_img_hide {display:none;}
-  .icn_img_display {width:50px; height:50px; display:block;}
-  .new_window_hide {display:none;}
-  .new_window_show {display:inline;}
-  .download_hide {display:none;}
-  .download_show {display:inline;}
+  a.gl_display span {font-size: 40px; color: #cccccc; margin-right:10px; text-decoration: none;}
+  .icn_img_display {width:50px; height:50px;}
   
   input[type=file].ng-valid, .ng-valid.required  { border-left: 5px solid #42A948; /* green */}
   input[type=file].ng-invalid  {border-left: 5px solid #a94442; /* red */}
@@ -185,46 +179,14 @@ export class AttachmentsComponent {
       .catch((error) => this.attachmentsService.errorHandler(error));
   }
 
-  // getSingleIconNLink(element: any) {
-  //   // get Icons and links to attached documents in element
-  //   console.info("AttachmentsComponent:getSingleIconNLink()", element);
-
-  //   this.attachmentsService.getIconsNLinks(this.userId, this.taskId, element)
-  //       .then((link) => {
-  //           let img = <HTMLImageElement> document.getElementById('img_' + element.id);
-  //           let a =  <HTMLLinkElement> document.getElementById('link_' + element.id);
-  //           let anw = <HTMLLinkElement> document.getElementById('new_window_' + element.id);
-  //           let dnw = <HTMLLinkElement> document.getElementById('download_' + element.id);
-            
-  //           a.href = link.toString();
-  //           if (this.attachmentsService.imgIcons.indexOf(element.type) > -1) {
-  //             img.src = link.toString();
-  //             img.className = "icn_img_display";
-  //             anw.className = "new_window_show";
-  //             anw.href = link.toString();
-  //             a.className = "gl_hide";
-  //           } else {
-  //             img.className = "icn_img_hide";
-  //             dnw.className = "download_show";
-  //             dnw.href = link.toString();
-
-  //           }
-            
-  //       })
-  //       .catch((error) => this.attachmentsService.errorHandler(error));
- 
-  // }
-
-  // getIconsNLinks() {
-  //   // get Icons and links to attached documents in attachment list
-  //   console.info("AttachmentsComponent:getIconsNLinks()", this.attachments);
-
-  //   this.attachments.forEach((element) => {
-  //      this.getSingleIconNLink(element);
-  //   });  
-  // }
+  private isImage(tp) : boolean {
+    //checks if this attachmnent typr should be considered as an image
+    if (this.attachmentsService.imgIcons.indexOf(tp) > -1)  return true;
+    return false;
+  }
 
   private clearFields () {
+    //clear new attachment form
     this.editFileId = ''; 
     this.editFilename = '';  
     this.deleteFileId = '';
@@ -242,9 +204,9 @@ export class AttachmentsComponent {
     return false;
   }
 
-  ngAfterViewInit() {
-    console.info("AttachmentsComponent:ngAfterViewInit()", this.userId);
-    
+  ngAfterViewInit() {   
+    console.info("AttachmentsComponent:ngAfterViewInit()", this.userId); 
+
     //fire standart event to start the Angular Digest loop -- for input[type=file] validation 
     document.getElementById('file').addEventListener('change', function () {
           var e = document.createEvent('HTMLEvents');
@@ -252,8 +214,6 @@ export class AttachmentsComponent {
           this.dispatchEvent(e);
     }, false); 
       
-    //get icons and links
-    //this.getIconsNLinks();    
   }
 
 }
