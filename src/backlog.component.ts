@@ -15,7 +15,7 @@ import { Project } from './project.class';
           </button>
           <ul class="dropdown-menu dropdown-menu-left">
             <li *ngFor="let prj of projectsService.projects">
-              <a href="javascript:void(0);" *ngIf="!ifInFilter(prj.id)" (click)="addToFilter(prj.id, prj.sname)">{{prj.sname}}</a>
+              <a href="javascript:void(0);" *ngIf="!ifInFilter(prj.id)" (click)="addToFilter(prj.id, prj.sname)">{{prj.name}}</a>
               <span *ngIf="ifInFilter(prj.id)" class="cant_choose">{{prj.sname}}</span>
             </li>
           </ul>
@@ -45,9 +45,11 @@ import { Project } from './project.class';
               </li>
               <template ngFor let-taskElement [ngForOf]="backLog">
                 <li *ngIf="taskElement.type=='s'" class="list-group-item" id="{{taskElement.id}}">
-                  <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
+                  <a [routerLink]="['/tasks', taskElement.id]" [class.resolved]="taskElement.status==='resolved'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code ? taskElement.code : 0}}</span> 
-                  <span *ngIf="taskElement.commentsNum > 0" class="label label-white hidden-xs"><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>
+                  <span *ngIf="taskElement.subtasksNum > 0" class="label label-white hidden-xs" title="subtasks"><span class="glyphicon glyphicon-tasks"></span> {{taskElement.subtasksNum}}</span>   
+                  <span *ngIf="taskElement.commentsNum > 0" class="label label-white hidden-xs" title="comment"><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>
+                  <span *ngIf="taskElement.attachmentsNum > 0" class="label label-white hidden-xs" title="attachments"><span class="glyphicon glyphicon-paperclip"></span> {{taskElement.attachmentsNum}}</span>
                   <span class="badge hidden-xs {{(isWrongEstimate(taskElement.worked, taskElement.estimate)) ? 'overworked' : ''}}"> {{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
                 </li>
               </template>
@@ -59,9 +61,11 @@ import { Project } from './project.class';
               <li style="margin-top:20px;" class="list-group-item disabled upbar">Backlog ( {{backLogLength}} issues )</li>
                <template ngFor let-taskElement [ngForOf]="backLog">
                 <li *ngIf="taskElement.type=='b'" class="list-group-item" id="{{taskElement.id}}">
-                  <a [routerLink]="['/tasks', taskElement.id]" [style.text-decoration]="taskElement.status==='resolved' ? 'line-through' : 'none'">{{taskElement.name}}</a> 
+                  <a [routerLink]="['/tasks', taskElement.id]" [class.resolved]="taskElement.status==='resolved'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code ? taskElement.code : 0}}</span> 
-                  <span *ngIf="taskElement.commentsNum > 0" class="label label-white hidden-xs"><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>                  
+                  <span *ngIf="taskElement.subtasksNum > 0" class="label label-white hidden-xs" title="subtasks"><span class="glyphicon glyphicon-tasks"></span> {{taskElement.subtasksNum}}</span>
+                  <span *ngIf="taskElement.commentsNum > 0" class="label label-white hidden-xs" title="comments"><span class="glyphicon glyphicon-comment"></span> {{taskElement.commentsNum}}</span>   
+                  <span *ngIf="taskElement.attachmentsNum > 0" class="label label-white hidden-xs" title="attachments"><span class="glyphicon glyphicon-paperclip"></span> {{taskElement.attachmentsNum}}</span>
                   <span class="badge hidden-xs {{(isWrongEstimate(taskElement.worked, taskElement.estimate)) ? 'overworked' : ''}}"> {{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h </span>
                 </li>
               </template>  
@@ -69,6 +73,8 @@ import { Project } from './project.class';
     </section>
   `,
   styles : [`
+    a.resolved {text-decoration:line-through; color:#bbb;}
+    a.resolved:hover {color: #555;text-decoration:none;}
     .upbar {cursor: default!important;}
     .accord {color: #777;cursor:pointer;margin-right: 5px;}
     .list-group-item {cursor: move;}
@@ -130,7 +136,7 @@ export class BackLogComponent {
           cursor: "move",
           //cancel: ".disabled",
           connectWith: '.connected',
-          items: ':not(a, .disabled, .label, .badge, .nodrug)',    
+          items: ':not(a, .disabled, .label, .badge, .nodrug, .glyphicon)',    
             
       })
       .disableSelection();
@@ -242,7 +248,7 @@ export class BackLogComponent {
 
         this.backLog.forEach((element) => {
           if(element.type == "b") blLength++; 
-          else asLength++;
+          if(element.type == "s") asLength++; 
         });
 
         this.backLogLength = blLength;

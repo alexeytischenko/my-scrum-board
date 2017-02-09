@@ -137,7 +137,8 @@ export class TaskService {
                             name: task.name, 
                             estimate: task.estimate,
                             project: task.project,
-                            status: task.status
+                            status: task.status,
+                            worked: task.worked
                         }
                     });
                   }

@@ -10,8 +10,8 @@ import { Component } from '@angular/core';
     <div class="topmenu-center">
       <div class="row">
         <div class="col-xs-3">
-          <h1>Scrum Board</h1>
-          <h2 class="hidden-xs">Backlog</h2>
+          <h4>Scrum Board</h4>
+          <h5 class="hidden-xs">Backlog</h5>
         </div>
 
         <div class="col-xs-7">

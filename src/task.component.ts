@@ -69,10 +69,11 @@ import { Subscription } from 'rxjs/Subscription';
             </div> 
             <div>
               <label>Status</label>
-              <span class="label label-default" 
+              <span class="label" 
                   [class.label-primary]="task.status==='in progress'" 
                   [class.label-success]="task.status==='resolved'" 
                   [class.label-info]="task.status==='review'"
+                  [class.label-default]="task.status==='idle'"
                   >
                     {{task.status}}
               </span>
@@ -97,7 +98,7 @@ import { Subscription } from 'rxjs/Subscription';
         <div class="panel-body">
           <div class="pull-right">
             <button class="btn btn-default" (click)="atc.setEditorField(-1)">
-              <span class="glyphicon glyphicon-file"></span>
+              <span class="glyphicon glyphicon-paperclip"></span>
               <span class="hidden-xs">Add file</span>
             </button>
           </div>
@@ -131,7 +132,7 @@ import { Subscription } from 'rxjs/Subscription';
       <div class="panel-body" *ngIf="task.type != 'i'">
           <div class="pull-right">
             <a class="btn btn-default" [routerLink]="['/tasks/edit/'+ taskId +'/-1']">
-              <span class="glyphicon glyphicon-list-alt"></span>
+              <span class="glyphicon glyphicon-tasks"></span>
               <span class="hidden-xs">Add subtask</span>
             </a>
           </div>
@@ -148,7 +149,7 @@ import { Subscription } from 'rxjs/Subscription';
             
             <p *ngIf="!task.subtasks || task.subtasks.length == 0" class="norecords">There are no subtasks</p>
             <div class="list-group subtasks-group">
-              <a *ngFor = "let st of task.subtasks" [routerLink]="['/tasks/'+ st.id]" class="list-group-item" [style.text-decoration]="st.status==='resolved' ? 'line-through' : 'none'">
+              <a *ngFor = "let st of task.subtasks" [routerLink]="['/tasks/'+ st.id]" class="list-group-item" [class.resolved]="st.status==='resolved'">
                 {{st.name}}
                 <span class="badge hidden-xs {{(isWrongEstimate(st.worked, st.estimate)) ? 'overworked' : ''}}"> {{st.worked ? st.worked : '0'}}h / {{st.estimate ? st.estimate : '0'}}h </span>
               </a>
@@ -199,6 +200,10 @@ import { Subscription } from 'rxjs/Subscription';
 
   `,
   styles : [`
+    a.resolved {text-decoration:line-through!important; color:#bbb!important;}
+    a.resolved:hover {color: #555!important;text-decoration:none!important;}
+    a.list-group-item {color: #337ab7; text-decoration: none;}
+    a.list-group-item:hover {color: #337ab7; text-decoration: none;}
     .norecords {color: #999; font-style: italic}
     .dropdown {padding-bottom: 10px;}
     .modal-dialog {margin: 100px auto!important;}

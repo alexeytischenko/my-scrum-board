@@ -11,4 +11,5 @@ To work on this project:
 
 Compatability:
 
-using Array.prototype.indexOf()   >=  IE9
+Array.prototype.indexOf()   >=  IE9
+Object.keys(obj).length     >=  IE9

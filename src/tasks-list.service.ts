@@ -90,6 +90,14 @@ export class TasksListService {
     let project = new Project();
     project = this.projectsService.getProject(objectedResponse.project);
 
+    //attachments count
+    let attachmentsNum = 0;
+    if (objectedResponse.attachments)  attachmentsNum = Object.keys(objectedResponse.attachments).length;
+
+    //subtasks count
+    let subtasksNum = 0;
+    if (objectedResponse.subtasks)  subtasksNum = Object.keys(objectedResponse.subtasks).length;
+
     return {
         id : id,
         name: objectedResponse.name,
@@ -102,7 +110,9 @@ export class TasksListService {
         worked: objectedResponse.worked,
         status: objectedResponse.status,
         type: objectedResponse.type,
-        commentsNum: objectedResponse.commentsNum
+        commentsNum: objectedResponse.commentsNum,
+        attachmentsNum: attachmentsNum,
+        subtasksNum: subtasksNum
     };
   }
 

@@ -5,8 +5,11 @@ import { Project } from './project.class';
 export class ProjectsService {
    
   projects = [];
-  colors = ['grey', 'orange', 'dark blue', 'blue', 'red', 'green'];
-  colorsMap: any = {'grey': 'default', 'orange': 'warning', 'dark blue': 'primary', 'blue': 'info', 'red': 'danger','green': 'success'};
+
+
+
+  colors = ['grey', 'orange', 'dark blue', 'blue', 'bright blue', 'red', 'maroon', 'green', 'celeste', 'yellow', 'olive', 'silver', 'black', 'magneta', 'purple', 'pink', 'steel', 'darkest blue', 'bright green', 'dark green', 'darkest green', 'light green', 'brown', 'dark brown', 'dark red', 'light red', 'neon'];
+  colorsMap: any = {'grey': 'default', 'orange': 'warning', 'dark blue': 'primary', 'blue': 'info', 'bright blue' : 'bluebright', 'red': 'danger','green': 'success', 'celeste':'celeste', 'yellow': 'yellow', 'maroon': 'maroon', 'olive':'olive','brown':'brown', 'silver':'silver', 'black':'black', 'magneta':'magneta', 'purple':'purple', 'pink':'pink', 'steel':'steel', 'darkest blue':'bluedarkest', 'bright green':'greenbright', 'dark green': 'greendark', 'darkest green' :'greendarkest', 'light green': 'greenlight', 'dark brown':'browndark', 'dark red':'reddark', 'light red':'redlight', 'neon':'neon'};
   
   errorHandler = error => console.error('ProjectsService error', error);
   
