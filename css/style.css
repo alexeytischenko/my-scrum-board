@@ -69,7 +69,7 @@ body { background-color:#fafafa;}
       margin: 0 auto;
   }
 
-  .overworked {color: #D03B3B;}
+  .overworked {color: #D03B3B!important;}
 
 
 /* additional colors*/
