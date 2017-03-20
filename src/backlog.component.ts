@@ -241,22 +241,22 @@ export class BackLogComponent {
       //updates current values   
       console.info ("BackLogComponent:countListsLength()");   
 
-      if (this.backLog && this.backLog.length > 0) {
+      var blLength  = 0;
+      var asLength = 0;
 
-        let blLength  = 0;
-        let asLength = 0;
+      if (this.backLog && this.backLog.length > 0) {
 
         this.backLog.forEach((element) => {
           if(element.type == "b") blLength++; 
           if(element.type == "s") asLength++; 
         });
-
-        this.backLogLength = blLength;
-        this.sprintLength = asLength;
-
-        // forcing Angular to detect changes in model, otherwise it takes much time to update them
-        if (this.ref) this.ref.detectChanges();
       }
+      
+      this.backLogLength = blLength;
+      this.sprintLength = asLength;
+
+      // forcing Angular to detect changes in model, otherwise it takes much time to update them
+      if (this.ref) this.ref.detectChanges();
   }
 
   private addToFilter(key : string, value: string) {
