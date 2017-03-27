@@ -54,6 +54,7 @@ import { ReactiveFormsModule, FormControl, FormGroup, FormBuilder, Validators } 
             <label for="project">Project</label>
             <div class="form-inline">
               <select formControlName="project" id="project" required  class="form-control input-sm w50" [ngModel]="task.project">
+                <option></option>
                 <option *ngFor="let pr of projects" [value]="pr.id">{{pr.name}}</option>
               </select>
               <newproject (save)="updateProjectsSelect($event)"></newproject>              
@@ -102,7 +103,7 @@ export class TaskEditComponent implements OnInit, OnDestroy {
       'required': 'Estimate is required.',
       'pattern' : 'Estimate is a number between 0 and 999 and one digit after the decimal' 
     },
-    'project' : {'required':      'Name is required.', }
+    'project' : {'required': 'Project is required.', }
   };                                                          // validation error messages
 
 

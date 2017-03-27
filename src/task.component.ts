@@ -74,6 +74,7 @@ import { Subscription } from 'rxjs/Subscription';
                   [class.label-success]="task.status==='resolved'" 
                   [class.label-info]="task.status==='review'"
                   [class.label-default]="task.status==='idle'"
+                  [class.label-danger]="task.status==='skipped'"
                   >
                     {{task.status}}
               </span>

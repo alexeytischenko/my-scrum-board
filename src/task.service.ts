@@ -11,7 +11,7 @@ export class TaskService {
   
   private baseUrl = 'https://myscrum-f606c.firebaseio.com';
   task;
-  taskSatuses = ['idle', 'in progress', 'review', 'resolved'];
+  taskSatuses = ['idle', 'in progress', 'review', 'skipped', 'resolved'];
   openComments = [];
   openLogs = [];
   
