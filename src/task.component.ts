@@ -143,8 +143,11 @@ import { Subscription } from 'rxjs/Subscription';
                 ({{task.subtasks.length}}) 
                 <div class="total_estimate">total estimate : {{subTasksTotalEstimate}}h</div>
                 <div *ngIf="needToCorrectEstimate()" class="estimate_recalc">
-                  exceeds parent task estimate! click to fix 
-                  <span class="glyphicon glyphicon-alert" (click)="fixEstimate(subTasksTotalEstimate)"></span>
+                  exceeds parent task estimate  
+                  <button class="btn btn-warning btn-xs" (click)="fixEstimate(subTasksTotalEstimate)">
+                    <span class="glyphicon glyphicon-alert"></span>
+                    <span class="hidden-xs">Fix it</span>
+                  </button>
                 </div>
             </span> 
             
@@ -213,8 +216,7 @@ import { Subscription } from 'rxjs/Subscription';
     .badge {background-color: #bbb;}
     .subtasks-group {margin-top: 20px;}
     .total_estimate {display: inline-block;margin-left: 10px; color: #999;}
-    .estimate_recalc {display: inline-block;margin-left: 10px; color: #999; font-style:italic;}
-    .estimate_recalc span {cursor: pointer;color: #D03B3B;}
+    .estimate_recalc {display: inline-block;margin-left: 10px; color: #999;}
   `]
 })
 export class TaskComponent implements OnInit, OnDestroy {
