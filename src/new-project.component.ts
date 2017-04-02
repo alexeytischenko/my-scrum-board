@@ -60,7 +60,7 @@ export class NewProject {
         progress_start("red");
         this.projectsService.saveProject(this.userId, projectToAdd)
             .catch((error)=>this.projectsService.errorHandler(error))
-            .then((newId)=> {    
+            .then((newId : {})=> {    
                 //finally / default    
                 //clean newProject form, emit output event with new node ID, close progressbar
                 this.clear();
