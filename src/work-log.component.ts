@@ -38,7 +38,7 @@ import { WorkLogService } from './work-log.service';
           </div>
           <div *ngIf="loading" class="loader"></div>
           <ul [hidden]="!openLog || loading">
-               <template ngFor let-log [ngForOf]="logs">
+               <ng-template ngFor let-log [ngForOf]="logs">
                 <li id="{{log.id}}" 
                       onmouseOver="$(this).find('div.comment_context_menu').show();"
                       onmouseOut="$(this).find('div.comment_context_menu').hide();"
@@ -63,7 +63,7 @@ import { WorkLogService } from './work-log.service';
 
 
                 </li>
-              </template>  
+              </ng-template>  
           </ul>
     </section>
 

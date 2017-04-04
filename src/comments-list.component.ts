@@ -24,7 +24,7 @@ import { CommentsListService } from './comments-list.service';
           </div>
           <div *ngIf="loading" class="loader"></div>
           <ul [hidden]="!openComments || loading">
-               <template ngFor let-comment [ngForOf]="comments">
+               <ng-template ngFor let-comment [ngForOf]="comments">
                 <li id="{{comment.id}}" 
                       onmouseOver="$(this).find('div.comment_context_menu').show();"
                       onmouseOut="$(this).find('div.comment_context_menu').hide();"
@@ -49,7 +49,7 @@ import { CommentsListService } from './comments-list.service';
                     </div>
                   </div>
                 </li>
-              </template>  
+              </ng-template>  
           </ul>
     </section>
 

@@ -13,12 +13,12 @@ import { EditProject } from './edit-project.component';
           <editproject></editproject>
           <ul class="list-group" id="projects">
               <li class="list-group-item disabled">Projects</li>
-              <template ngFor let-prElement [ngForOf]="projects">
+              <ng-template ngFor let-prElement [ngForOf]="projects">
                 <li class="list-group-item" id="{{prElement.id}}">
                   <a href="javascript:void(0);" (click)="epc.editProject(prElement)">{{prElement.name}}</a>
                   <span class="label label-{{prElement.color}}">{{prElement.sname}}</span> 
                 </li>
-              </template>
+              </ng-template>
           </ul>
       </div>
     </section>

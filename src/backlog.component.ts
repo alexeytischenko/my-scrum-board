@@ -8,6 +8,14 @@ import { Project } from './project.class';
   selector: 'scrum-board',
   template: `
     <div class="form-inline filters">
+        <button class="btn btn-default btn-sm" type="button" *ngIf="true">
+            <span class="glyphicon glyphicon-star"></span>
+            <span class="hidden-xs">Starred only</span>
+        </button>
+        <button class="btn btn-link btn-xs" *ngIf="false" alt="Show all" title="Show all">
+                <span class="glyphicon glyphicon-minus-sign"></span>
+                starred tasks
+        </button>
         <span class="dropdown">
           <button class="btn btn-default dropdown-toggle btn-sm" type="button" data-toggle="dropdown">
             <span class="glyphicon glyphicon-filter"></span>
@@ -21,12 +29,12 @@ import { Project } from './project.class';
           </ul>
         </span>
 
-        <template ngFor let-prj [ngForOf]="projectsService.projects">
+        <ng-template ngFor let-prj [ngForOf]="projectsService.projects">
           <button class="btn btn-link btn-xs" (click)="removeFromFilter(prj.id)" *ngIf="ifInFilter(prj.id)" alt="Remove from filter" title="Remove from filter">
                 <span class="glyphicon glyphicon-minus-sign"></span>
                 {{prj.sname}}
           </button>
-        </template>
+        </ng-template>
     </div>
     <section>
           <ul class="list-group list-group-sortable connected" id="sprnt">
@@ -37,13 +45,11 @@ import { Project } from './project.class';
                   </a>
                   <ul class="dropdown-menu dropdown-menu-right nodrug">
                     <li class="nodrug"><a href="javascript:void(0);" (click)="moveResolvedToBackLog()">Move resolved items to Backlog</a></li>
-                    <li class="nodrug"><span class="cant_choose">Move resolved items to Archive</span></li>
                     <li class="nodrug"><span class="cant_choose">Delete resolved items</span></li>
-                    
                   </ul>
                 </span>
               </li>
-              <template ngFor let-taskElement [ngForOf]="backLog">
+              <ng-template ngFor let-taskElement [ngForOf]="backLog">
                 <li *ngIf="taskElement.type=='s'" class="list-group-item" id="{{taskElement.id}}">
                   <a [routerLink]="['/tasks', taskElement.id]" [class.resolved]="taskElement.status==='resolved'" [class.skipped]="taskElement.status==='skipped'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code ? taskElement.code : 0}}</span> 
@@ -53,14 +59,23 @@ import { Project } from './project.class';
                   <i>{{(taskElement.status==='skipped') ? ' skipped' : ''}}</i>
                   <span class="badge hidden-xs {{(isWrongEstimate(taskElement.worked, taskElement.estimate)) ? 'overworked' : ''}}"> {{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h</span>
                 </li>
-              </template>
+              </ng-template>
   
           </ul>
     </section>
     <section>
           <ul class="list-group list-group-sortable connected" id="bklg">
-              <li style="margin-top:20px;" class="list-group-item disabled upbar">Backlog ( {{backLogLength}} issues )</li>
-               <template ngFor let-taskElement [ngForOf]="backLog">
+              <li style="margin-top:20px;" class="list-group-item disabled upbar">Backlog ( {{backLogLength}} issues )
+                  <span class="dropdown nodrug" style="float:right;">
+                    <a class="dropdown-toggle nodrug" type="button" data-toggle="dropdown">
+                      <span class="glyphicon glyphicon-align-justify accord nodrug"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right nodrug">
+                      <li class="nodrug"><span class="cant_choose">Delete resolved items</span></li>
+                    </ul>
+                  </span>
+              </li>
+               <ng-template ngFor let-taskElement [ngForOf]="backLog">
                 <li *ngIf="taskElement.type=='b'" class="list-group-item" id="{{taskElement.id}}">
                   <a [routerLink]="['/tasks', taskElement.id]" [class.resolved]="taskElement.status==='resolved'" [class.skipped]="taskElement.status==='skipped'">{{taskElement.name}}</a> 
                   <span class="label label-{{taskElement.project_color}}">{{taskElement.project}} - {{taskElement.code ? taskElement.code : 0}}</span> 
@@ -70,7 +85,7 @@ import { Project } from './project.class';
                   <i>{{(taskElement.status==='skipped') ? ' skipped' : ''}}</i>
                   <span class="badge hidden-xs {{(isWrongEstimate(taskElement.worked, taskElement.estimate)) ? 'overworked' : ''}}"> {{taskElement.worked ? taskElement.worked : '0'}}h / {{taskElement.estimate ? taskElement.estimate : '0'}}h </span>
                 </li>
-              </template>  
+              </ng-template>  
           </ul>
     </section>
   `,

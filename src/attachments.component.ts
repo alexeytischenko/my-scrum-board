@@ -23,7 +23,7 @@ import { AttachmentsService } from './attachments.service';
           </div>
           <div *ngIf="loading" class="loader"></div>
           <ul>
-               <template ngFor let-file [ngForOf]="attachments">
+               <ng-template ngFor let-file [ngForOf]="attachments">
                 <li id="{{file.id}}" 
                       onmouseOver="$(this).find('div.comment_context_menu').show();"
                       onmouseOut="$(this).find('div.comment_context_menu').hide();"
@@ -52,7 +52,7 @@ import { AttachmentsService } from './attachments.service';
                     </div>
                   </div>
                 </li>
-              </template>  
+              </ng-template>  
           </ul>
     </section>
 
