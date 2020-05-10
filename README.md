@@ -11,19 +11,19 @@ To work on this project:
 
 
 #### database.config.js  file
-====================
-  // Initialize Firebase
-  var config = {
-    apiKey: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-XXX",
-    authDomain: "xxxxxx-xxxx.firebaseapp.com",
-    databaseURL: "https://xxxxxx-xxxx.firebaseio.com",
-    storageBucket: "xxxxxx-xxxx.appspot.com",
-  };
+
+  // Initialize Firebase\
+  var config = {\
+    apiKey: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-XXX",\
+    authDomain: "xxxxxx-xxxx.firebaseapp.com",\
+    databaseURL: "https://xxxxxx-xxxx.firebaseio.com", \
+    storageBucket: "xxxxxx-xxxx.appspot.com",\
+  };\
   firebase.initializeApp(config);
-====================
 
 
-Compatability:
 
-Array.prototype.indexOf()   >=  IE9
+#### Compatability:
+
+Array.prototype.indexOf()   >=  IE9 \
 Object.keys(obj).length     >=  IE9
