@@ -1,10 +1,10 @@
-System.register([], function(exports_1, context_1) {
+System.register([], function (exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var Task;
     return {
-        setters:[],
-        execute: function() {
+        setters: [],
+        execute: function () {
             Task = (function () {
                 function Task(id, name, project, estimate, description, status, sortnum, created, updated, attachments, comments, worklog) {
                     this.id = id;
@@ -24,5 +24,5 @@ System.register([], function(exports_1, context_1) {
             }());
             exports_1("Task", Task);
         }
-    }
+    };
 });
